@@ -1,0 +1,53 @@
+# X-Clearlag — Russian Messages
+# Placeholders: %prefix%, %time%, %count%, %task%, %tps%
+
+reload-success: "%prefix% &aКонфигурация и задачи успешно перезагружены!"
+no-permission: "%prefix% &cУ вас нет прав на выполнение этого действия."
+unknown-command: "%prefix% &cНеизвестная подкоманда. Используйте &f/xcl help &cдля списка команд."
+
+clear-start: "%prefix% &eВыполнение задачи очистки..."
+cleared: "%prefix% &aУспешно удалено &c%count% &aсущностей/предметов."
+cleared-none: "%prefix% &aОчистка завершена. Сущности не были удалены."
+
+manual-clear-disabled: "%prefix% &cРучная очистка в данный момент отключена в конфигурации."
+cooldown: "%prefix% &cПожалуйста, подождите &e%time%s &cперед повторным запуском."
+invalid-task: "%prefix% &cЗадача '&f%task%&c' не найдена."
+
+tps-format: "%prefix% &7Текущий TPS: &e%tps%"
+
+# Help Menu
+help-header: "&b&lX-ClearLag Помощь"
+help-help: "&7/xcl help &8- &fПоказать это меню"
+help-reload: "&7/xcl reload &8- &fПерезагрузить конфигурацию"
+help-clear: "&7/xcl clear [task] &8- &fЗапустить очистку вручную"
+help-lag: "&7/xcl lag &8- &fПоказать статус производительности"
+help-stats: "&7/xcl stats &8- &fПоказать расширенные метрики"
+help-inspect: "&7/xcl inspect [x z] &8- &fПроверить чанк"
+help-clearchunk: "&7/xcl clearchunk [x z] &8- &fОчистить конкретный чанк"
+help-tpchunk: "&7/xcl tpchunk <x> <z> &8- &fТелепортироваться в чанк"
+help-update: "&7/xcl update &8- &fПроверить обновления"
+
+# Updates
+update-available: "%prefix% &aДоступно новое обновление! Текущая: &e%current% &aПоследняя: &e%latest%"
+update-download: "%prefix% &aСкачать здесь: &f%url%"
+update-current: "%prefix% &aВы используете последнюю версию."
+update-error: "%prefix% &cПроизошла ошибка при проверке обновлений."
+
+# Inspect & Chunk
+inspect-format: "%prefix% &bЧанк &e%x%, %z% &bв &e%world%&7: &f%items% Предметов, %mobs% Мобов &7(%total% Всего)"
+clearchunk-success: "%prefix% &aУспешно очищено &c%count% &aсущностей в чанке &e%x%, %z%&a."
+tpchunk-success: "%prefix% &aТелепортированы в чанк &e%x%, %z%&a."
+invalid-coordinates: "%prefix% &cНеверные координаты! Пожалуйста, используйте целые числа."
+player-only: "%prefix% &cЭта команда может быть выполнена только игроками."
+invalid-world: "%prefix% &cМир '&f%world%&c' не найден."
+
+# Stats & Lag
+stats-header: "&b&lX-ClearLag Расширенные Метрики"
+stats-total: "&7Всего удалено: &e%count%"
+stats-average: "&7Среднее за запуск: &e%avg%"
+stats-history-header: "&b&lИстория (Последние 5):"
+stats-history-entry: " &8[&7%time%&8] &e%task%&7: &b%count% &7удалено (TPS: %tps%)"
+stats-no-data: " &7- Данных пока нет."
+lag-header: "&b&lX-ClearLag Статус Производительности"
+lag-tps: "&7TPS: %color%%tps%"
+lag-memory: "&7Память: &e%used%МБ&7 / &e%max%МБ"

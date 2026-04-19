@@ -1,0 +1,172 @@
+package com.fabian.xclearlag;
+
+import org.bukkit.Bukkit;
+import org.bukkit.plugin.java.JavaPlugin;
+import com.fabian.xclearlag.commands.*;
+import com.fabian.xclearlag.config.*;
+import com.fabian.xclearlag.services.*;
+import com.fabian.xclearlag.utils.*;
+import com.fabian.xclearlag.utils.scheduler.*;
+import com.fabian.xclearlag.api.XClearlagAPI;
+
+/**
+ * Main plugin class for X-Clearlag.
+ * Refactored for modularity, custom events, and elite-level API.
+ */
+public class XClearlag extends JavaPlugin {
+
+    private ConfigManager configManager;
+    private MessageManager messageManager;
+    private TaskManager taskManager;
+    private UpdateChecker updateChecker;
+    private TPSMonitor tpsMonitor;
+    private Object tpsMonitorTask;
+    private TpsCleanupService tpsCleanupService;
+    private SchedulerAdapter schedulerAdapter;
+    
+    private MetricsTracker metricsTracker;
+    private CommandDispatcher commandDispatcher;
+    private ClearExecutor clearExecutor;
+    private BossBarManager bossBarManager;
+    private CleanupNotifier cleanupNotifier;
+
+    @Override
+    public void onEnable() {
+        try {
+            saveDefaultConfig();
+            XClearlagAPI.init(this);
+            
+            initScheduler();
+            initManagers();
+            initServices();
+            initCommands();
+            
+            // PlaceholderAPI Integration
+            if (getServer().getPluginManager().getPlugin("PlaceholderAPI") != null) {
+                new XPlaceholderExpansion(this).register();
+                getLogger().info("Found PlaceholderAPI! Custom placeholders registered.");
+            }
+            
+            getLogger().info("X-Clearlag v" + getDescription().getVersion() + " initialized successfully.");
+        } catch (Exception e) {
+            getLogger().severe("CRITICAL FAILURE DURING STARTUP: " + e.getMessage());
+            e.printStackTrace();
+            getServer().getPluginManager().disablePlugin(this);
+        }
+    }
+
+    private void initManagers() {
+        getLogger().info("Loading managers...");
+        configManager = new ConfigManager(this);
+        try {
+            configManager.load();
+        } catch (Exception e) {
+            getLogger().severe("Failed to load config: " + e.getMessage());
+        }
+
+        messageManager = new MessageManager(this);
+        try {
+            messageManager.load();
+        } catch (Exception e) {
+            getLogger().severe("Failed to load messages: " + e.getMessage());
+        }
+        
+        taskManager = new TaskManager(this);
+    }
+
+    private void initServices() {
+        getLogger().info("Initializing services...");
+        
+        // 1. Core Utilities
+        tpsMonitor = new TPSMonitor();
+        tpsMonitorTask = schedulerAdapter.runTaskTimer(tpsMonitor, 1L, 1L);
+        
+        commandDispatcher = new CommandDispatcher(this);
+        bossBarManager = new BossBarManager(configManager);
+        cleanupNotifier = new CleanupNotifier(messageManager, bossBarManager, getLogger());
+        
+        // 2. Functional Services
+        metricsTracker = new MetricsTracker(tpsMonitor);
+        clearExecutor = new ClearExecutor(this, configManager);
+
+        // 3. Lifecycle Managers
+        taskManager.loadTasks();
+        
+        tpsCleanupService = new TpsCleanupService(this, configManager, tpsMonitor, taskManager, schedulerAdapter);
+        tpsCleanupService.start();
+
+        updateChecker = new UpdateChecker(this);
+        schedulerAdapter.runTaskLater(() -> updateChecker.checkForUpdates(), 100L);
+    }
+
+    private void initCommands() {
+        getLogger().info("Registering commands...");
+        XClearlagCommand commandHandler = new XClearlagCommand(this);
+        org.bukkit.command.PluginCommand xclCmd = getCommand("xcl");
+        if (xclCmd != null) {
+            xclCmd.setExecutor(commandHandler);
+            xclCmd.setTabCompleter(commandHandler);
+        }
+    }
+
+    @Override
+    public void onDisable() {
+        if (taskManager != null) taskManager.stopAll();
+        if (tpsCleanupService != null) tpsCleanupService.stop();
+        if (tpsMonitorTask != null) schedulerAdapter.cancelTask(tpsMonitorTask);
+        if (bossBarManager != null) bossBarManager.hide();
+    }
+
+    public void reload() {
+        try {
+            reloadConfig();
+            configManager.load();
+            messageManager.load();
+            metricsTracker.reset();
+            taskManager.loadTasks();
+            if (tpsCleanupService != null) {
+                tpsCleanupService.stop();
+                tpsCleanupService.start();
+            }
+            getLogger().info("X-Clearlag reloaded successfully.");
+        } catch (Exception e) {
+            getLogger().severe("Failed to reload plugin: " + e.getMessage());
+        }
+    }
+
+    private void initScheduler() {
+        boolean isFolia = false;
+        try {
+            // Check for Folia by looking for the GlobalRegionScheduler method
+            // This is more reliable than Class.forName across different versions
+            Bukkit.getServer().getClass().getMethod("getGlobalRegionScheduler");
+            isFolia = true;
+        } catch (Throwable ignored) {
+            // Fallback to class check
+            try {
+                Class.forName("io.papermc.paper.threadedregionscheduler.RegionScheduler");
+                isFolia = true;
+            } catch (Throwable ignored2) {}
+        }
+
+        if (isFolia) {
+            schedulerAdapter = new FoliaSchedulerAdapter(this);
+            getLogger().info("Folia detected! Using regional scheduler adapter.");
+        } else {
+            schedulerAdapter = new BukkitSchedulerAdapter(this);
+            getLogger().info("Standard Bukkit/Paper detected! Using standard scheduler adapter.");
+        }
+    }
+
+    public SchedulerAdapter getSchedulerAdapter() { return schedulerAdapter; }
+    public ConfigManager getConfigManager() { return configManager; }
+    public MessageManager getMessageManager() { return messageManager; }
+    public TaskManager getTaskManager() { return taskManager; }
+    public UpdateChecker getUpdateChecker() { return updateChecker; }
+    public TPSMonitor getTpsMonitor() { return tpsMonitor; }
+    public MetricsTracker getMetricsTracker() { return metricsTracker; }
+    public CommandDispatcher getCommandDispatcher() { return commandDispatcher; }
+    public ClearExecutor getClearExecutor() { return clearExecutor; }
+    public BossBarManager getBossBarManager() { return bossBarManager; }
+    public CleanupNotifier getCleanupNotifier() { return cleanupNotifier; }
+}

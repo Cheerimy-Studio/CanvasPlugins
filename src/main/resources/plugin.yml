@@ -1,0 +1,32 @@
+name: X-Clearlag
+version: 1.7
+main: com.fabian.xclearlag.XClearlag
+description: Advanced entity and item cleanup plugin (Elite Pro Edition).
+author: Fabián ツ
+api-version: 1.13
+folia-supported: true
+
+# Declaración de comandos (Compatible con todas las versiones)
+commands:
+  xcl:
+    description: Main command for X-Clearlag.
+    aliases: [xclearlag, cl, clear]
+    permission: xclearlag.admin
+
+# Dependencias
+depend: [PlaceholderAPI]
+
+# Registro completo de permisos
+permissions:
+  xclearlag.admin:
+    description: Full access to X-Clearlag commands.
+    default: op
+  xclearlag.admin.stats:
+    description: Access to cleanup history and statistics.
+    default: op
+  xclearlag.admin.reload:
+    description: Allows reloading the plugin configuration.
+    default: op
+  xclearlag.notify:
+    description: Receive notifications when a cleanup is triggered.
+    default: op

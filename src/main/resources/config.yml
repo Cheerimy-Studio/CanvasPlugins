@@ -1,0 +1,303 @@
+# ========================================================================
+#  __  __         ____ _                 _                 
+#  \ \/ /        / ___| | ___  __ _ _ __| |    __ _  __ _  
+#   \  /  _____ | |   | |/ _ \/ _` | '__| |   / _` |/ _` | 
+#   /  \ |_____|| |___| |  __/ (_| | |  | |__| (_| | (_| | 
+#  /_/\_\       \____|_|\___|\__,_|_|  |_____\__,_|\__, | 
+#                                                  |___/  
+#
+#   X-ClearLag Configuration
+# ========================================================================
+
+# Prefix shown in all plugin messages.
+# Supports color codes with & (e.g. &a = green, &c = red, &b = aqua).
+prefix: "&8[&bX-ClearLag&8] &7"
+
+# Main language for plugin messages.
+# Available options:
+#   "en"     -> English
+#   "es"     -> Spanish
+#   "pt"     -> Portuguese
+#   "ja"     -> Japanese
+#   "ru"     -> Russian
+#   "custom" -> Custom (edit plugins/X-Clearlag/messages/custom.yml)
+# Message files are stored in: plugins/X-Clearlag/messages/<language>.yml
+language: "en"
+
+# ============================================================
+#   GLOBAL SETTINGS
+# ============================================================
+worlds:
+  # List of worlds (exact names) where X-Clearlag will NEVER run.
+  # Entities and item drops in these worlds will be 100% protected.
+  blacklist:
+    - "spawn"
+    - "lobby"
+
+# ============================================================
+#   TPS MONITORING & AUTO-CLEANUP
+#
+#   Monitors server performance and automatically triggers 
+#   emergency cleanups if severe lag is detected.
+# ============================================================
+tps-check:
+  # Enable automatic emergency cleanups when TPS drops?
+  enabled: true
+  
+  # Minimum TPS threshold. If the server's TPS falls below this,
+  # an emergency cleanup will be triggered.
+  # 20.0 = Perfect, 16.0 = Noticeable lag, <10.0 = Severe lag.
+  threshold: 16.0
+  
+  # How often (in seconds) the plugin checks the current TPS.
+  interval: 60
+  
+  # Which task(s) from the 'tasks' section (below) should be executed during lag?
+  # You can list multiple tasks separated by commas: ["clearlag", "save_world"]
+  task-to-run: ["clearlag"]
+
+  # Cooldown between automatic emergency cleanups (in seconds).
+  # Prevents the server from spamming cleanups if the lag takes time to recover.
+  cooldown-seconds: 60
+
+# ============================================================
+#   BOSSBAR SETTINGS (Requires Minecraft 1.9+)
+#
+#   Shows a progress bar at the top of the screen during 
+#   cleanup countdowns.
+# ============================================================
+bossbar:
+  # Enable BossBar during the countdown?
+  enabled: false
+  
+  # Bar color. 
+  # Options: BLUE, GREEN, PINK, PURPLE, RED, WHITE, YELLOW
+  color: "RED"
+  
+  # Visual style of the progress bar (solid or segmented).
+  # Options: SOLID, SEGMENTED_6, SEGMENTED_10, SEGMENTED_12, SEGMENTED_20
+  style: "SOLID"
+  
+  # Title displayed on the bar. 
+  # Use %time% to show the remaining seconds. Supports color codes.
+  title: "&e&lCleaning in &c&l%time%s"
+
+# ============================================================
+#   AUTOMATIC SCHEDULED TASKS (tasks)
+#
+#   You can define as many tasks as you want.
+#   Each task runs independently on its own interval.
+#
+#   Available options per task (detailed explanation):
+#
+#   enabled          -> true/false. 
+#                       Determines if the task is active. If false, the task and its countdowns are ignored.
+#
+#   interval         -> Time in SECONDS between each task execution.
+#                       Example: 300 = every 5 minutes, 1800 = every 30 minutes.
+#                       This is the total lifecycle of the task.
+#
+#   min-players      -> Minimum number of online players required for the task to run.
+#                       If there are fewer players than the minimum, the timer is paused/reset.
+#                       Use 0 so it always runs regardless of who is online.
+#                       Default: 0 
+#
+#   countdown        -> List of specific seconds BEFORE the cleanup when players are warned.
+#                       Example: [60, 30, 10, 5, 3, 2, 1] 
+#                       If you want to completely disable warnings, use empty brackets: []
+#
+#   remove-drops     -> true/false. 
+#                       If true, the task will automatically remove all items dropped on the ground, 
+#                       even if 'DROPPED_ITEM' is not explicitly listed in 'entities'.
+#
+#   protect-named    -> true/false. 
+#                       If true, mobs with a custom name (e.g. via Name Tag) and items
+#                       renamed in an anvil will NOT be removed.
+#                       Highly recommended to set to true to prevent players from losing pets or valuable items!
+#
+#   protect-leashed  -> true/false. 
+#                       If true, animals and mobs that are currently attached to a lead/leash 
+#                       will NOT be removed, thus protecting player farms.
+#
+#   protect-near-player -> true/false.
+#                       If true, all entities and items within 'near-player-radius' blocks of 
+#                       ANY living player will be ignored and protected. Great for PvP and mining.
+#
+#   near-player-radius  -> Integer.
+#                       Defines the radius (in blocks) to protect entities if 'protect-near-player' is true.
+#                       Example: 16 (protects a 16-block radius around every online player).
+#
+#   entities         -> List of entity types that the task MUST REMOVE.
+#                       Use the EXACT Bukkit EntityType names.
+#                       Reference: https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/entity/EntityType.html
+#                       If empty [], the task will not selectively remove any entities.
+#
+#   protected-entities -> List of entity types that will NEVER be removed by this task,
+#                         regardless of what the original 'entities' list says.
+#                         Acts as an absolute safety White-List.
+#                         Common examples: PLAYER, VILLAGER, ARMOR_STAND.
+#
+#   commands         -> List of console commands to execute IMMEDIATELY AFTER the cleanup occurs.
+#                       Do NOT put "/" at the start of the command (they are sent to the console).
+#                       Example: ["save-all", "broadcast The server has been cleaned and saved!"]
+#
+#   countdown-commands -> Map assigning specific countdown seconds to lists of special commands.
+#                         Useful for sending Titles, Actionbar messages, or sounds.
+#                         Supports special plugin tags to avoid console spam:
+#                         [TITLE], [SUBTITLE], [ACTIONBAR], [BROADCAST], [MESSAGE], [SOUND]
+#                         NOTE: If using pure Minecraft JSON format (json title), wrap the whole command in single quotes ' '.
+# ============================================================
+tasks:
+
+  # ----------------------------------------------------------
+  #   TASK 1: Main Entity and Item Drop Cleanup
+  #   Runs cyclically every 5 minutes (300 seconds).
+  # ----------------------------------------------------------
+  clearlag:
+    enabled: true
+
+    # Task interval in seconds (300 = 5 minutes)
+    interval: 300
+
+    # Trigger cleanup only if there are at least 3 players online
+    min-players: 3
+
+    # Remove all dropped items on the ground indiscriminately?
+    remove-drops: true
+
+    # Protect mobs and items with custom names? (Prevents crying)
+    protect-named: true
+
+    # Protect entities held by a leash in farms?
+    protect-leashed: true
+
+    # Protect recent drops or standing entities close to players?
+    protect-near-player: false
+    near-player-radius: 16
+
+    # Exact seconds that will trigger the warning commands prior to cleanup
+    countdown: [60, 30, 10, 5, 3, 2, 1]
+
+    # Clean system without annoying console logs, uses native tags
+    countdown-commands:
+      60:
+        - '[TITLE] &b&lX-ClearLag'
+        - '[SUBTITLE] &7General cleanup in &c60s'
+        - '[SOUND] NOTE_PLING'
+      30:
+        - '[TITLE] &b&lX-ClearLag'
+        - '[SUBTITLE] &7General cleanup in &c30s'
+      10:
+        - '[ACTIONBAR] &eEntities removed in &c10s&e!'
+
+    # List of heavy or chaotic entities we want to clean globally.
+    entities:
+      - ARROW               # Stuck arrows
+      - SNOWBALL            # Snowballs
+      - EGG                 # Thrown farm eggs
+      - FIREBALL            # Loose fireballs
+      - SMALL_FIREBALL      # Blazer fireballs
+      - THROWN_EXP_BOTTLE   # Thrown EXP bottles
+      - SPLASH_POTION       # Lingering splash potions
+      - LINGERING_POTION    # Lingering smoke potions (1.9+)
+      - EXPERIENCE_ORB      # Lag-causing green exp orbs
+
+    # Absolute "Whitelist". Never remove these:
+    protected-entities:
+      - PLAYER              # Players (always protected as a precaution)
+      - VILLAGER            # Valuable trading villagers
+      - IRON_GOLEM          # Iron golems
+      - SNOW_GOLEM          # Snow golems
+      - ARMOR_STAND         # Armor stands (they are entities)
+      - ITEM_FRAME          # Glowing item frames
+      - PAINTING            # Paintings
+
+    # Empty post-execution options
+    commands: []
+
+  # ----------------------------------------------------------
+  #   TASK 2: Silent Auto-Save
+  #   Runs every half hour (1800 seconds).
+  #   Use this only to trigger a server save command.
+  # ----------------------------------------------------------
+  save_world:
+    enabled: true
+
+    # Every 1800 seconds (30 mins)
+    interval: 1800
+    
+    # Minimum 5 Players
+    min-players: 5
+
+    # Alerts 30 and 10 seconds before the save
+    countdown: [30, 10]
+
+    # No active cleanup is needed for this task
+    remove-drops: false
+    protect-named: true
+    protect-leashed: true
+
+    # Empty victim list
+    entities: []
+
+    protected-entities:
+      - PLAYER
+
+    # Triggers the "save-all" command directly on the Bukkit server console
+    commands:
+      - "save-all"
+
+# ============================================================
+#   MANUAL CLEAR COMMAND (/xcl clear)
+# ============================================================
+manual-clear:
+  # Enable Admins to force-execute a cleanup?
+  enabled: true
+
+  # Which automated tasks from above will be triggered when an Admin uses the command?
+  tasks:
+    - clearlag
+
+  # Allow the admin to target specific tasks? (e.g. '/xcl clear save_world')
+  allow-specific: true
+
+  # Broadcast and send messages to all players when an admin runs it globally?
+  broadcast: true
+
+  # Ignore the 'min-players' requirement from the task config
+  # and simply force the execution regardless?
+  ignore-min-players: true
+
+  # If we run the command... force the instant cleanup of entities,
+  # or trigger the countdown stage specified in the configuration?
+  # 'true' cleans instantly, 'false' starts sending 60,30,10 alerts and then cleans.
+  instant: true
+
+  # Anti-spam cooldown (in seconds) to limit command usage by abusive admins
+  cooldown: 30
+
+# ============================================================
+#   PRO PERFORMANCE OPTIMIZATIONS (Advanced)
+#
+#   Ultra-low level settings for the plugin's core.
+# ============================================================
+optimizations:
+  # 'Batch removal'. Amount of entities the plugin can delete in 1 single processing "tick" (1/20 sec).
+  # If there are 2,000 spare entities on the server, instead of deleting all 2,000 at the exact same moment
+  # and freezing the main thread (sending mspt to the sky), it will gently delete them batch by batch
+  # every time the clock ticks.
+  # Set it to '0' to disable it if you prefer the "instant" micro-lags (Classic clearlag style).
+  # Recommendation: Between 100 and 200 entities per tick for massive servers running Folia/Paper.
+  batch-size: 100
+
+  # (Scanning Performance)
+  # How many "Chunks" the entity-finder scans per "tick".
+  # Prevents freezing the main thread by mapping an infinite 1000-player world all at once.
+  # Increasing it (e.g. 100) makes X-ClearLag faster at finding beasts or drops, but will require extra CPU spikes.
+  chunks-per-tick: 40
+
+# ------------------------------------------------------------------------------
+# INTERNAL SYSTEM SETTINGS (NEVER ALTER THIS!)
+# ------------------------------------------------------------------------------
+# Native tracker that allows us to update the config via automatic database versioning.
+config-version: 2

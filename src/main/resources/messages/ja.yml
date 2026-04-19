@@ -1,0 +1,53 @@
+# X-Clearlag — Japanese Messages
+# Placeholders: %prefix%, %time%, %count%, %task%, %tps%
+
+reload-success: "%prefix% &a設定とタスクが正常にリロードされました！"
+no-permission: "%prefix% &cこのアクションを実行する権限がありません。"
+unknown-command: "%prefix% &c不明なサブコマンドです。&f/xcl help &cでコマンドリストを表示してください。"
+
+clear-start: "%prefix% &eクリーナータスクを実行中..."
+cleared: "%prefix% &c%count% &a個のエンティティ/アイテムを正常に削除しました。"
+cleared-none: "%prefix% &aクリーンアップが完了しました。削除されたエンティティはありません。"
+
+manual-clear-disabled: "%prefix% &c手動クリーンアップは現在設定で無効になっています。"
+cooldown: "%prefix% &c再度実行するには &e%time%秒 &c待ってください。"
+invalid-task: "%prefix% &cタスク「&f%task%&c」が見つかりません。"
+
+tps-format: "%prefix% &7現在のTPS: &e%tps%"
+
+# Help Menu
+help-header: "&b&lX-ClearLag ヘルプ"
+help-help: "&7/xcl help &8- &fこのメニューを表示"
+help-reload: "&7/xcl reload &8- &f設定をリロード"
+help-clear: "&7/xcl clear [task] &8- &f手動クリーンアップを実行"
+help-lag: "&7/xcl lag &8- &fサーバーパフォーマンスを表示"
+help-stats: "&7/xcl stats &8- &f詳細なメトリクスを表示"
+help-inspect: "&7/xcl inspect [x z] &8- &fチャンクを調査"
+help-clearchunk: "&7/xcl clearchunk [x z] &8- &f特定のチャンクをクリア"
+help-tpchunk: "&7/xcl tpchunk <x> <z> &8- &fチャンクへテレポート"
+help-update: "&7/xcl update &8- &fアップデートを確認"
+
+# Updates
+update-available: "%prefix% &a新しいアップデートがあります！ 現在: &e%current% 最新: &e%latest%"
+update-download: "%prefix% &aここからダウンロード: &f%url%"
+update-current: "%prefix% &a最新バージョンを使用しています。"
+update-error: "%prefix% &cアップデート確認中にエラーが発生しました。"
+
+# Inspect & Chunk
+inspect-format: "%prefix% &bチャンク &e%x%, %z% &b(&e%world%&7): &f%items% アイテム, %mobs% モブ &7(合計 %total%)"
+clearchunk-success: "%prefix% &aチャンク &e%x%, %z% &aの &c%count% &a個のエンティティを削除しました。"
+tpchunk-success: "%prefix% &aチャンク &e%x%, %z% &aへテレポートしました。"
+invalid-coordinates: "%prefix% &c無効な座標です！ 整数を使用してください。"
+player-only: "%prefix% &cこのコマンドはプレイヤーのみ実行可能です。"
+invalid-world: "%prefix% &cワールド「&f%world%&c」が見つかりません。"
+
+# Stats & Lag
+stats-header: "&b&lX-ClearLag 詳細メトリクス"
+stats-total: "&7総削除数: &e%count%"
+stats-average: "&71回あたりの平均: &e%avg%"
+stats-history-header: "&b&l最近の履歴 (最新5件):"
+stats-history-entry: " &8[&7%time%&8] &e%task%&7: &b%count% &7削除 (TPS: %tps%)"
+stats-no-data: " &7- まだデータが記録されていません。"
+lag-header: "&b&lX-ClearLag パフォーマンス"
+lag-tps: "&7TPS: %color%%tps%"
+lag-memory: "&7メモリ: &e%used%MB&7 / &e%max%MB"

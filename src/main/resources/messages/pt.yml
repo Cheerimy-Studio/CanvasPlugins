@@ -1,0 +1,53 @@
+# X-Clearlag — Portuguese Messages
+# Placeholders: %prefix%, %time%, %count%, %task%, %tps%
+
+reload-success: "%prefix% &aConfiguração e tarefas recarregadas com sucesso!"
+no-permission: "%prefix% &cVocê não tem permissão para executar esta ação."
+unknown-command: "%prefix% &cSubcomando desconhecido. Use &f/xcl help &cpara uma lista de comandos."
+
+clear-start: "%prefix% &eExecutando tarefa de limpeza..."
+cleared: "%prefix% &aRemovido com sucesso &c%count% &aentidades/itens."
+cleared-none: "%prefix% &aLimpeza concluída. Nenhuma entidade foi removida."
+
+manual-clear-disabled: "%prefix% &cA limpeza manual está desativada na configuração."
+cooldown: "%prefix% &cPor favor, aguarde &e%time%s &cantes de executar novamente."
+invalid-task: "%prefix% &cTarefa '&f%task%&c' não encontrada."
+
+tps-format: "%prefix% &7TPS Atual: &e%tps%"
+
+# Help Menu
+help-header: "&b&lX-ClearLag Ajuda"
+help-help: "&7/xcl help &8- &fMostrar este menu"
+help-reload: "&7/xcl reload &8- &fRecarregar configuração"
+help-clear: "&7/xcl clear [task] &8- &fAcionar limpeza manual"
+help-lag: "&7/xcl lag &8- &fMostrar status de desempenho"
+help-stats: "&7/xcl stats &8- &fMostrar métricas avançadas"
+help-inspect: "&7/xcl inspect [x z] &8- &fInspecionar chunks"
+help-clearchunk: "&7/xcl clearchunk [x z] &8- &fLimpar chunk específico"
+help-tpchunk: "&7/xcl tpchunk <x> <z> &8- &fTeleportar para chunk"
+help-update: "&7/xcl update &8- &fVerificar atualizações"
+
+# Updates
+update-available: "%prefix% &aNova atualização disponível! Atual: &e%current% &aÚltima: &e%latest%"
+update-download: "%prefix% &aBaixe aqui: &f%url%"
+update-current: "%prefix% &aVocê está usando a versão mais recente."
+update-error: "%prefix% &cOcorreu um erro ao verificar atualizações."
+
+# Inspect & Chunk
+inspect-format: "%prefix% &bChunk &e%x%, %z% &bem &e%world%&7: &f%items% Itens, %mobs% Mobs &7(%total% Total)"
+clearchunk-success: "%prefix% &aLimpeza de &c%count% &aentidades no chunk &e%x%, %z% &aconcluída."
+tpchunk-success: "%prefix% &aTeleportado para o chunk &e%x%, %z%&a."
+invalid-coordinates: "%prefix% &cCoordenadas inválidas! Por favor, use números inteiros."
+player-only: "%prefix% &cEste comando só pode ser executado por jogadores."
+invalid-world: "%prefix% &cMundo '&f%world%&c' não encontrado."
+
+# Stats & Lag
+stats-header: "&b&lMétricas Avançadas X-ClearLag"
+stats-total: "&7Total Removido: &e%count%"
+stats-average: "&7Média por execução: &e%avg%"
+stats-history-header: "&b&lHistórico Recente (Last 5):"
+stats-history-entry: " &8[&7%time%&8] &e%task%&7: &b%count% &7removidos (TPS: %tps%)"
+stats-no-data: " &7- Nenhum dado registrado ainda."
+lag-header: "&b&lStatus de Desempenho X-ClearLag"
+lag-tps: "&7TPS: %color%%tps%"
+lag-memory: "&7Memória: &e%used%MB&7 / &e%max%MB"

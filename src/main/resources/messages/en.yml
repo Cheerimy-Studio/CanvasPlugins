@@ -1,0 +1,60 @@
+# X-Clearlag — English Messages
+# Placeholders: %prefix%, %time%, %count%, %task%, %tps%
+
+reload-success: "%prefix% &aConfiguration and tasks reloaded successfully!"
+no-permission: "%prefix% &cYou don't have permission to perform this action."
+unknown-command: "%prefix% &cUnknown subcommand. Use &f/xcl help &cfor a list of commands."
+
+clear-start: "%prefix% &eExecuting cleanup task..."
+cleared: "%prefix% &aSuccessfully removed &c%count% &aentities/items."
+cleared-none: "%prefix% &aCleanup completed. No entities were removed."
+
+manual-clear-disabled: "%prefix% &cManual cleanup is currently disabled in the config."
+cooldown: "%prefix% &cPlease wait &e%time%s &cbefore running this again."
+invalid-task: "%prefix% &cTask '&f%task%&c' not found."
+
+tps-format: "%prefix% &7Current TPS: &e%tps%"
+
+manual-clear-start: "%prefix% &7Triggering manual cleanup for '&f%task%&7'..."
+global-clear-start: "%prefix% &7Triggering global cleanup for all configured tasks..."
+command-usage: "%prefix% &cUsage: /xcl <cmd> [world] <x> <z> or /xcl <cmd> <x> <z>"
+
+# Help Menu
+help-header: "&b&lX-ClearLag Help"
+help-help: "&7/xcl help &8- &fShow this menu"
+help-reload: "&7/xcl reload &8- &fReload configuration"
+help-clear: "&7/xcl clear [task] &8- &fManually trigger cleanup"
+help-lag: "&7/xcl lag &8- &fShow server performance status"
+help-inspect: "&7/xcl inspect [x z] &8- &fInspect chunk entities"
+help-clearchunk: "&7/xcl clearchunk [x z] &8- &fClear specific chunk"
+help-tpchunk: "&7/xcl tpchunk <x> <z> &8- &fTeleport to chunk"
+help-stats: "&7/xcl stats &8- &fShow advanced cleanup metrics"
+help-update: "&7/xcl update &8- &fCheck for updates"
+
+# Updates
+update-available: "%prefix% &aNew update available! Current: &e%current% &aLatest: &e%latest%"
+update-download: "%prefix% &aDownload it here: &f%url%"
+update-current: "%prefix% &aYou are running the latest version."
+update-error: "%prefix% &cAn error occurred while checking for updates."
+
+# Inspect & Chunk
+inspect-format: "%prefix% &bChunk &e%x%, %z% &bIn &e%world%&7: &f%items% Items, %mobs% Mobs &7(%total% Total)"
+clearchunk-success: "%prefix% &aSuccessfully cleared &c%count% &aentities in chunk &e%x%, %z%&a."
+tpchunk-success: "%prefix% &aTeleported to chunk &e%x%, %z%&a."
+invalid-coordinates: "%prefix% &cInvalid coordinates! Please use integers."
+player-only: "%prefix% &cThis command can only be executed by players."
+invalid-world: "%prefix% &cWorld '&f%world%&c' not found."
+
+# Stats & Lag
+stats-header: "&b&lX-ClearLag Advanced Metrics"
+stats-total: "&7Total Removed: &e%count%"
+stats-average: "&7Average per run: &e%avg%"
+stats-history-header: "&b&lRecent History (Last 5):"
+stats-history-entry: " &8[&7%time%&8] &e%task%&7: &b%count% &7removed (TPS: %tps%)"
+stats-no-data: " &7- No data recorded yet."
+lag-header: "&b&lX-ClearLag Performance Status"
+lag-tps: "&7TPS: %color%%tps%"
+lag-memory: "&7Memory: &e%used%MB&7 / &e%max%MB"
+
+# Technical Logs
+tps-critical: "&cCRITICAL: TPS dropped to &f%tps% &cfor &f%checks% &cconsecutive checks. Triggering anti-lag cleanup..."

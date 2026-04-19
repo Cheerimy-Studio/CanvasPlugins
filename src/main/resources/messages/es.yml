@@ -1,0 +1,60 @@
+# X-Clearlag — Mensajes en Español
+# Placeholders: %prefix%, %time%, %count%, %task%, %tps%
+
+reload-success: "%prefix% &a¡Configuración y tareas recargadas con éxito!"
+no-permission: "%prefix% &cNo tienes permiso para realizar esta acción."
+unknown-command: "%prefix% &cSubcomando desconocido. Usa &f/xcl help &cpara ver la lista."
+
+clear-start: "%prefix% &eEjecutando tarea de limpieza..."
+cleared: "%prefix% &aSe han eliminado &c%count% &aentidades/objetos con éxito."
+cleared-none: "%prefix% &aLimpieza completada. No se eliminaron entidades."
+
+manual-clear-disabled: "%prefix% &cLa limpieza manual está desactivada en la configuración."
+cooldown: "%prefix% &cPor favor, espera &e%time%s &cantes de ejecutar esto de nuevo."
+invalid-task: "%prefix% &cLa tarea '&f%task%&c' no existe."
+
+tps-format: "%prefix% &7TPS Actual: &e%tps%"
+
+manual-clear-start: "%prefix% &7Iniciando limpieza manual para la tarea '&f%task%&7'..."
+global-clear-start: "%prefix% &7Iniciando limpieza global para todas las tareas configuradas..."
+command-usage: "%prefix% &cUso: /xcl <cmd> [world] <x> <z> o /xcl <cmd> <x> <z>"
+
+# Menú de Ayuda
+help-header: "&b&lAyuda de X-ClearLag"
+help-help: "&7/xcl help &8- &fMostrar este menú"
+help-reload: "&7/xcl reload &8- &fRecargar configuración"
+help-clear: "&7/xcl clear [task] &8- &fLimpieza manual"
+help-lag: "&7/xcl lag &8- &fEstado del rendimiento"
+help-inspect: "&7/xcl inspect [x z] &8- &fInspeccionar entidades del chunk"
+help-clearchunk: "&7/xcl clearchunk [x z] &8- &fLimpiar un chunk específico"
+help-tpchunk: "&7/xcl tpchunk <x> <z> &8- &fTeletransportarse al chunk"
+help-stats: "&7/xcl stats &8- &fMostrar métricas avanzadas"
+help-update: "&7/xcl update &8- &fBuscar actualizaciones"
+
+# Actualizaciones
+update-available: "%prefix% &a¡Nueva actualización disponible! Actual: &e%current% &aÚltima: &e%latest%"
+update-download: "%prefix% &aDescárgala aquí: &f%url%"
+update-current: "%prefix% &aYa estás en la última versión."
+update-error: "%prefix% &cOcurrió un error al buscar actualizaciones."
+
+# Inspección y Chunk
+inspect-format: "%prefix% &bChunk &e%x%, %z% &ben &e%world%&7: &f%items% Objetos, %mobs% Mobs &7(%total% Total)"
+clearchunk-success: "%prefix% &aSe han eliminado &c%count% &aentidades en el chunk &e%x%, %z%&a."
+tpchunk-success: "%prefix% &aTeletransportado al chunk &e%x%, %z%&a."
+invalid-coordinates: "%prefix% &c¡Coordenadas inválidas! Por favor usa números enteros."
+player-only: "%prefix% &cEste comando solo puede ser ejecutado por jugadores."
+invalid-world: "%prefix% &cNo se encontró el mundo '&f%world%&c'."
+
+# Estadísticas y Lag
+stats-header: "&b&lMétricas Avanzadas de X-ClearLag"
+stats-total: "&7Total Eliminado: &e%count%"
+stats-average: "&7Promedio por ejecución: &e%avg%"
+stats-history-header: "&b&lHistorial Reciente (Últimos 5):"
+stats-history-entry: " &8[&7%time%&8] &e%task%&7: &b%count% &7eliminados (TPS: %tps%)"
+stats-no-data: " &7- No hay datos registrados aún."
+lag-header: "&b&lEstado de Rendimiento de X-ClearLag"
+lag-tps: "&7TPS: %color%%tps%"
+lag-memory: "&7Memoria: &e%used%MB&7 / &e%max%MB"
+
+# Logs Técnicos
+tps-critical: "&cCRÍTICO: El TPS bajó a &f%tps% &cdurante &f%checks% &cchequeos. Iniciando limpieza anti-lag..."
