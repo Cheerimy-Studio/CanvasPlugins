@@ -1,7 +1,7 @@
 package com.fabian.xclearlag.managers;
 
 import com.fabian.xclearlag.XClearlag;
-import org.bukkit.ChatColor;
+import com.fabian.xclearlag.utils.ColorUtils;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import java.io.File;
@@ -91,7 +91,7 @@ public class MessageManager {
             if (!messagesConfig.isConfigurationSection(key)) {
                 String val = messagesConfig.getString(key);
                 if (val != null) {
-                    messages.put(key, ChatColor.translateAlternateColorCodes('&', val));
+                    messages.put(key, ColorUtils.translateColors(val));
                 }
             }
         }
@@ -103,7 +103,7 @@ public class MessageManager {
 
         XConfig config = plugin.getConfigManager().get();
         if (config != null) {
-            String prefix = ChatColor.translateAlternateColorCodes('&', config.general.prefix);
+            String prefix = ColorUtils.translateColors(config.general.prefix);
             msg = msg.replace("%prefix%", prefix);
         }
 
@@ -121,7 +121,7 @@ public class MessageManager {
             } catch (Exception ignored) {}
         }
 
-        return ChatColor.translateAlternateColorCodes('&', msg);
+        return ColorUtils.translateColors(msg);
     }
 
     public String get(String key, String... replacements) {
