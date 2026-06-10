@@ -1,6 +1,6 @@
 package com.fabian.xclearlag.api.events;
 
-import com.fabian.xclearlag.config.XConfig;
+import com.fabian.xclearlag.managers.XConfig;
 
 /**
  * Fired AFTER a cleanup task has finished removing entities.

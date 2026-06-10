@@ -81,7 +81,7 @@ public class EntityScanner {
             while (!worldQueue.isEmpty()) {
                 World world = worldQueue.poll();
                 if (disabledWorlds.contains(world.getName())) continue;
-                currentEntityIterator = world.getEntities().iterator();
+                currentEntityIterator = new ArrayList<>(world.getEntities()).iterator();
                 return true;
             }
             return false;

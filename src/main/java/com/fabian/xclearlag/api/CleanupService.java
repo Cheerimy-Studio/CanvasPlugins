@@ -1,6 +1,6 @@
 package com.fabian.xclearlag.api;
 
-import com.fabian.xclearlag.config.XConfig;
+import com.fabian.xclearlag.managers.XConfig;
 import org.bukkit.command.CommandSender;
 import java.util.function.Consumer;
 

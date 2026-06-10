@@ -1,4 +1,4 @@
-package com.fabian.xclearlag.config;
+package com.fabian.xclearlag.managers;
 
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;

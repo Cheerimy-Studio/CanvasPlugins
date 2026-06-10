@@ -4,7 +4,7 @@ import com.fabian.xclearlag.api.CleanupReason;
 import com.fabian.xclearlag.api.CleanupService;
 import com.fabian.xclearlag.api.events.*;
 import com.fabian.xclearlag.XClearlag;
-import com.fabian.xclearlag.config.*;
+import com.fabian.xclearlag.managers.*;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;

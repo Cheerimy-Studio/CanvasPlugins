@@ -2,7 +2,7 @@ name: X-Clearlag
 version: 1.7
 main: com.fabian.xclearlag.XClearlag
 description: Advanced entity and item cleanup plugin (Elite Pro Edition).
-author: Fabián ツ
+authors: [Fabian]
 api-version: 1.13
 folia-supported: true
 

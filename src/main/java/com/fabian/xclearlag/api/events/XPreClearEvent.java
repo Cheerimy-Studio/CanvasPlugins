@@ -1,6 +1,6 @@
 package com.fabian.xclearlag.api.events;
 
-import com.fabian.xclearlag.config.XConfig;
+import com.fabian.xclearlag.managers.XConfig;
 import org.bukkit.command.CommandSender;
 import org.bukkit.event.Cancellable;
 

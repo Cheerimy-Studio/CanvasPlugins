@@ -1,7 +1,7 @@
 package com.fabian.xclearlag.utils;
 
 import com.fabian.xclearlag.XClearlag;
-import com.fabian.xclearlag.config.MessageManager;
+import com.fabian.xclearlag.managers.MessageManager;
 import com.fabian.xclearlag.utils.scheduler.SchedulerAdapter;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;

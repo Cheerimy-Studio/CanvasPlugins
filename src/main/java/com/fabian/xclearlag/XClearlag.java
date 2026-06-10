@@ -3,7 +3,8 @@ package com.fabian.xclearlag;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 import com.fabian.xclearlag.commands.*;
-import com.fabian.xclearlag.config.*;
+import com.fabian.xclearlag.managers.*;
+import com.fabian.xclearlag.managers.DependencyManager;
 import com.fabian.xclearlag.services.*;
 import com.fabian.xclearlag.utils.*;
 import com.fabian.xclearlag.utils.scheduler.*;
@@ -14,6 +15,20 @@ import com.fabian.xclearlag.api.XClearlagAPI;
  * Refactored for modularity, custom events, and elite-level API.
  */
 public class XClearlag extends JavaPlugin {
+
+    private static XClearlag instance;
+
+    public static XClearlag getInstance() {
+        return instance;
+    }
+
+    public void logInfo(String message) {
+        getLogger().info(message);
+    }
+
+    public void logError(String message) {
+        getLogger().severe(message);
+    }
 
     private ConfigManager configManager;
     private MessageManager messageManager;
@@ -33,6 +48,11 @@ public class XClearlag extends JavaPlugin {
     @Override
     public void onEnable() {
         try {
+            // Load libraries before anything else
+            new DependencyManager(this).loadDependencies();
+
+            instance = this;
+
             saveDefaultConfig();
             XClearlagAPI.init(this);
             

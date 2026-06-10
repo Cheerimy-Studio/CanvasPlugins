@@ -1,7 +1,7 @@
 package com.fabian.xclearlag.services;
 
 import com.fabian.xclearlag.XClearlag;
-import com.fabian.xclearlag.config.XConfig;
+import com.fabian.xclearlag.managers.XConfig;
 import java.util.Collection;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;

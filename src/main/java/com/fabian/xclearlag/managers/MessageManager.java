@@ -1,4 +1,4 @@
-package com.fabian.xclearlag.config;
+package com.fabian.xclearlag.managers;
 
 import com.fabian.xclearlag.XClearlag;
 import org.bukkit.ChatColor;

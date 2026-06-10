@@ -1,4 +1,4 @@
-package com.fabian.xclearlag.config;
+package com.fabian.xclearlag.managers;
 
 import java.util.List;
 
