@@ -53,7 +53,6 @@ public class XClearlag extends JavaPlugin {
 
             instance = this;
 
-            saveDefaultConfig();
             XClearlagAPI.init(this);
             
             initScheduler();
@@ -116,7 +115,9 @@ public class XClearlag extends JavaPlugin {
         tpsCleanupService.start();
 
         updateChecker = new UpdateChecker(this);
-        schedulerAdapter.runTaskLater(() -> updateChecker.checkForUpdates(), 100L);
+        if (configManager.get().general.checkUpdates) {
+            schedulerAdapter.runTaskLater(() -> updateChecker.checkForUpdates(), 100L);
+        }
     }
 
     private void initCommands() {
@@ -164,7 +165,7 @@ public class XClearlag extends JavaPlugin {
         } catch (Throwable ignored) {
             // Fallback to class check
             try {
-                Class.forName("io.papermc.paper.threadedregionscheduler.RegionScheduler");
+                Class.forName("io.papermc.paper.threadedregions.RegionizedServer");
                 isFolia = true;
             } catch (Throwable ignored2) {}
         }

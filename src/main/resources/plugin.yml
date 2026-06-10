@@ -1,22 +1,20 @@
 name: X-Clearlag
 version: 1.7
 main: com.fabian.xclearlag.XClearlag
-description: Advanced entity and item cleanup plugin (Elite Pro Edition).
-authors: [Fabian]
 api-version: 1.13
 folia-supported: true
+authors: [Fabian]
+website: https://xproyects.qzz.io
+description: "Advanced entity and item cleanup plugin for Paper, Purpur, Folia & Bukkit (1.8.8+)."
 
-# Declaración de comandos (Compatible con todas las versiones)
 commands:
   xcl:
-    description: Main command for X-Clearlag.
+    description: Main command for X-Clearlag
     aliases: [xclearlag, cl, clear]
     permission: xclearlag.admin
 
-# Dependencias
-depend: [PlaceholderAPI]
+softdepend: [PlaceholderAPI]
 
-# Registro completo de permisos
 permissions:
   xclearlag.admin:
     description: Full access to X-Clearlag commands.

@@ -24,6 +24,15 @@ prefix: "&8[&bX-ClearLag&8] &7"
 # Message files are stored in: plugins/X-Clearlag/messages/<language>.yml
 language: "en"
 
+# Check for plugin updates on startup?
+check-updates: true
+
+# Enable detailed debug logging in the console?
+debug: false
+
+# Enable anonymous plugin statistics via bStats?
+metrics: true
+
 # ============================================================
 #   GLOBAL SETTINGS
 # ============================================================
@@ -300,4 +309,4 @@ optimizations:
 # INTERNAL SYSTEM SETTINGS (NEVER ALTER THIS!)
 # ------------------------------------------------------------------------------
 # Native tracker that allows us to update the config via automatic database versioning.
-config-version: 2
+code: 2

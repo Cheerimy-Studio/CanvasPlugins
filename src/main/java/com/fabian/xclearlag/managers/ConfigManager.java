@@ -1,6 +1,7 @@
 package com.fabian.xclearlag.managers;
 
 import com.fabian.xclearlag.XClearlag;
+import com.fabian.xclearlag.utils.ConfigUpdater;
 
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -18,58 +19,50 @@ public class ConfigManager {
         this.plugin = plugin;
     }
 
-    private static final int LATEST_VERSION = 2; // Incrementar para forzar migración
-
     public void load() {
         File configFile = new File(plugin.getDataFolder(), "config.yml");
-        
+
         if (configFile.exists()) {
-            YamlConfiguration currentYaml = YamlConfiguration.loadConfiguration(configFile);
-            int version = currentYaml.getInt("config-version", 0);
-            
-            if (version < LATEST_VERSION) {
-                plugin.getLogger().info("Outdated configuration detected (v" + version + "). Migrating to v" + LATEST_VERSION + "...");
-                migrate(configFile, currentYaml);
+            // Read code from disk config
+            YamlConfiguration diskYaml = YamlConfiguration.loadConfiguration(configFile);
+            int diskCode = diskYaml.getInt("code", 0);
+
+            // Read code from JAR default config
+            YamlConfiguration jarYaml = null;
+            try (java.io.InputStream is = plugin.getResource("config.yml")) {
+                if (is != null) {
+                    jarYaml = YamlConfiguration.loadConfiguration(
+                            new java.io.InputStreamReader(is, java.nio.charset.StandardCharsets.UTF_8));
+                }
+            } catch (Exception ignored) {}
+
+            int jarCode = (jarYaml != null) ? jarYaml.getInt("code", 0) : 0;
+
+            if (diskCode < jarCode) {
+                plugin.getLogger().info("Outdated configuration detected (code " + diskCode + " < " + jarCode + "). Updating config...");
+
+                // Backup current config
+                File backupFile = new File(plugin.getDataFolder(), "config_old.yml");
+                if (backupFile.exists()) backupFile.delete();
+                configFile.renameTo(backupFile);
+                plugin.getLogger().info("Old config backed up as config_old.yml");
+
+                // Save fresh default config from JAR
+                plugin.saveDefaultConfig();
+                File newConfigFile = new File(plugin.getDataFolder(), "config.yml");
+
+                // Use ConfigUpdater to migrate old values into the new file
+                ConfigUpdater.update(plugin, "config.yml", newConfigFile);
+                plugin.getLogger().info("Configuration updated successfully via ConfigUpdater.");
+            } else {
+                // Config is up to date, still run ConfigUpdater to add any missing keys
+                ConfigUpdater.update(plugin, "config.yml", configFile);
             }
         }
-        
+
         plugin.saveDefaultConfig();
         plugin.reloadConfig();
         this.config = new XConfig(plugin.getConfig());
-    }
-
-    private void migrate(File configFile, YamlConfiguration oldYaml) {
-        try {
-            // 1. Respaldar configuración vieja
-            File backupFile = new File(plugin.getDataFolder(), "config_old.yml");
-            if (backupFile.exists()) backupFile.delete();
-            configFile.renameTo(backupFile);
-            
-            // 2. Generar nueva configuración desde el recurso interno
-            plugin.saveDefaultConfig();
-            plugin.reloadConfig();
-            FileConfiguration newYaml = plugin.getConfig();
-            
-            // 3. Migrar valores uno a uno (solo si existen en la vieja)
-            for (String key : oldYaml.getKeys(true)) {
-                // No migramos la versión ni secciones, solo valores finales
-                if (key.equals("config-version") || oldYaml.isConfigurationSection(key)) continue;
-                
-                // Solo migramos si la clave aún existe en el nuevo formato
-                if (newYaml.contains(key)) {
-                    newYaml.set(key, oldYaml.get(key));
-                }
-            }
-            
-            // 4. Actualizar versión y guardar
-            newYaml.set("config-version", LATEST_VERSION);
-            plugin.saveConfig();
-            plugin.getLogger().info("Configuration migration completed successfully. Old config saved as config_old.yml");
-            
-        } catch (Exception e) {
-            plugin.getLogger().severe("Failed to migrate configuration: " + e.getMessage());
-            e.printStackTrace();
-        }
     }
 
     /**
