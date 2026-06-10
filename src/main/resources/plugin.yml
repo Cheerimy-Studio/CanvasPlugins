@@ -1,11 +1,11 @@
 name: X-Clearlag
-version: 1.7
+version: 1.8
 main: com.fabian.xclearlag.XClearlag
 api-version: 1.13
 folia-supported: true
 authors: [Fabian]
 website: https://xproyects.qzz.io
-description: "Advanced entity and item cleanup plugin for Paper, Purpur, Folia & Bukkit (1.8.8+)."
+description: "Simple plugin to clean up your server."
 
 commands:
   xcl:
