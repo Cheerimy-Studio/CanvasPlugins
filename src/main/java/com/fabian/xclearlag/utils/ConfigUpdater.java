@@ -18,6 +18,7 @@ public class ConfigUpdater {
      */
     public static void update(XClearlag plugin, String resourcePath, File diskFile) {
         if (!diskFile.exists()) return;
+        DebugLogger.debug("ConfigUpdater", "Updating " + diskFile.getName() + "...");
 
         try {
             YamlConfiguration resConfig = null;
@@ -53,6 +54,7 @@ public class ConfigUpdater {
             if (isFlat) {
                 updateFlatFile(plugin, resourcePath, diskFile, diskConfig);
             } else {
+                DebugLogger.debug("ConfigUpdater", "Using hierarchical update for " + diskFile.getName());
                 updateHierarchicalFile(plugin, diskFile, diskConfig, resConfig);
             }
 

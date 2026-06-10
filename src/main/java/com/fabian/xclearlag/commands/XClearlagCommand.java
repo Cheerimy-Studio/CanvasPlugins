@@ -5,6 +5,7 @@ import com.fabian.xclearlag.api.CleanupReason;
 import com.fabian.xclearlag.managers.*;
 import com.fabian.xclearlag.services.*;
 import com.fabian.xclearlag.utils.MetricsTracker;
+import com.fabian.xclearlag.utils.DebugLogger;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
@@ -36,6 +37,7 @@ public class XClearlagCommand implements CommandExecutor, TabCompleter {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+        DebugLogger.debug("Command", "Command received: /xcl " + String.join(" ", args) + " from " + sender.getName());
         if (args.length == 0) {
             sendHelp(sender);
             return true;
@@ -92,6 +94,7 @@ public class XClearlagCommand implements CommandExecutor, TabCompleter {
     }
 
     private void handleClear(CommandSender sender, String[] args) {
+        DebugLogger.debug("Command", "Handling clear command from " + sender.getName());
         if (!sender.hasPermission("xclearlag.admin.clear")) {
             sender.sendMessage(plugin.getMessageManager().getWithContext(sender, "no-permission"));
             return;
@@ -117,6 +120,7 @@ public class XClearlagCommand implements CommandExecutor, TabCompleter {
 
         if (args.length > 1 && config.manualClear.allowSpecific) {
             String taskName = args[1].toLowerCase();
+            DebugLogger.debug("Command", "Clearing specific task: " + taskName);
             ClearTask task = plugin.getTaskManager().getTaskMap().get(taskName);
             if (task == null) {
                 sender.sendMessage(plugin.getMessageManager().getWithContext(sender, "invalid-task", "%task%", taskName));
@@ -129,6 +133,7 @@ public class XClearlagCommand implements CommandExecutor, TabCompleter {
                 return;
             }
             
+            DebugLogger.debug("Command", "Clearing all manual tasks: " + config.manualClear.tasks);
             sender.sendMessage(plugin.getMessageManager().getWithContext(sender, "global-clear-start"));
             
             // Execute all configured manual tasks

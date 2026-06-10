@@ -2,6 +2,7 @@ package com.fabian.xclearlag.managers;
 
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
+import com.fabian.xclearlag.utils.DebugLogger;
 import java.util.*;
 
 /**
@@ -57,6 +58,7 @@ public class XConfig {
                 tasks.put(key.toLowerCase(), new TaskConfig(taskSection.getConfigurationSection(key)));
             }
         }
+        DebugLogger.debug("XConfig", "Parsed " + tasks.size() + " tasks, TPS enabled=" + tps.enabled + ", ManualClear enabled=" + manualClear.enabled);
     }
 
     public static class TaskConfig {

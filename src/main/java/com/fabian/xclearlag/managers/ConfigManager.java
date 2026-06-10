@@ -2,6 +2,7 @@ package com.fabian.xclearlag.managers;
 
 import com.fabian.xclearlag.XClearlag;
 import com.fabian.xclearlag.utils.ConfigUpdater;
+import com.fabian.xclearlag.utils.DebugLogger;
 
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -20,9 +21,11 @@ public class ConfigManager {
     }
 
     public void load() {
+        DebugLogger.debug("Config", "Loading configuration...");
         File configFile = new File(plugin.getDataFolder(), "config.yml");
 
         if (configFile.exists()) {
+            DebugLogger.debug("Config", "config.yml found on disk.");
             // Read code from disk config
             YamlConfiguration diskYaml = YamlConfiguration.loadConfiguration(configFile);
             int diskCode = diskYaml.getInt("code", 0);
@@ -39,6 +42,7 @@ public class ConfigManager {
             int jarCode = (jarYaml != null) ? jarYaml.getInt("code", 0) : 0;
 
             if (diskCode < jarCode) {
+                DebugLogger.debug("Config", "Config outdated (disk=" + diskCode + " < jar=" + jarCode + "), updating...");
                 plugin.getLogger().info("Outdated configuration detected (code " + diskCode + " < " + jarCode + "). Updating config...");
 
                 // Backup current config
@@ -56,6 +60,7 @@ public class ConfigManager {
                 plugin.getLogger().info("Configuration updated successfully via ConfigUpdater.");
             } else {
                 // Config is up to date, still run ConfigUpdater to add any missing keys
+                DebugLogger.debug("Config", "Config up to date, running ConfigUpdater for missing keys...");
                 ConfigUpdater.update(plugin, "config.yml", configFile);
             }
         }
@@ -63,6 +68,7 @@ public class ConfigManager {
         plugin.saveDefaultConfig();
         plugin.reloadConfig();
         this.config = new XConfig(plugin.getConfig());
+        DebugLogger.debug("Config", "Configuration loaded. Debug=" + this.config.general.debug + ", Tasks=" + this.config.tasks.size() + ", DisabledWorlds=" + this.config.general.disabledWorlds);
     }
 
     /**

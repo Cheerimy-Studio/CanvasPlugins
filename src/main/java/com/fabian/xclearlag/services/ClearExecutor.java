@@ -5,6 +5,7 @@ import com.fabian.xclearlag.api.CleanupService;
 import com.fabian.xclearlag.api.events.*;
 import com.fabian.xclearlag.XClearlag;
 import com.fabian.xclearlag.managers.*;
+import com.fabian.xclearlag.utils.DebugLogger;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
@@ -30,10 +31,12 @@ public class ClearExecutor implements CleanupService {
 
     @Override
     public void execute(String taskName, XConfig.TaskConfig taskConfig, CleanupReason reason, CommandSender sender, Consumer<Integer> onComplete) {
+        DebugLogger.debug("ClearExecutor", "Starting cleanup: task=" + taskName + ", reason=" + reason + ", disabledWorlds=" + configManager.get().general.disabledWorlds);
         // 1. Fire Pre-Clear Event
         XPreClearEvent preEvent = new XPreClearEvent(taskName, taskConfig, sender);
         Bukkit.getPluginManager().callEvent(preEvent);
         if (preEvent.isCancelled()) {
+            DebugLogger.debug("ClearExecutor", "Cleanup cancelled by PreClearEvent for task: " + taskName);
             onComplete.accept(0);
             return;
         }
@@ -49,6 +52,7 @@ public class ClearExecutor implements CleanupService {
                 // 4. Fire Post-Clear Event
                 XPostClearEvent postEvent = new XPostClearEvent(taskName, taskConfig, removed);
                 Bukkit.getPluginManager().callEvent(postEvent);
+                DebugLogger.debug("ClearExecutor", "Cleanup finished for task '" + taskName + "': " + removed + " entities removed.");
                 
                 onComplete.accept(removed);
             });

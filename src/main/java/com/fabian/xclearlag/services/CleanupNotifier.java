@@ -2,6 +2,7 @@ package com.fabian.xclearlag.services;
 
 import com.fabian.xclearlag.managers.*;
 import com.fabian.xclearlag.utils.BossBarManager;
+import com.fabian.xclearlag.utils.DebugLogger;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -28,6 +29,7 @@ public class CleanupNotifier {
     }
 
     public void broadcast(String keyOrRaw, boolean raw, CommandSender context) {
+        DebugLogger.debug("Notifier", "Broadcasting: " + keyOrRaw + " (raw=" + raw + ")");
         String msgTemplate = raw ? keyOrRaw : messageManager.get(keyOrRaw);
         if (msgTemplate.isEmpty()) return;
 

@@ -1,6 +1,7 @@
 package com.fabian.xclearlag.services;
 
 import com.fabian.xclearlag.utils.scheduler.SchedulerAdapter;
+import com.fabian.xclearlag.utils.DebugLogger;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
@@ -28,6 +29,7 @@ public class EntityScanner {
      * @param onComplete     Callback with the list of found entities.
      */
     public void scan(int chunksPerTick, List<String> disabledWorlds, Predicate<Entity> filter, Consumer<List<Entity>> onComplete) {
+        DebugLogger.debug("EntityScanner", "Starting entity scan (chunksPerTick=" + chunksPerTick + ", disabledWorlds=" + disabledWorlds + ")");
         ScanTask taskLogic = new ScanTask(chunksPerTick, disabledWorlds, filter, onComplete, schedulerAdapter);
         Object task = schedulerAdapter.runTaskTimer(taskLogic, 0L, 1L);
         taskLogic.setTaskHandle(task);
@@ -55,6 +57,7 @@ public class EntityScanner {
             this.onComplete = onComplete;
             this.schedulerAdapter = schedulerAdapter;
             this.worldQueue = new LinkedList<>(Bukkit.getWorlds());
+            DebugLogger.debug("EntityScanner", "Scan queued for " + this.worldQueue.size() + " worlds.");
             
             if (!prepareNextWorld()) {
                 finish();
@@ -64,6 +67,7 @@ public class EntityScanner {
         private void finish() {
             if (finished) return;
             finished = true;
+            DebugLogger.debug("EntityScanner", "Scan complete: " + discoveredEntities.size() + " entities found.");
             onComplete.accept(discoveredEntities);
             if (taskHandle != null) {
                 schedulerAdapter.cancelTask(taskHandle);

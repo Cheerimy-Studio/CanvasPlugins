@@ -39,6 +39,7 @@ public class XPlaceholderExpansion extends PlaceholderExpansion {
 
     @Override
     public String onRequest(OfflinePlayer player, @NotNull String params) {
+        DebugLogger.debug("PAPI", "Placeholder request: xclearlag_" + params);
         if (params.equalsIgnoreCase("tps")) {
             return String.format("%.2f", plugin.getTpsMonitor().getTPS());
         }

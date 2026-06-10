@@ -3,6 +3,7 @@ package com.fabian.xclearlag.utils;
 import com.fabian.xclearlag.XClearlag;
 import com.fabian.xclearlag.managers.MessageManager;
 import com.fabian.xclearlag.utils.scheduler.SchedulerAdapter;
+import com.fabian.xclearlag.utils.DebugLogger;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 
@@ -30,6 +31,7 @@ public class UpdateChecker {
     }
 
     public void checkForUpdates(CommandSender sender) {
+        DebugLogger.debug("UpdateChecker", "Checking for updates (sender=" + (sender != null ? sender.getName() : "console") + ")...");
         schedulerAdapter.runTaskAsync(() -> {
             try {
                 String currentVersion = plugin.getDescription().getVersion();
@@ -51,6 +53,7 @@ public class UpdateChecker {
 
                 if (latestVersion != null && isNewerVersion(currentVersion, latestVersion)) {
                     this.updateAvailable = true;
+                    DebugLogger.debug("UpdateChecker", "Update available: " + currentVersion + " -> " + latestVersion);
 
                     if (sender != null) {
                         sender.sendMessage(
@@ -72,6 +75,7 @@ public class UpdateChecker {
                 }
 
             } catch (Exception e) {
+                DebugLogger.debug("UpdateChecker", "Update check failed.", e);
                 if (sender != null) {
                     sender.sendMessage(plugin.getMessageManager().getWithContext(sender, "update-error"));
                 } else {

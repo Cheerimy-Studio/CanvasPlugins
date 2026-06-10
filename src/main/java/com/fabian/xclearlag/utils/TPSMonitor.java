@@ -25,6 +25,10 @@ public class TPSMonitor implements Runnable {
     private int tickIndex = 0;
     private int tickCount = 0;
 
+    {
+        DebugLogger.debug("TPS", "TPSMonitor initialized (ring buffer: " + ticks.length + " ticks).");
+    }
+
     @Override
     public void run() {
         ticks[tickIndex] = System.currentTimeMillis();

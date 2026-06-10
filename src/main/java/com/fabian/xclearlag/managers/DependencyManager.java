@@ -1,6 +1,7 @@
 package com.fabian.xclearlag.managers;
 
 import com.fabian.xclearlag.XClearlag;
+import com.fabian.xclearlag.utils.DebugLogger;
 import net.byteflux.libby.BukkitLibraryManager;
 import net.byteflux.libby.Library;
 
@@ -31,10 +32,13 @@ public class DependencyManager {
     public void loadDependencies() {
         try {
             plugin.getLogger().info("Loading runtime dependencies via X-API...");
+            DebugLogger.debug("Dependency", "Loading Adventure dependencies...");
             loadAdventureDependencies();
             plugin.getLogger().info("All dependencies loaded successfully!");
+            DebugLogger.debug("Dependency", "All dependencies loaded.");
         } catch (Exception e) {
             plugin.getLogger().severe("Failed to load runtime dependencies! " + e.getMessage());
+            DebugLogger.debug("Dependency", "Failed to load dependencies!", e);
         }
     }
 

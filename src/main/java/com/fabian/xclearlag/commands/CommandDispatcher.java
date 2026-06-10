@@ -1,6 +1,7 @@
 package com.fabian.xclearlag.commands;
 
 import com.fabian.xclearlag.XClearlag;
+import com.fabian.xclearlag.utils.DebugLogger;
 
 
 import org.bukkit.Bukkit;
@@ -32,6 +33,7 @@ public class CommandDispatcher {
     public void dispatch(String cmd, Collection<? extends Player> players, int secondsLeft) {
         if (cmd == null || cmd.trim().isEmpty()) return;
         cmd = cmd.trim();
+        DebugLogger.debug("CommandDispatch", "Dispatching: " + cmd);
 
         if (handleSpecialCommand(cmd, players, secondsLeft)) return;
 
@@ -44,6 +46,7 @@ public class CommandDispatcher {
 
     public void dispatch(List<String> cmds, Collection<? extends Player> players, int secondsLeft) {
         if (cmds == null || cmds.isEmpty()) return;
+        DebugLogger.debug("CommandDispatch", "Dispatching " + cmds.size() + " commands.");
         for (String cmd : cmds) {
             dispatch(cmd, players, secondsLeft);
         }
@@ -53,6 +56,7 @@ public class CommandDispatcher {
         String upper = cmd.toUpperCase();
         
         if (upper.startsWith("[TITLE]")) {
+            DebugLogger.debug("CommandDispatch", "Special command: [TITLE] for " + players.size() + " players");
             String title = cmd.substring(7).trim();
             for (Player p : players) {
                 sendTitle(p, processPlaceholders(p, title, secondsLeft), "", 10, 40, 10);

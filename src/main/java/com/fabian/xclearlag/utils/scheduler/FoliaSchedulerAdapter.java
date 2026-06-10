@@ -4,6 +4,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 import java.lang.reflect.Method;
 import java.util.function.Consumer;
+import com.fabian.xclearlag.utils.DebugLogger;
 
 /**
  * Folia-specific implementation of the SchedulerAdapter using Reflection.
@@ -52,6 +53,7 @@ public class FoliaSchedulerAdapter implements SchedulerAdapter {
 
         } catch (Exception e) {
             plugin.getLogger().warning("Failed to initialize Folia Reflection: " + e.getMessage());
+            DebugLogger.debug("Scheduler", "FoliaSchedulerAdapter reflection init failed.", e);
         }
     }
 
@@ -97,6 +99,7 @@ public class FoliaSchedulerAdapter implements SchedulerAdapter {
             runMethod.invoke(entityScheduler, plugin, (Consumer<Object>) t -> runnable.run(), null);
         } catch (Exception e) {
             // Fallback to global scheduler if entity-specific fails
+            DebugLogger.debug("Scheduler", "Entity scheduler failed, falling back to global.");
             runTask(runnable);
         }
     }

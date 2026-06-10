@@ -50,8 +50,10 @@ public class BossBarManager {
             removeAllMethod = bossBarClass.getMethod("removeAll");
 
             enabled = true;
+            DebugLogger.debug("BossBar", "BossBar reflection initialized successfully.");
         } catch (Exception e) {
             enabled = false;
+            DebugLogger.debug("BossBar", "BossBar reflection failed - feature disabled.", e);
         }
     }
 
@@ -102,6 +104,7 @@ public class BossBarManager {
             setVisibleMethod.invoke(bossBar, false);
             removeAllMethod.invoke(bossBar);
             bossBar = null;
+            DebugLogger.debug("BossBar", "BossBar hidden and removed.");
         } catch (Exception ignored) {}
     }
 }

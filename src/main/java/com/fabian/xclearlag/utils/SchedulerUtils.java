@@ -3,6 +3,7 @@ package com.fabian.xclearlag.utils;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitTask;
+import com.fabian.xclearlag.utils.DebugLogger;
 
 import java.util.function.Consumer;
 
@@ -22,6 +23,7 @@ public class SchedulerUtils {
             } catch (ClassNotFoundException e) {
                 isFolia = false;
             }
+            DebugLogger.debug("SchedulerUtils", "Folia detection: " + isFolia);
         }
         return isFolia;
     }

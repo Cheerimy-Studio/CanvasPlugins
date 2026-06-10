@@ -3,6 +3,7 @@ package com.fabian.xclearlag.utils.scheduler;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitTask;
+import com.fabian.xclearlag.utils.DebugLogger;
 
 /**
  * Standard Bukkit/Spigot implementation of the SchedulerAdapter.
@@ -13,6 +14,7 @@ public class BukkitSchedulerAdapter implements SchedulerAdapter {
 
     public BukkitSchedulerAdapter(Plugin plugin) {
         this.plugin = plugin;
+        DebugLogger.debug("Scheduler", "BukkitSchedulerAdapter created.");
     }
 
     @Override

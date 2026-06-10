@@ -16,6 +16,7 @@ public class CountdownManager {
         this.interval = interval;
         this.warningSeconds = warningSeconds != null ? warningSeconds : new ArrayList<>();
         this.currentSeconds = interval;
+        DebugLogger.debug("Countdown", "Created: interval=" + interval + "s, warnings=" + this.warningSeconds);
     }
 
     /**
@@ -31,6 +32,7 @@ public class CountdownManager {
 
     public void reset() {
         this.currentSeconds = interval;
+        DebugLogger.debug("Countdown", "Reset to " + interval + "s.");
     }
 
     public int getCurrentSeconds() {

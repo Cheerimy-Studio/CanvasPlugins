@@ -1,6 +1,7 @@
 package com.fabian.xclearlag.services;
 
 import com.fabian.xclearlag.utils.scheduler.SchedulerAdapter;
+import com.fabian.xclearlag.utils.DebugLogger;
 import org.bukkit.entity.Entity;
 import java.util.LinkedList;
 import java.util.List;
@@ -26,6 +27,7 @@ public class CleanupProcessor {
      * @param onComplete Callback with total entities removed.
      */
     public void process(List<Entity> entities, int batchSize, Consumer<Integer> onComplete) {
+        DebugLogger.debug("CleanupProcessor", "Processing " + entities.size() + " entities (batchSize=" + batchSize + ")");
         if (entities.isEmpty()) {
             onComplete.accept(0);
             return;
@@ -39,6 +41,7 @@ public class CleanupProcessor {
                     count++;
                 }
             }
+            DebugLogger.debug("CleanupProcessor", "Instant removal complete: " + count + " entities.");
             onComplete.accept(count);
             return;
         }
@@ -46,6 +49,7 @@ public class CleanupProcessor {
         RemovalTask taskLogic = new RemovalTask(entities, batchSize, onComplete, schedulerAdapter);
         Object task = schedulerAdapter.runTaskTimer(taskLogic, 0L, 1L);
         taskLogic.setTaskHandle(task);
+        DebugLogger.debug("CleanupProcessor", "Batched removal started (batchSize=" + batchSize + ").");
     }
 
     private static class RemovalTask implements Runnable {
@@ -68,6 +72,7 @@ public class CleanupProcessor {
         private void finish() {
             if (finished) return;
             finished = true;
+            DebugLogger.debug("CleanupProcessor", "Batched removal complete: " + totalRemoved + " entities removed.");
             onComplete.accept(totalRemoved);
             if (taskHandle != null) {
                 schedulerAdapter.cancelTask(taskHandle);

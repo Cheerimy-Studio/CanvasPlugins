@@ -2,6 +2,7 @@ package com.fabian.xclearlag.managers;
 
 import com.fabian.xclearlag.XClearlag;
 import com.fabian.xclearlag.utils.ColorUtils;
+import com.fabian.xclearlag.utils.DebugLogger;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import java.io.File;
@@ -25,6 +26,7 @@ public class MessageManager {
 
     public void load() {
         messages.clear();
+        DebugLogger.debug("Messages", "Loading messages...");
         XConfig config = plugin.getConfigManager().get();
         String lang = (config != null) ? config.general.language : plugin.getConfig().getString("language", "en");
         lang = lang.toLowerCase().trim();
@@ -39,6 +41,7 @@ public class MessageManager {
         File messagesFile = new File(messagesFolder, fileName);
 
         if (!messagesFile.exists()) {
+            DebugLogger.debug("Messages", "Message file not found, extracting default: " + fileName);
             InputStream resource = plugin.getResource("messages/" + fileName);
             if (resource != null) {
                 plugin.saveResource("messages/" + fileName, false);
@@ -95,6 +98,7 @@ public class MessageManager {
                 }
             }
         }
+        DebugLogger.debug("Messages", "Loaded " + messages.size() + " message keys from " + fileName);
     }
 
     public String getWithContext(org.bukkit.command.CommandSender sender, String key, String... replacements) {

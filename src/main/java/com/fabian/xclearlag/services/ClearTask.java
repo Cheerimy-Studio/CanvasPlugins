@@ -7,6 +7,7 @@ import com.fabian.xclearlag.managers.*;
 import com.fabian.xclearlag.utils.*;
 
 import com.fabian.xclearlag.utils.scheduler.SchedulerAdapter;
+import com.fabian.xclearlag.utils.DebugLogger;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -45,14 +46,17 @@ public class ClearTask {
         this.messageManager = messageManager;
         this.schedulerAdapter = schedulerAdapter;
         this.countdownManager = new CountdownManager(config.interval, config.countdown);
+        DebugLogger.debug("ClearTask", "Created task '" + name + "' (interval=" + config.interval + "s, entities=" + config.entities + ")");
     }
 
     public void start() {
         if (task != null) stop();
+        DebugLogger.debug("ClearTask", "Starting task timer: " + name);
 
         task = schedulerAdapter.runTaskTimer(() -> {
             int online = Bukkit.getOnlinePlayers().size();
             if (online < config.minPlayers) {
+                DebugLogger.debug("ClearTask", "Task '" + name + "' skipped: not enough players (" + online + " < " + config.minPlayers + ")");
                 countdownManager.reset();
                 notifier.hideUI();
                 return;
@@ -70,6 +74,7 @@ public class ClearTask {
             notifier.updateCountdown(secondsLeft, config.interval);
 
             if (secondsLeft <= 0) {
+                DebugLogger.debug("ClearTask", "Countdown reached 0 for task '" + name + "', executing cleanup.");
                 executeCleanup(new SilentCommandSender(), false, CleanupReason.SCHEDULE_TRIGGERED);
                 countdownManager.reset();
             }
@@ -77,6 +82,7 @@ public class ClearTask {
     }
 
     public void executeCleanup(CommandSender sender, boolean silent, CleanupReason reason) {
+        DebugLogger.debug("ClearTask", "Executing cleanup: task=" + name + ", reason=" + reason + ", silent=" + silent);
         if (!silent) {
             notifier.broadcast("clear-start", false, sender);
         } else {
@@ -86,6 +92,7 @@ public class ClearTask {
 
         cleanupService.execute(name, config, reason, sender, (removed) -> {
             metricsTracker.record(name, removed);
+            DebugLogger.debug("ClearTask", "Task '" + name + "' cleanup complete: " + removed + " entities removed.");
 
             if (!silent) {
                 String clearedMsg = messageManager.getWithContext(sender,
@@ -110,6 +117,7 @@ public class ClearTask {
         if (task != null) {
             schedulerAdapter.cancelTask(task);
             task = null;
+            DebugLogger.debug("ClearTask", "Stopped task: " + name);
         }
         notifier.hideUI();
     }

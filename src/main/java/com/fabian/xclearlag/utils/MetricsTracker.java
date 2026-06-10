@@ -18,6 +18,7 @@ public class MetricsTracker {
     }
 
     public void record(String taskName, int removed) {
+        DebugLogger.debug("Metrics", "Recorded: task=" + taskName + ", removed=" + removed + ", tps=" + String.format("%.1f", tpsMonitor.getTPS()));
         recentStats.merge(taskName, removed, Integer::sum);
         
         CleanupRecord record = new CleanupRecord(
@@ -55,6 +56,7 @@ public class MetricsTracker {
     }
 
     public void reset() {
+        DebugLogger.debug("Metrics", "Metrics reset.");
         recentStats.clear();
         history.clear();
     }
