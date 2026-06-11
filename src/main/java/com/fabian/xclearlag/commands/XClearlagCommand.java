@@ -76,6 +76,13 @@ public class XClearlagCommand implements CommandExecutor, TabCompleter {
             case "stats":
                 handleStats(sender);
                 break;
+            case "debug":
+                boolean currentDebug = plugin.getConfig().getBoolean("debug", false);
+                plugin.getConfig().set("debug", !currentDebug);
+                plugin.saveConfig();
+                plugin.getConfigManager().load();
+                sender.sendMessage(plugin.getMessageManager().getWithContext(sender, "debug-toggled").replace("%state%", currentDebug ? "disabled" : "enabled"));
+                break;
             default:
                 sender.sendMessage(plugin.getMessageManager().getWithContext(sender, "unknown-command"));
                 break;
@@ -346,7 +353,7 @@ public class XClearlagCommand implements CommandExecutor, TabCompleter {
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
         if (args.length == 1) {
-            return filter(Arrays.asList("help", "reload", "clear", "lag", "stats", "inspect", "clearchunk", "tpchunk", "update"), args[0]);
+            return filter(Arrays.asList("help", "reload", "clear", "lag", "stats", "inspect", "clearchunk", "tpchunk", "update", "debug"), args[0]);
         }
         if (args.length == 2) {
             if (args[0].equalsIgnoreCase("clear")) {
