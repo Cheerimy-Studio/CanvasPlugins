@@ -28,7 +28,7 @@ public class ClearTask {
     private final CleanupNotifier notifier;
     private final CleanupService cleanupService;
     private final MetricsTracker metricsTracker;
-    private final MessageManager messageManager;
+    private final LanguageManager languageManager;
     private final SchedulerAdapter schedulerAdapter;
 
     private Object task;
@@ -36,7 +36,7 @@ public class ClearTask {
     public ClearTask(JavaPlugin plugin, String name, XConfig.TaskConfig config,
                      CommandDispatcher commandDispatcher, CleanupNotifier notifier,
                      CleanupService cleanupService, MetricsTracker metricsTracker,
-                     MessageManager messageManager, SchedulerAdapter schedulerAdapter) {
+                     LanguageManager languageManager, SchedulerAdapter schedulerAdapter) {
         this.name = name;
         this.config = config;
         this.commandDispatcher = commandDispatcher;
@@ -87,7 +87,7 @@ public class ClearTask {
             notifier.broadcast("clear-start", false, sender);
         } else {
             // Even if silent for players, log to console
-            Bukkit.getConsoleSender().sendMessage(messageManager.getWithContext(null, "clear-start"));
+            Bukkit.getConsoleSender().sendMessage(languageManager.getWithContext(null, "clear-start"));
         }
 
         cleanupService.execute(name, config, reason, sender, (removed) -> {
@@ -95,14 +95,14 @@ public class ClearTask {
             DebugLogger.debug("ClearTask", "Task '" + name + "' cleanup complete: " + removed + " entities removed.");
 
             if (!silent) {
-                String clearedMsg = messageManager.getWithContext(sender,
+                String clearedMsg = languageManager.getWithContext(sender,
                         removed > 0 ? "cleared" : "cleared-none",
                         "%count%", String.valueOf(removed)
                 );
                 notifier.broadcast(clearedMsg, true, sender);
             } else {
                 // Console feedback for silent tasks
-                String clearedMsg = messageManager.getWithContext(null,
+                String clearedMsg = languageManager.getWithContext(null,
                         removed > 0 ? "cleared" : "cleared-none",
                         "%count%", String.valueOf(removed)
                 );

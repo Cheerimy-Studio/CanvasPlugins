@@ -64,7 +64,7 @@ public class TpsCleanupService {
                 
                 List<String> taskNames = config.tps.tasksToRun;
                 DebugLogger.debug("TPS-Cleanup", "TPS threshold breached! Triggering cleanup tasks: " + taskNames);
-                Bukkit.getConsoleSender().sendMessage(plugin.getMessageManager().getWithContext(null, "tps-critical", 
+                Bukkit.getConsoleSender().sendMessage(plugin.getLanguageManager().getWithContext(null, "tps-critical", 
                     "%tps%", String.format("%.2f", currentTps),
                     "%checks%", String.valueOf(config.tps.consecutiveChecks)));
                 for (String taskName : taskNames) {

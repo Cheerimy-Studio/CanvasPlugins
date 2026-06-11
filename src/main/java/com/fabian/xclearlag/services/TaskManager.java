@@ -36,7 +36,7 @@ public class TaskManager {
                     plugin.getCleanupNotifier(),
                     plugin.getClearExecutor(),
                     plugin.getMetricsTracker(),
-                    plugin.getMessageManager(),
+                    plugin.getLanguageManager(),
                     plugin.getSchedulerAdapter()
                 );
                 tasks.put(entry.getKey().toLowerCase(), task);

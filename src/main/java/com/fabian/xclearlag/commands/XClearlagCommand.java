@@ -81,10 +81,10 @@ public class XClearlagCommand implements CommandExecutor, TabCompleter {
                 plugin.getConfig().set("debug", !currentDebug);
                 plugin.saveConfig();
                 plugin.getConfigManager().load();
-                sender.sendMessage(plugin.getMessageManager().getWithContext(sender, "debug-toggled").replace("%state%", currentDebug ? "disabled" : "enabled"));
+                sender.sendMessage(plugin.getLanguageManager().getWithContext(sender, "debug-toggled").replace("%state%", currentDebug ? "disabled" : "enabled"));
                 break;
             default:
-                sender.sendMessage(plugin.getMessageManager().getWithContext(sender, "unknown-command"));
+                sender.sendMessage(plugin.getLanguageManager().getWithContext(sender, "unknown-command"));
                 break;
         }
 
@@ -93,23 +93,23 @@ public class XClearlagCommand implements CommandExecutor, TabCompleter {
 
     private void handleReload(CommandSender sender) {
         if (!sender.hasPermission("xclearlag.admin.reload")) {
-            sender.sendMessage(plugin.getMessageManager().getWithContext(sender, "no-permission"));
+            sender.sendMessage(plugin.getLanguageManager().getWithContext(sender, "no-permission"));
             return;
         }
         plugin.reload();
-        sender.sendMessage(plugin.getMessageManager().getWithContext(sender, "reload-success"));
+        sender.sendMessage(plugin.getLanguageManager().getWithContext(sender, "reload-success"));
     }
 
     private void handleClear(CommandSender sender, String[] args) {
         DebugLogger.debug("Command", "Handling clear command from " + sender.getName());
         if (!sender.hasPermission("xclearlag.admin.clear")) {
-            sender.sendMessage(plugin.getMessageManager().getWithContext(sender, "no-permission"));
+            sender.sendMessage(plugin.getLanguageManager().getWithContext(sender, "no-permission"));
             return;
         }
 
         XConfig config = plugin.getConfigManager().get();
         if (!config.manualClear.enabled) {
-            sender.sendMessage(plugin.getMessageManager().getWithContext(sender, "manual-clear-disabled"));
+            sender.sendMessage(plugin.getLanguageManager().getWithContext(sender, "manual-clear-disabled"));
             return;
         }
 
@@ -118,7 +118,7 @@ public class XClearlagCommand implements CommandExecutor, TabCompleter {
             if (cooldowns.containsKey(uuid)) {
                 long left = (cooldowns.get(uuid) + (config.manualClear.cooldown * 1000L)) - System.currentTimeMillis();
                 if (left > 0) {
-                    sender.sendMessage(plugin.getMessageManager().getWithContext(sender, "cooldown", "%time%", String.valueOf(left / 1000L)));
+                    sender.sendMessage(plugin.getLanguageManager().getWithContext(sender, "cooldown", "%time%", String.valueOf(left / 1000L)));
                     return;
                 }
             }
@@ -130,7 +130,7 @@ public class XClearlagCommand implements CommandExecutor, TabCompleter {
             DebugLogger.debug("Command", "Clearing specific task: " + taskName);
             ClearTask task = plugin.getTaskManager().getTaskMap().get(taskName);
             if (task == null) {
-                sender.sendMessage(plugin.getMessageManager().getWithContext(sender, "invalid-task", "%task%", taskName));
+                sender.sendMessage(plugin.getLanguageManager().getWithContext(sender, "invalid-task", "%task%", taskName));
                 return;
             }
             task.executeCleanup(sender, false, CleanupReason.MANUAL_TRIGGERED);
@@ -141,7 +141,7 @@ public class XClearlagCommand implements CommandExecutor, TabCompleter {
             }
             
             DebugLogger.debug("Command", "Clearing all manual tasks: " + config.manualClear.tasks);
-            sender.sendMessage(plugin.getMessageManager().getWithContext(sender, "global-clear-start"));
+            sender.sendMessage(plugin.getLanguageManager().getWithContext(sender, "global-clear-start"));
             
             // Execute all configured manual tasks
             for (String name : config.manualClear.tasks) {
@@ -155,42 +155,42 @@ public class XClearlagCommand implements CommandExecutor, TabCompleter {
 
     private void handleLag(CommandSender sender) {
         if (!sender.hasPermission("xclearlag.admin.lag")) {
-            sender.sendMessage(plugin.getMessageManager().getWithContext(sender, "no-permission"));
+            sender.sendMessage(plugin.getLanguageManager().getWithContext(sender, "no-permission"));
             return;
         }
 
         double tps = plugin.getTpsMonitor().getTPS();
         String tpsColor = tps >= 18 ? "&a" : (tps >= 15 ? "&e" : "&c");
 
-        sender.sendMessage(plugin.getMessageManager().getWithContext(sender, "lag-header"));
-        sender.sendMessage(plugin.getMessageManager().getWithContext(sender, "lag-tps", 
+        sender.sendMessage(plugin.getLanguageManager().getWithContext(sender, "lag-header"));
+        sender.sendMessage(plugin.getLanguageManager().getWithContext(sender, "lag-tps", 
             "%color%", tpsColor, 
             "%tps%", String.format("%.2f", tps)));
-        sender.sendMessage(plugin.getMessageManager().getWithContext(sender, "lag-memory", 
+        sender.sendMessage(plugin.getLanguageManager().getWithContext(sender, "lag-memory", 
             "%used%", String.valueOf(getUsedMemory()), 
             "%max%", String.valueOf(getMaxMemory())));
     }
 
     private void handleStats(CommandSender sender) {
         if (!sender.hasPermission("xclearlag.admin.stats")) {
-            sender.sendMessage(plugin.getMessageManager().getWithContext(sender, "no-permission"));
+            sender.sendMessage(plugin.getLanguageManager().getWithContext(sender, "no-permission"));
             return;
         }
 
         MetricsTracker metrics = plugin.getMetricsTracker();
-        sender.sendMessage(plugin.getMessageManager().getWithContext(sender, "stats-header"));
-        sender.sendMessage(plugin.getMessageManager().getWithContext(sender, "stats-total", "%count%", String.valueOf(metrics.getTotalRemoved())));
-        sender.sendMessage(plugin.getMessageManager().getWithContext(sender, "stats-average", "%avg%", String.format("%.1f", metrics.getAverageRemoved())));
+        sender.sendMessage(plugin.getLanguageManager().getWithContext(sender, "stats-header"));
+        sender.sendMessage(plugin.getLanguageManager().getWithContext(sender, "stats-total", "%count%", String.valueOf(metrics.getTotalRemoved())));
+        sender.sendMessage(plugin.getLanguageManager().getWithContext(sender, "stats-average", "%avg%", String.format("%.1f", metrics.getAverageRemoved())));
         
         List<MetricsTracker.CleanupRecord> history = metrics.getHistory();
         if (history.isEmpty()) {
-            sender.sendMessage(plugin.getMessageManager().getWithContext(sender, "stats-no-data"));
+            sender.sendMessage(plugin.getLanguageManager().getWithContext(sender, "stats-no-data"));
         } else {
-            sender.sendMessage(plugin.getMessageManager().getWithContext(sender, "stats-history-header"));
+            sender.sendMessage(plugin.getLanguageManager().getWithContext(sender, "stats-history-header"));
             for (int i = 0; i < Math.min(5, history.size()); i++) {
                 MetricsTracker.CleanupRecord r = history.get(i);
                 String time = df.format(new Date(r.timestamp));
-                sender.sendMessage(plugin.getMessageManager().getWithContext(sender, "stats-history-entry",
+                sender.sendMessage(plugin.getLanguageManager().getWithContext(sender, "stats-history-entry",
                     "%time%", time,
                     "%task%", r.taskName,
                     "%count%", String.valueOf(r.removed),
@@ -201,25 +201,25 @@ public class XClearlagCommand implements CommandExecutor, TabCompleter {
 
     private void handleTps(CommandSender sender) {
         double tps = plugin.getTpsMonitor().getTPS();
-        sender.sendMessage(plugin.getMessageManager().getWithContext(sender, "tps-format", "%tps%", String.format("%.2f", tps)));
+        sender.sendMessage(plugin.getLanguageManager().getWithContext(sender, "tps-format", "%tps%", String.format("%.2f", tps)));
     }
 
     private void sendHelp(CommandSender sender) {
-        sender.sendMessage(plugin.getMessageManager().getWithContext(sender, "help-header"));
-        sender.sendMessage(plugin.getMessageManager().getWithContext(sender, "help-help"));
-        sender.sendMessage(plugin.getMessageManager().getWithContext(sender, "help-clear"));
-        sender.sendMessage(plugin.getMessageManager().getWithContext(sender, "help-lag"));
-        sender.sendMessage(plugin.getMessageManager().getWithContext(sender, "help-stats"));
-        sender.sendMessage(plugin.getMessageManager().getWithContext(sender, "help-inspect"));
-        sender.sendMessage(plugin.getMessageManager().getWithContext(sender, "help-clearchunk"));
-        sender.sendMessage(plugin.getMessageManager().getWithContext(sender, "help-tpchunk"));
-        sender.sendMessage(plugin.getMessageManager().getWithContext(sender, "help-update"));
-        sender.sendMessage(plugin.getMessageManager().getWithContext(sender, "help-reload"));
+        sender.sendMessage(plugin.getLanguageManager().getWithContext(sender, "help-header"));
+        sender.sendMessage(plugin.getLanguageManager().getWithContext(sender, "help-help"));
+        sender.sendMessage(plugin.getLanguageManager().getWithContext(sender, "help-clear"));
+        sender.sendMessage(plugin.getLanguageManager().getWithContext(sender, "help-lag"));
+        sender.sendMessage(plugin.getLanguageManager().getWithContext(sender, "help-stats"));
+        sender.sendMessage(plugin.getLanguageManager().getWithContext(sender, "help-inspect"));
+        sender.sendMessage(plugin.getLanguageManager().getWithContext(sender, "help-clearchunk"));
+        sender.sendMessage(plugin.getLanguageManager().getWithContext(sender, "help-tpchunk"));
+        sender.sendMessage(plugin.getLanguageManager().getWithContext(sender, "help-update"));
+        sender.sendMessage(plugin.getLanguageManager().getWithContext(sender, "help-reload"));
     }
 
     private void handleInspect(CommandSender sender, String[] args) {
         if (!sender.hasPermission("xclearlag.admin.inspect")) {
-            sender.sendMessage(plugin.getMessageManager().getWithContext(sender, "no-permission"));
+            sender.sendMessage(plugin.getLanguageManager().getWithContext(sender, "no-permission"));
             return;
         }
 
@@ -236,7 +236,7 @@ public class XClearlagCommand implements CommandExecutor, TabCompleter {
             else if (entity instanceof LivingEntity && !(entity instanceof Player)) mobs++;
         }
 
-        sender.sendMessage(plugin.getMessageManager().getWithContext(sender, "inspect-format", 
+        sender.sendMessage(plugin.getLanguageManager().getWithContext(sender, "inspect-format", 
             "%world%", chunk.getWorld().getName(),
             "%x%", String.valueOf(chunk.getX()),
             "%z%", String.valueOf(chunk.getZ()),
@@ -247,7 +247,7 @@ public class XClearlagCommand implements CommandExecutor, TabCompleter {
 
     private void handleClearChunk(CommandSender sender, String[] args) {
         if (!sender.hasPermission("xclearlag.admin.clearchunk")) {
-            sender.sendMessage(plugin.getMessageManager().getWithContext(sender, "no-permission"));
+            sender.sendMessage(plugin.getLanguageManager().getWithContext(sender, "no-permission"));
             return;
         }
 
@@ -262,7 +262,7 @@ public class XClearlagCommand implements CommandExecutor, TabCompleter {
             }
         }
 
-        sender.sendMessage(plugin.getMessageManager().getWithContext(sender, "clearchunk-success", 
+        sender.sendMessage(plugin.getLanguageManager().getWithContext(sender, "clearchunk-success", 
             "%count%", String.valueOf(count),
             "%x%", String.valueOf(chunk.getX()),
             "%z%", String.valueOf(chunk.getZ())));
@@ -270,12 +270,12 @@ public class XClearlagCommand implements CommandExecutor, TabCompleter {
 
     private void handleTpChunk(CommandSender sender, String[] args) {
         if (!(sender instanceof Player)) {
-            sender.sendMessage(plugin.getMessageManager().getWithContext(sender, "player-only"));
+            sender.sendMessage(plugin.getLanguageManager().getWithContext(sender, "player-only"));
             return;
         }
 
         if (!sender.hasPermission("xclearlag.admin.tpchunk")) {
-            sender.sendMessage(plugin.getMessageManager().getWithContext(sender, "no-permission"));
+            sender.sendMessage(plugin.getLanguageManager().getWithContext(sender, "no-permission"));
             return;
         }
 
@@ -288,14 +288,14 @@ public class XClearlagCommand implements CommandExecutor, TabCompleter {
         int y = chunk.getWorld().getHighestBlockYAt(x, z);
 
         player.teleport(new org.bukkit.Location(chunk.getWorld(), x + 0.5, y + 1, z + 0.5));
-        sender.sendMessage(plugin.getMessageManager().getWithContext(sender, "tpchunk-success", 
+        sender.sendMessage(plugin.getLanguageManager().getWithContext(sender, "tpchunk-success", 
             "%x%", String.valueOf(chunk.getX()),
             "%z%", String.valueOf(chunk.getZ())));
     }
 
     private void handleUpdate(CommandSender sender) {
         if (!sender.hasPermission("xclearlag.admin.update")) {
-            sender.sendMessage(plugin.getMessageManager().getWithContext(sender, "no-permission"));
+            sender.sendMessage(plugin.getLanguageManager().getWithContext(sender, "no-permission"));
             return;
         }
         plugin.getUpdateChecker().checkForUpdates(sender);
@@ -307,7 +307,7 @@ public class XClearlagCommand implements CommandExecutor, TabCompleter {
 
         if (args.length <= startIndex) {
             if (!(sender instanceof Player)) {
-                sender.sendMessage(plugin.getMessageManager().getWithContext(sender, "player-only"));
+                sender.sendMessage(plugin.getLanguageManager().getWithContext(sender, "player-only"));
                 return null;
             }
             Player p = (Player) sender;
@@ -318,26 +318,26 @@ public class XClearlagCommand implements CommandExecutor, TabCompleter {
             if (args.length >= startIndex + 3) {
                 world = Bukkit.getWorld(args[startIndex]);
                 if (world == null) {
-                    sender.sendMessage(plugin.getMessageManager().getWithContext(sender, "invalid-world", "%world%", args[startIndex]));
+                    sender.sendMessage(plugin.getLanguageManager().getWithContext(sender, "invalid-world", "%world%", args[startIndex]));
                     return null;
                 }
                 cx = Integer.parseInt(args[startIndex + 1]);
                 cz = Integer.parseInt(args[startIndex + 2]);
             } else if (args.length >= startIndex + 2) {
                 if (!(sender instanceof Player)) {
-                    sender.sendMessage(plugin.getMessageManager().getWithContext(sender, "player-only"));
+                    sender.sendMessage(plugin.getLanguageManager().getWithContext(sender, "player-only"));
                     return null;
                 }
                 world = ((Player) sender).getWorld();
                 cx = Integer.parseInt(startIndex == 1 ? args[1] : args[startIndex]);
                 cz = Integer.parseInt(startIndex == 1 ? args[2] : args[startIndex + 1]);
             } else {
-                sender.sendMessage(plugin.getMessageManager().getWithContext(sender, "command-usage"));
+                sender.sendMessage(plugin.getLanguageManager().getWithContext(sender, "command-usage"));
                 return null;
             }
             return world.getChunkAt(cx, cz);
         } catch (NumberFormatException e) {
-            sender.sendMessage(plugin.getMessageManager().getWithContext(sender, "invalid-coordinates"));
+            sender.sendMessage(plugin.getLanguageManager().getWithContext(sender, "invalid-coordinates"));
             return null;
         }
     }

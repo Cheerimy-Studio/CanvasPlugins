@@ -1,7 +1,7 @@
 package com.fabian.xclearlag.utils;
 
 import com.fabian.xclearlag.XClearlag;
-import com.fabian.xclearlag.managers.MessageManager;
+import com.fabian.xclearlag.managers.LanguageManager;
 import com.fabian.xclearlag.utils.scheduler.SchedulerAdapter;
 import com.fabian.xclearlag.utils.DebugLogger;
 import org.bukkit.Bukkit;
@@ -49,7 +49,7 @@ public class UpdateChecker {
                 reader.close();
 
                 this.latestVersion = version;
-                MessageManager lang = plugin.getMessageManager();
+                LanguageManager lang = plugin.getLanguageManager();
 
                 if (latestVersion != null && isNewerVersion(currentVersion, latestVersion)) {
                     this.updateAvailable = true;
@@ -77,10 +77,10 @@ public class UpdateChecker {
             } catch (Exception e) {
                 DebugLogger.debug("UpdateChecker", "Update check failed.", e);
                 if (sender != null) {
-                    sender.sendMessage(plugin.getMessageManager().getWithContext(sender, "update-error"));
+                    sender.sendMessage(plugin.getLanguageManager().getWithContext(sender, "update-error"));
                 } else {
                     Bukkit.getConsoleSender()
-                            .sendMessage(plugin.getMessageManager().getWithContext(null, "update-error"));
+                            .sendMessage(plugin.getLanguageManager().getWithContext(null, "update-error"));
                 }
             }
         });

@@ -15,12 +15,12 @@ import java.util.Map;
 /**
  * Manages localized messages and color translation.
  */
-public class MessageManager {
+public class LanguageManager {
 
     private final XClearlag plugin;
     private final Map<String, String> messages = new HashMap<>();
 
-    public MessageManager(XClearlag plugin) {
+    public LanguageManager(XClearlag plugin) {
         this.plugin = plugin;
     }
 

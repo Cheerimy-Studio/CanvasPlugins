@@ -14,12 +14,12 @@ import java.util.logging.Logger;
  */
 public class CleanupNotifier {
 
-    private final MessageManager messageManager;
+    private final LanguageManager languageManager;
     private final BossBarManager bossBarManager;
     private final Logger logger;
 
-    public CleanupNotifier(MessageManager messageManager, BossBarManager bossBarManager, Logger logger) {
-        this.messageManager = messageManager;
+    public CleanupNotifier(LanguageManager languageManager, BossBarManager bossBarManager, Logger logger) {
+        this.languageManager = languageManager;
         this.bossBarManager = bossBarManager;
         this.logger = logger;
     }
@@ -30,7 +30,7 @@ public class CleanupNotifier {
 
     public void broadcast(String keyOrRaw, boolean raw, CommandSender context) {
         DebugLogger.debug("Notifier", "Broadcasting: " + keyOrRaw + " (raw=" + raw + ")");
-        String msgTemplate = raw ? keyOrRaw : messageManager.get(keyOrRaw);
+        String msgTemplate = raw ? keyOrRaw : languageManager.get(keyOrRaw);
         if (msgTemplate.isEmpty()) return;
 
         // Use ConsoleSender to avoid double [X-Clearlag] prefix and preserve colors

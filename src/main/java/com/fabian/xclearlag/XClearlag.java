@@ -36,7 +36,7 @@ public class XClearlag extends JavaPlugin {
     }
 
     private ConfigManager configManager;
-    private MessageManager messageManager;
+    private LanguageManager languageManager;
     private TaskManager taskManager;
     private UpdateChecker updateChecker;
     private TPSMonitor tpsMonitor;
@@ -96,10 +96,10 @@ public class XClearlag extends JavaPlugin {
             logError("Failed to load config: " + e.getMessage());
         }
 
-        DebugLogger.debug("Managers", "Creating MessageManager...");
-        messageManager = new MessageManager(this);
+        DebugLogger.debug("Managers", "Creating LanguageManager...");
+        languageManager = new LanguageManager(this);
         try {
-            messageManager.load();
+            languageManager.load();
         } catch (Exception e) {
             logError("Failed to load messages: " + e.getMessage());
         }
@@ -209,7 +209,7 @@ public class XClearlag extends JavaPlugin {
 
     public SchedulerAdapter getSchedulerAdapter() { return schedulerAdapter; }
     public ConfigManager getConfigManager() { return configManager; }
-    public MessageManager getMessageManager() { return messageManager; }
+    public LanguageManager getLanguageManager() { return languageManager; }
     public TaskManager getTaskManager() { return taskManager; }
     public UpdateChecker getUpdateChecker() { return updateChecker; }
     public TPSMonitor getTpsMonitor() { return tpsMonitor; }
