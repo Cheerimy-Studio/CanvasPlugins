@@ -43,13 +43,13 @@ public class ConfigManager {
 
             if (diskCode < jarCode) {
                 DebugLogger.debug("Config", "Config outdated (disk=" + diskCode + " < jar=" + jarCode + "), updating...");
-                plugin.getLogger().info("Outdated configuration detected (code " + diskCode + " < " + jarCode + "). Updating config...");
+                plugin.logInfo("Outdated configuration detected (code " + diskCode + " < " + jarCode + "). Updating config...");
 
                 // Backup current config
                 File backupFile = new File(plugin.getDataFolder(), "config_old.yml");
                 if (backupFile.exists()) backupFile.delete();
                 configFile.renameTo(backupFile);
-                plugin.getLogger().info("Old config backed up as config_old.yml");
+                plugin.logInfo("Old config backed up as config_old.yml");
 
                 // Save fresh default config from JAR
                 plugin.saveDefaultConfig();
@@ -57,7 +57,7 @@ public class ConfigManager {
 
                 // Use ConfigUpdater to migrate old values into the new file
                 ConfigUpdater.update(plugin, "config.yml", newConfigFile);
-                plugin.getLogger().info("Configuration updated successfully via ConfigUpdater.");
+                plugin.logInfo("Configuration updated successfully via ConfigUpdater.");
             } else {
                 // Config is up to date, still run ConfigUpdater to add any missing keys
                 DebugLogger.debug("Config", "Config up to date, running ConfigUpdater for missing keys...");

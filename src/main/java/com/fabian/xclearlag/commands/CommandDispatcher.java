@@ -40,7 +40,7 @@ public class CommandDispatcher {
         try {
             Bukkit.dispatchCommand(new SilentCommandSender(), processPlaceholders(null, cmd, secondsLeft));
         } catch (Exception e) {
-            plugin.getLogger().warning("Error executing command: " + cmd);
+            plugin.logWarning("Error executing command: " + cmd);
         }
     }
 

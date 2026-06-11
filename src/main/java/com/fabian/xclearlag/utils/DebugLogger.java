@@ -11,7 +11,7 @@ import org.bukkit.ChatColor;
  */
 public final class DebugLogger {
 
-    private static final String PREFIX = "&8[&bX-Clearlag&8] &b[DEBUG] &7";
+    private static final String PREFIX = "&8[&bDEBUG&8]&r ";
 
     private DebugLogger() {}
 
@@ -34,7 +34,7 @@ public final class DebugLogger {
     public static void debug(String category, String message) {
         if (!isDebugEnabled()) return;
         Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&',
-                PREFIX + "&f[" + category + "&f] &7" + message));
+                PREFIX + "&f[" + category + "&f]&r &7" + message));
     }
 
     /**
@@ -47,7 +47,7 @@ public final class DebugLogger {
     public static void debug(String category, String message, Throwable throwable) {
         if (!isDebugEnabled()) return;
         Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&',
-                PREFIX + "&f[" + category + "&f] &7" + message));
+                PREFIX + "&f[" + category + "&f]&r &7" + message));
         if (throwable != null) {
             throwable.printStackTrace();
         }

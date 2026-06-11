@@ -10,7 +10,6 @@ import com.fabian.xclearlag.utils.DebugLogger;
 
 import org.bukkit.Bukkit;
 import java.util.List;
-import java.util.logging.Logger;
 
 /**
  * Monitor TPS and trigger automatic cleanups if the server lags.
@@ -22,7 +21,6 @@ public class TpsCleanupService {
     private final ConfigManager configManager;
     private final TPSMonitor tpsMonitor;
     private final TaskManager taskManager;
-    private final Logger logger;
     private final SchedulerAdapter schedulerAdapter;
     
     private Object task;
@@ -35,7 +33,6 @@ public class TpsCleanupService {
         this.tpsMonitor = tpsMonitor;
         this.taskManager = taskManager;
         this.schedulerAdapter = schedulerAdapter;
-        this.logger = plugin.getLogger();
     }
 
     public void start() {
@@ -76,7 +73,7 @@ public class TpsCleanupService {
                         try {
                             ct.executeCleanup(new SilentCommandSender(), true, CleanupReason.TPS_TRIGGERED);
                         } catch (Exception e) {
-                            logger.warning("Cleanup error in auto-task '" + taskName + "': " + e.getMessage());
+                            plugin.logWarning("Cleanup error in auto-task '" + taskName + "': " + e.getMessage());
                         }
                     }
                 }

@@ -27,6 +27,10 @@ public class XClearlag extends JavaPlugin {
         getLogger().info(message);
     }
 
+    public void logWarning(String message) {
+        getLogger().warning(message);
+    }
+
     public void logError(String message) {
         getLogger().severe(message);
     }
@@ -69,27 +73,27 @@ public class XClearlag extends JavaPlugin {
             // PlaceholderAPI Integration
             if (getServer().getPluginManager().getPlugin("PlaceholderAPI") != null) {
                 new XPlaceholderExpansion(this).register();
-                getLogger().info("Found PlaceholderAPI! Custom placeholders registered.");
+                logInfo("Found PlaceholderAPI! Custom placeholders registered.");
                 DebugLogger.debug("Init", "PlaceholderAPI expansion registered.");
             }
             
             DebugLogger.debug("Init", "X-Clearlag v" + getDescription().getVersion() + " fully initialized.");
-            getLogger().info("X-Clearlag v" + getDescription().getVersion() + " initialized successfully.");
+            logInfo("X-Clearlag v" + getDescription().getVersion() + " initialized successfully.");
         } catch (Exception e) {
-            getLogger().severe("CRITICAL FAILURE DURING STARTUP: " + e.getMessage());
+            logError("CRITICAL FAILURE DURING STARTUP: " + e.getMessage());
             e.printStackTrace();
             getServer().getPluginManager().disablePlugin(this);
         }
     }
 
     private void initManagers() {
-        getLogger().info("Loading managers...");
+        logInfo("Loading managers...");
         DebugLogger.debug("Managers", "Creating ConfigManager...");
         configManager = new ConfigManager(this);
         try {
             configManager.load();
         } catch (Exception e) {
-            getLogger().severe("Failed to load config: " + e.getMessage());
+            logError("Failed to load config: " + e.getMessage());
         }
 
         DebugLogger.debug("Managers", "Creating MessageManager...");
@@ -97,7 +101,7 @@ public class XClearlag extends JavaPlugin {
         try {
             messageManager.load();
         } catch (Exception e) {
-            getLogger().severe("Failed to load messages: " + e.getMessage());
+            logError("Failed to load messages: " + e.getMessage());
         }
         
         DebugLogger.debug("Managers", "Creating TaskManager...");
@@ -105,7 +109,7 @@ public class XClearlag extends JavaPlugin {
     }
 
     private void initServices() {
-        getLogger().info("Initializing services...");
+        logInfo("Initializing services...");
         
         // 1. Core Utilities
         DebugLogger.debug("Services", "Creating TPSMonitor...");
@@ -138,7 +142,7 @@ public class XClearlag extends JavaPlugin {
     }
 
     private void initCommands() {
-        getLogger().info("Registering commands...");
+        logInfo("Registering commands...");
         XClearlagCommand commandHandler = new XClearlagCommand(this);
         org.bukkit.command.PluginCommand xclCmd = getCommand("xcl");
         if (xclCmd != null) {
@@ -170,9 +174,9 @@ public class XClearlag extends JavaPlugin {
                 tpsCleanupService.start();
             }
             DebugLogger.debug("Reload", "Reload complete.");
-            getLogger().info("X-Clearlag reloaded successfully.");
+            logInfo("X-Clearlag reloaded successfully.");
         } catch (Exception e) {
-            getLogger().severe("Failed to reload plugin: " + e.getMessage());
+            logError("Failed to reload plugin: " + e.getMessage());
         }
     }
 
@@ -194,11 +198,11 @@ public class XClearlag extends JavaPlugin {
 
         if (isFolia) {
             schedulerAdapter = new FoliaSchedulerAdapter(this);
-            getLogger().info("Folia detected! Using regional scheduler adapter.");
+            logInfo("Folia detected! Using regional scheduler adapter.");
             DebugLogger.debug("Scheduler", "Folia detected, using FoliaSchedulerAdapter.");
         } else {
             schedulerAdapter = new BukkitSchedulerAdapter(this);
-            getLogger().info("Standard Bukkit/Paper detected! Using standard scheduler adapter.");
+            logInfo("Standard Bukkit/Paper detected! Using standard scheduler adapter.");
             DebugLogger.debug("Scheduler", "Standard Bukkit/Paper detected, using BukkitSchedulerAdapter.");
         }
     }

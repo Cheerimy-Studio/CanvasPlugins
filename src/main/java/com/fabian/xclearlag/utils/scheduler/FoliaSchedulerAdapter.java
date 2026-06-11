@@ -1,5 +1,6 @@
 package com.fabian.xclearlag.utils.scheduler;
 
+import com.fabian.xclearlag.XClearlag;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 import java.lang.reflect.Method;
@@ -13,7 +14,7 @@ import com.fabian.xclearlag.utils.DebugLogger;
  */
 public class FoliaSchedulerAdapter implements SchedulerAdapter {
 
-    private final Plugin plugin;
+    private final XClearlag plugin;
     private Object globalScheduler;
     private Object asyncScheduler;
 
@@ -22,7 +23,7 @@ public class FoliaSchedulerAdapter implements SchedulerAdapter {
     private Method runAtFixedRateMethod;
     private Method runNowAsyncMethod;
 
-    public FoliaSchedulerAdapter(Plugin plugin) {
+    public FoliaSchedulerAdapter(XClearlag plugin) {
         this.plugin = plugin;
         try {
             Class<?> serverClass = Bukkit.getServer().getClass();
@@ -52,7 +53,7 @@ public class FoliaSchedulerAdapter implements SchedulerAdapter {
             this.runNowAsyncMethod = asyncClass.getMethod("runNow", Plugin.class, Consumer.class);
 
         } catch (Exception e) {
-            plugin.getLogger().warning("Failed to initialize Folia Reflection: " + e.getMessage());
+            plugin.logWarning("Failed to initialize Folia Reflection: " + e.getMessage());
             DebugLogger.debug("Scheduler", "FoliaSchedulerAdapter reflection init failed.", e);
         }
     }

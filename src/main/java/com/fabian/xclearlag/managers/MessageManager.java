@@ -57,7 +57,7 @@ public class MessageManager {
                 defaults = YamlConfiguration.loadConfiguration(new InputStreamReader(ds, StandardCharsets.UTF_8));
             }
         } catch (Exception e) {
-            plugin.getLogger().warning("Failed to load default messages for " + fileName + ": " + e.getMessage());
+            plugin.logWarning("Failed to load default messages for " + fileName + ": " + e.getMessage());
         }
 
         if (defaults == null) {
@@ -66,7 +66,7 @@ public class MessageManager {
                     defaults = YamlConfiguration.loadConfiguration(new InputStreamReader(ds, StandardCharsets.UTF_8));
                 }
             } catch (Exception e) {
-                plugin.getLogger().warning("Failed to load fallback en.yml messages: " + e.getMessage());
+                plugin.logWarning("Failed to load fallback en.yml messages: " + e.getMessage());
             }
         }
 
@@ -82,9 +82,9 @@ public class MessageManager {
             if (modified) {
                 try {
                     messagesConfig.save(messagesFile);
-                    plugin.getLogger().info("Synchronized missing keys in " + fileName);
+                    plugin.logInfo("Synchronized missing keys in " + fileName);
                 } catch (Exception e) {
-                    plugin.getLogger().warning("Failed to sync keys in " + fileName + ": " + e.getMessage());
+                    plugin.logWarning("Failed to sync keys in " + fileName + ": " + e.getMessage());
                 }
             }
             messagesConfig.setDefaults(defaults);
