@@ -1,4 +1,4 @@
-package com.fabian.xclearlag.services;
+package com.fabian.xclearlag.commands;
 
 import com.fabian.xclearlag.api.CleanupReason;
 import com.fabian.xclearlag.api.CleanupService;
