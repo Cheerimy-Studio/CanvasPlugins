@@ -4,7 +4,7 @@ import com.fabian.xclearlag.XClearlag;
 import com.fabian.xclearlag.api.CleanupReason;
 import com.fabian.xclearlag.managers.*;
 
-import com.fabian.xclearlag.utils.MetricsTracker;
+import com.fabian.xclearlag.metrics.Metrics;
 import com.fabian.xclearlag.utils.DebugLogger;
 
 import org.bukkit.Bukkit;
@@ -177,18 +177,18 @@ public class XClearlagCommand implements CommandExecutor, TabCompleter {
             return;
         }
 
-        MetricsTracker metrics = plugin.getMetricsTracker();
+        Metrics metrics = plugin.getMetricsTracker();
         sender.sendMessage(plugin.getLanguageManager().getWithContext(sender, "stats-header"));
         sender.sendMessage(plugin.getLanguageManager().getWithContext(sender, "stats-total", "%count%", String.valueOf(metrics.getTotalRemoved())));
         sender.sendMessage(plugin.getLanguageManager().getWithContext(sender, "stats-average", "%avg%", String.format("%.1f", metrics.getAverageRemoved())));
         
-        List<MetricsTracker.CleanupRecord> history = metrics.getHistory();
+        List<Metrics.CleanupRecord> history = metrics.getHistory();
         if (history.isEmpty()) {
             sender.sendMessage(plugin.getLanguageManager().getWithContext(sender, "stats-no-data"));
         } else {
             sender.sendMessage(plugin.getLanguageManager().getWithContext(sender, "stats-history-header"));
             for (int i = 0; i < Math.min(5, history.size()); i++) {
-                MetricsTracker.CleanupRecord r = history.get(i);
+                Metrics.CleanupRecord r = history.get(i);
                 String time = df.format(new Date(r.timestamp));
                 sender.sendMessage(plugin.getLanguageManager().getWithContext(sender, "stats-history-entry",
                     "%time%", time,

@@ -11,7 +11,7 @@ import java.util.function.Consumer;
  * Utility class to handle task scheduling on both traditional (Spigot/Paper)
  * and regional (Folia) servers.
  */
-public class SchedulerUtils {
+public class SchedulerUtil {
 
     private static Boolean isFolia = null;
 
@@ -23,7 +23,7 @@ public class SchedulerUtils {
             } catch (ClassNotFoundException e) {
                 isFolia = false;
             }
-            DebugLogger.debug("SchedulerUtils", "Folia detection: " + isFolia);
+            DebugLogger.debug("SchedulerUtil", "Folia detection: " + isFolia);
         }
         return isFolia;
     }

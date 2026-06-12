@@ -1,7 +1,6 @@
-package com.fabian.xclearlag.utils;
+package com.fabian.xclearlag.managers;
 
-import com.fabian.xclearlag.managers.*;
-
+import com.fabian.xclearlag.utils.DebugLogger;
 import org.bukkit.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;

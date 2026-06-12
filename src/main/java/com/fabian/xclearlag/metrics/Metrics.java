@@ -1,19 +1,22 @@
-package com.fabian.xclearlag.utils;
+package com.fabian.xclearlag.metrics;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
+import com.fabian.xclearlag.utils.TPSMonitor;
+import com.fabian.xclearlag.utils.DebugLogger;
+
 /**
  * Tracks cleanup statistics and performance history.
  */
-public class MetricsTracker {
+public class Metrics {
 
     private final TPSMonitor tpsMonitor;
     private final Map<String, Integer> recentStats = new ConcurrentHashMap<>();
     private final List<CleanupRecord> history = Collections.synchronizedList(new LinkedList<>());
     private static final int MAX_HISTORY = 50;
 
-    public MetricsTracker(TPSMonitor tpsMonitor) {
+    public Metrics(TPSMonitor tpsMonitor) {
         this.tpsMonitor = tpsMonitor;
     }
 

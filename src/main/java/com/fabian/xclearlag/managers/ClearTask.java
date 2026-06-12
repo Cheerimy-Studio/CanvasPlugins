@@ -5,6 +5,7 @@ import com.fabian.xclearlag.api.CleanupService;
 import com.fabian.xclearlag.commands.*;
 import com.fabian.xclearlag.managers.*;
 import com.fabian.xclearlag.utils.*;
+import com.fabian.xclearlag.metrics.Metrics;
 
 import com.fabian.xclearlag.utils.scheduler.SchedulerAdapter;
 import com.fabian.xclearlag.utils.DebugLogger;
@@ -27,7 +28,7 @@ public class ClearTask {
     private final CommandDispatcher commandDispatcher;
     private final CleanupNotifier notifier;
     private final CleanupService cleanupService;
-    private final MetricsTracker metricsTracker;
+    private final Metrics metricsTracker;
     private final LanguageManager languageManager;
     private final SchedulerAdapter schedulerAdapter;
 
@@ -35,7 +36,7 @@ public class ClearTask {
 
     public ClearTask(JavaPlugin plugin, String name, XConfig.TaskConfig config,
                      CommandDispatcher commandDispatcher, CleanupNotifier notifier,
-                     CleanupService cleanupService, MetricsTracker metricsTracker,
+                     CleanupService cleanupService, Metrics metricsTracker,
                      LanguageManager languageManager, SchedulerAdapter schedulerAdapter) {
         this.name = name;
         this.config = config;

@@ -1,7 +1,9 @@
-package com.fabian.xclearlag.utils;
+package com.fabian.xclearlag.hooks;
 
 import com.fabian.xclearlag.XClearlag;
 import com.fabian.xclearlag.managers.ClearTask;
+import com.fabian.xclearlag.metrics.Metrics;
+import com.fabian.xclearlag.utils.DebugLogger;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.OfflinePlayer;
 import org.jetbrains.annotations.NotNull;
@@ -45,7 +47,7 @@ public class XPlaceholderExpansion extends PlaceholderExpansion {
         }
 
         if (params.equalsIgnoreCase("last_removed")) {
-            java.util.List<MetricsTracker.CleanupRecord> history = plugin.getMetricsTracker().getHistory();
+            java.util.List<Metrics.CleanupRecord> history = plugin.getMetricsTracker().getHistory();
             if (history.isEmpty()) return "0";
             return String.valueOf(history.get(0).removed);
         }

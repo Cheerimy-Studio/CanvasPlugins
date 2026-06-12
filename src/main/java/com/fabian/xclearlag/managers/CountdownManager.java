@@ -1,7 +1,9 @@
-package com.fabian.xclearlag.utils;
+package com.fabian.xclearlag.managers;
 
 import java.util.List;
 import java.util.ArrayList;
+
+import com.fabian.xclearlag.utils.DebugLogger;
 
 /**
  * Manages the countdown state for a task.

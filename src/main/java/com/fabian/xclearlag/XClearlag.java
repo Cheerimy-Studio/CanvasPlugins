@@ -7,6 +7,8 @@ import com.fabian.xclearlag.managers.*;
 import com.fabian.xclearlag.managers.DependencyManager;
 
 import com.fabian.xclearlag.utils.*;
+import com.fabian.xclearlag.metrics.Metrics;
+import com.fabian.xclearlag.hooks.XPlaceholderExpansion;
 import com.fabian.xclearlag.utils.scheduler.*;
 import com.fabian.xclearlag.utils.DebugLogger;
 import com.fabian.xclearlag.api.XClearlagAPI;
@@ -44,7 +46,7 @@ public class XClearlag extends JavaPlugin {
     private TpsCleanupService tpsCleanupService;
     private SchedulerAdapter schedulerAdapter;
     
-    private MetricsTracker metricsTracker;
+    private Metrics metricsTracker;
     private CommandDispatcher commandDispatcher;
     private ClearExecutor clearExecutor;
     private BossBarManager bossBarManager;
@@ -122,9 +124,9 @@ public class XClearlag extends JavaPlugin {
         cleanupNotifier = new CleanupNotifier(messageManager, bossBarManager, getLogger());
         
         // 2. Functional Services
-        metricsTracker = new MetricsTracker(tpsMonitor);
+        metricsTracker = new Metrics(tpsMonitor);
         clearExecutor = new ClearExecutor(this, configManager);
-        DebugLogger.debug("Services", "ClearExecutor and MetricsTracker created.");
+        DebugLogger.debug("Services", "ClearExecutor and Metrics created.");
 
         // 3. Lifecycle Managers
         DebugLogger.debug("Services", "Loading tasks...");
@@ -213,7 +215,7 @@ public class XClearlag extends JavaPlugin {
     public TaskManager getTaskManager() { return taskManager; }
     public UpdateChecker getUpdateChecker() { return updateChecker; }
     public TPSMonitor getTpsMonitor() { return tpsMonitor; }
-    public MetricsTracker getMetricsTracker() { return metricsTracker; }
+    public Metrics getMetricsTracker() { return metricsTracker; }
     public CommandDispatcher getCommandDispatcher() { return commandDispatcher; }
     public ClearExecutor getClearExecutor() { return clearExecutor; }
     public BossBarManager getBossBarManager() { return bossBarManager; }

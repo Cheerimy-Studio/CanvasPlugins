@@ -1,7 +1,6 @@
 package com.fabian.xclearlag.managers;
 
 import com.fabian.xclearlag.managers.*;
-import com.fabian.xclearlag.utils.BossBarManager;
 import com.fabian.xclearlag.utils.DebugLogger;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
