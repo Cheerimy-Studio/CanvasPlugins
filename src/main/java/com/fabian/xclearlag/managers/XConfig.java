@@ -21,7 +21,7 @@ public class XConfig {
             config.getString("prefix", "&8[&bX-ClearLag&8] &7"),
             config.getString("language", "en"),
             config.getStringList("worlds.blacklist"),
-            config.getBoolean("check-updates", true),
+            config.getBoolean("updates.check", true),
             config.getBoolean("debug", false),
             config.getBoolean("metrics", true),
             config.getBoolean("bossbar.enabled", false),

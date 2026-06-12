@@ -24,8 +24,15 @@ prefix: "&8[&bX-ClearLag&8] &7"
 # Message files are stored in: plugins/X-Clearlag/messages/<language>.yml
 language: "en"
 
-# Check for plugin updates on startup?
-check-updates: true
+# ------------------------------------------------------------------------------
+# UPDATE CHECKER
+# Checks the SpigotMC API for new versions on startup.
+# ------------------------------------------------------------------------------
+updates:
+  # Check for updates when the server starts?
+  check: true
+  # Notify admins (players with xclearlag.admin) on join if an update exists?
+  notify-on-join: true
 
 # Enable detailed debug logging in the console?
 debug: false

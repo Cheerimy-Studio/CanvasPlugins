@@ -2,6 +2,7 @@ package com.fabian.xclearlag;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.event.EventHandler;
 import org.bukkit.plugin.java.JavaPlugin;
 import com.fabian.xclearlag.commands.*;
 import com.fabian.xclearlag.managers.*;
@@ -116,6 +117,26 @@ public class XClearlag extends JavaPlugin {
             this.updateChecker = new UpdateChecker(this);
             schedulerAdapter.runTaskLater(() -> updateChecker.checkForUpdates(), 100L);
         }
+
+        // Register update notification listener
+        getServer().getPluginManager().registerEvents(new org.bukkit.event.Listener() {
+            @EventHandler
+            public void onPlayerJoin(org.bukkit.event.player.PlayerJoinEvent event) {
+                org.bukkit.entity.Player player = event.getPlayer();
+                if (!player.isOp() && !player.hasPermission("xclearlag.admin")) return;
+                if (!getConfig().getBoolean("updates.notify-on-join", true)) return;
+                if (updateChecker == null) return;
+                if (updateChecker.isUpdateAvailable()) {
+                    DebugLogger.debug("UpdateListener", "Notifying admin " + player.getName() + " about update");
+                    String current = getDescription().getVersion();
+                    String latest = updateChecker.getLatestVersion();
+                    player.sendMessage(org.bukkit.ChatColor.translateAlternateColorCodes('&',
+                            "&8[&bX-Clearlag&8] &eA new version is available: &a" + latest + " &e(current: &c" + current + "&e)"));
+                    player.sendMessage(org.bukkit.ChatColor.translateAlternateColorCodes('&',
+                            "&8[&bX-Clearlag&8] &7Download it at: &f" + updateChecker.getDownloadUrl()));
+                }
+            }
+        }, this);
 
         // Initialize bStats Metrics
         setupMetrics();
