@@ -1,16 +1,26 @@
-# ========================================================================
-#  __  __         ____ _                 _                 
-#  \ \/ /        / ___| | ___  __ _ _ __| |    __ _  __ _  
-#   \  /  _____ | |   | |/ _ \/ _` | '__| |   / _` |/ _` | 
-#   /  \ |_____|| |___| |  __/ (_| | |  | |__| (_| | (_| | 
-#  /_/\_\       \____|_|\___|\__,_|_|  |_____\__,_|\__, | 
-#                                                  |___/  
 #
-#   X-ClearLag Configuration
-# ========================================================================
-
-# Prefix shown in all plugin messages.
+#  __  __    _    _     _     ___   ____   __  __  ___  _   _
+# \ \/ /   / \  | |   | |   / _ \ |  _ \ |  \/  |/ _ \| \ | |
+#  \  /   / _ \ | |   | |  | | | || | | || |\/| | | | |  \| |
+#  / /   / ___ \| |___| |___| |_| || |_| || |  | | |_| | |\  |
+# /_/\_\ /_/   \_\_____|_____|\___/ |____/ |_|  |_|\___/|_| \_|
+#
+# ======================================================== #
+#    X-ClearLag | Advanced Lag Management Plugin for Minecraft #
+#    Author: Fabian | Web: https://xproyects.qzz.io           #
+# ======================================================== #
+#
+# Features:
+#   - Automatic scheduled entity & item cleanup with countdown warnings
+#   - TPS monitoring with automatic emergency cleanups
+#   - Per-task configuration: entities, protected types, countdowns, commands
+#   - BossBar support (1.9+) for cleanup countdowns
+#   - Manual cleanup via /xcl clear command
+#   - World blacklist to protect specific worlds from cleanup
+#   - Folia and Paper compatible
+#
 # Supports color codes with & (e.g. &a = green, &c = red, &b = aqua).
+# Message files are stored in: plugins/X-Clearlag/messages/<language>.yml
 prefix: "&8[&bX-ClearLag&8] &7"
 
 # Main language for plugin messages.
