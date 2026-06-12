@@ -1,6 +1,7 @@
 package com.fabian.xclearlag;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.plugin.java.JavaPlugin;
 import com.fabian.xclearlag.commands.*;
 import com.fabian.xclearlag.managers.*;
@@ -54,66 +55,82 @@ public class XClearlag extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        try {
-            DebugLogger.debug("Init", "Loading dependencies...");
-            // Load libraries before anything else
-            new DependencyManager(this).loadDependencies();
+        instance = this;
 
-            instance = this;
+        try {
+            // Initialize config managers first
+            this.configManager = new ConfigManager(this);
+            configManager.load();
+            DebugLogger.debug("Config", "ConfigManager initialized");
+        } catch (Exception e) {
+            DebugLogger.debug("Config", "Failed to initialize config managers", e);
+            e.printStackTrace();
+            Bukkit.getPluginManager().disablePlugin(this);
+            return;
+        }
+
+        // Load libraries before anything else
+        DebugLogger.debug("Dependency", "Initializing DependencyManager...");
+        new DependencyManager(this).loadDependencies();
+
+        // Initialize remaining managers
+        try {
             DebugLogger.debug("Init", "Instance set, initializing API...");
             XClearlagAPI.init(this);
-            
+
             DebugLogger.debug("Init", "Initializing scheduler...");
             initScheduler();
-            DebugLogger.debug("Init", "Initializing managers...");
-            initManagers();
+
+            DebugLogger.debug("Init", "Initializing LanguageManager...");
+            languageManager = new LanguageManager(this);
+            languageManager.load();
+            DebugLogger.debug("Init", "LanguageManager initialized");
+
+            DebugLogger.debug("Init", "Initializing TaskManager...");
+            taskManager = new TaskManager(this);
+
             DebugLogger.debug("Init", "Initializing services...");
             initServices();
+
             DebugLogger.debug("Init", "Initializing commands...");
             initCommands();
-            
+
             // PlaceholderAPI Integration
             if (getServer().getPluginManager().getPlugin("PlaceholderAPI") != null) {
                 new XPlaceholderExpansion(this).register();
-                logInfo("Found PlaceholderAPI! Custom placeholders registered.");
-                DebugLogger.debug("Init", "PlaceholderAPI expansion registered.");
+                DebugLogger.debug("PAPI", "PlaceholderAPI expansion registered");
+            } else {
+                DebugLogger.debug("PAPI", "PlaceholderAPI not found, skipping expansion");
             }
-            
-            DebugLogger.debug("Init", "X-Clearlag v" + getDescription().getVersion() + " fully initialized.");
-            logInfo("X-Clearlag v" + getDescription().getVersion() + " initialized successfully.");
+
         } catch (Exception e) {
-            logError("CRITICAL FAILURE DURING STARTUP: " + e.getMessage());
+            DebugLogger.debug("Init", "Failed to initialize managers", e);
             e.printStackTrace();
-            getServer().getPluginManager().disablePlugin(this);
-        }
-    }
-
-    private void initManagers() {
-        logInfo("Loading managers...");
-        DebugLogger.debug("Managers", "Creating ConfigManager...");
-        configManager = new ConfigManager(this);
-        try {
-            configManager.load();
-        } catch (Exception e) {
-            logError("Failed to load config: " + e.getMessage());
+            Bukkit.getPluginManager().disablePlugin(this);
+            return;
         }
 
-        DebugLogger.debug("Managers", "Creating LanguageManager...");
-        languageManager = new LanguageManager(this);
-        try {
-            languageManager.load();
-        } catch (Exception e) {
-            logError("Failed to load messages: " + e.getMessage());
+        // Check for updates
+        if (configManager.get().general.checkUpdates) {
+            DebugLogger.debug("Update", "Update checker enabled, scheduling check");
+            this.updateChecker = new UpdateChecker(this);
+            schedulerAdapter.runTaskLater(() -> updateChecker.checkForUpdates(), 100L);
         }
-        
-        DebugLogger.debug("Managers", "Creating TaskManager...");
-        taskManager = new TaskManager(this);
+
+        // Initialize bStats Metrics
+        setupMetrics();
+
+        Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&',
+                "&8[&bX-Clearlag&8] &7----------------------------------------------"));
+        Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&',
+                "&8[&bX-Clearlag&8]   &aEnabled v" + getDescription().getVersion() + "! Lag is now managed."));
+        Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&',
+                "&8[&bX-Clearlag&8]   &7Language: &f" + configManager.get().general.language.toUpperCase()));
+        Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&',
+                "&8[&bX-Clearlag&8] &7----------------------------------------------"));
     }
 
     private void initServices() {
-        logInfo("Initializing services...");
-        
-        // 1. Core Utilities
         DebugLogger.debug("Services", "Creating TPSMonitor...");
         tpsMonitor = new TPSMonitor();
         tpsMonitorTask = schedulerAdapter.runTaskTimer(tpsMonitor, 1L, 1L);
@@ -136,15 +153,10 @@ public class XClearlag extends JavaPlugin {
         tpsCleanupService.start();
         DebugLogger.debug("Services", "TpsCleanupService started.");
 
-        updateChecker = new UpdateChecker(this);
-        if (configManager.get().general.checkUpdates) {
-            schedulerAdapter.runTaskLater(() -> updateChecker.checkForUpdates(), 100L);
-            DebugLogger.debug("Services", "Update check scheduled (delayed 5s).");
-        }
     }
 
     private void initCommands() {
-        logInfo("Registering commands...");
+        DebugLogger.debug("Command", "Registering commands...");
         XClearlagCommand commandHandler = new XClearlagCommand(this);
         org.bukkit.command.PluginCommand xclCmd = getCommand("xcl");
         if (xclCmd != null) {
@@ -155,12 +167,28 @@ public class XClearlag extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        DebugLogger.debug("Shutdown", "Disabling X-Clearlag...");
-        if (taskManager != null) { taskManager.stopAll(); DebugLogger.debug("Shutdown", "All tasks stopped."); }
-        if (tpsCleanupService != null) { tpsCleanupService.stop(); DebugLogger.debug("Shutdown", "TpsCleanupService stopped."); }
-        if (tpsMonitorTask != null) { schedulerAdapter.cancelTask(tpsMonitorTask); DebugLogger.debug("Shutdown", "TPSMonitor task cancelled."); }
-        if (bossBarManager != null) { bossBarManager.hide(); DebugLogger.debug("Shutdown", "BossBar hidden."); }
-        DebugLogger.debug("Shutdown", "X-Clearlag disabled.");
+        DebugLogger.debug("Init", "Plugin disabling...");
+        if (taskManager != null) { taskManager.stopAll(); }
+        if (tpsCleanupService != null) { tpsCleanupService.stop(); }
+        if (tpsMonitorTask != null) { schedulerAdapter.cancelTask(tpsMonitorTask); }
+        if (bossBarManager != null) { bossBarManager.hide(); }
+
+        Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&',
+                "&8[&bX-Clearlag&8] &7----------------------------------------------"));
+        Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&',
+                "&8[&bX-Clearlag&8]   &cDisabled v" + getDescription().getVersion() + "! Out."));
+        Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&',
+                "&8[&bX-Clearlag&8] &7----------------------------------------------"));
+    }
+
+    private void setupMetrics() {
+        if (configManager.get().general.metrics) {
+            try {
+                new org.bstats.bukkit.Metrics(this, 31665);
+            } catch (Exception e) {
+                logWarning("Could not start bStats Metrics: " + e.getMessage());
+            }
+        }
     }
 
     public void reload() {
@@ -168,7 +196,7 @@ public class XClearlag extends JavaPlugin {
             DebugLogger.debug("Reload", "Reloading X-Clearlag...");
             reloadConfig();
             configManager.load();
-            messageManager.load();
+            languageManager.load();
             metricsTracker.reset();
             taskManager.loadTasks();
             if (tpsCleanupService != null) {
