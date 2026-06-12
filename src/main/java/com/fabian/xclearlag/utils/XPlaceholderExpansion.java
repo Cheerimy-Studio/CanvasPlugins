@@ -1,7 +1,7 @@
 package com.fabian.xclearlag.utils;
 
 import com.fabian.xclearlag.XClearlag;
-import com.fabian.xclearlag.services.ClearTask;
+import com.fabian.xclearlag.managers.ClearTask;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.OfflinePlayer;
 import org.jetbrains.annotations.NotNull;

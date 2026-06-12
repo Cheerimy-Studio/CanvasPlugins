@@ -1,4 +1,4 @@
-package com.fabian.xclearlag.services;
+package com.fabian.xclearlag.managers;
 
 import com.fabian.xclearlag.managers.*;
 import com.fabian.xclearlag.utils.BossBarManager;
