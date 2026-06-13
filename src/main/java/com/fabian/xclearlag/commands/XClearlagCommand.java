@@ -81,11 +81,11 @@ public class XClearlagCommand implements CommandExecutor, TabCompleter {
                     Player player = (Player) sender;
                     if (plugin.getConfigManager().debugPlayer != null && plugin.getConfigManager().debugPlayer.equals(player.getUniqueId())) {
                         plugin.getConfigManager().debugPlayer = null;
-                        player.sendMessage(ChatColor.translateAlternateColorCodes('&',
+                        player.sendMessage(com.fabian.xclearlag.utils.ColorUtils.translateColors(
                                 plugin.getConfigManager().get().general.prefix + "&7Debug mode: &cdisabled"));
                     } else {
                         plugin.getConfigManager().debugPlayer = player.getUniqueId();
-                        player.sendMessage(ChatColor.translateAlternateColorCodes('&',
+                        player.sendMessage(com.fabian.xclearlag.utils.ColorUtils.translateColors(
                                 plugin.getConfigManager().get().general.prefix + "&7Debug mode: &aenabled &7(messages sent to you)"));
                     }
                 } else {
@@ -93,7 +93,7 @@ public class XClearlagCommand implements CommandExecutor, TabCompleter {
                     plugin.getConfig().set("debug", !currentDebug);
                     plugin.saveConfig();
                     plugin.getConfigManager().load();
-                    sender.sendMessage(ChatColor.translateAlternateColorCodes('&',
+                    sender.sendMessage(com.fabian.xclearlag.utils.ColorUtils.translateColors(
                             plugin.getConfigManager().get().general.prefix + "&7Debug mode: " + (!currentDebug ? "&aenabled &7(console)" : "&cdisabled")));
                 }
                 break;
