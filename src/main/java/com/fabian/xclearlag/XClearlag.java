@@ -159,7 +159,7 @@ public class XClearlag extends JavaPlugin {
         
         commandDispatcher = new CommandDispatcher(this);
         bossBarManager = new BossBarManager(configManager);
-        cleanupNotifier = new CleanupNotifier(messageManager, bossBarManager, getLogger());
+        cleanupNotifier = new CleanupNotifier(languageManager, bossBarManager, getLogger());
         
         // 2. Functional Services
         metricsTracker = new Metrics(tpsMonitor);

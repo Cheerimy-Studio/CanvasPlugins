@@ -44,7 +44,7 @@ public class ClearTask {
         this.notifier = notifier;
         this.cleanupService = cleanupService;
         this.metricsTracker = metricsTracker;
-        this.messageManager = messageManager;
+        this.languageManager = languageManager;
         this.schedulerAdapter = schedulerAdapter;
         this.countdownManager = new CountdownManager(config.interval, config.countdown);
         DebugLogger.debug("ClearTask", "Created task '" + name + "' (interval=" + config.interval + "s, entities=" + config.entities + ")");

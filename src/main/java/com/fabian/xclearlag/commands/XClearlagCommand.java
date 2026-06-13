@@ -77,11 +77,25 @@ public class XClearlagCommand implements CommandExecutor, TabCompleter {
                 handleStats(sender);
                 break;
             case "debug":
-                boolean currentDebug = plugin.getConfig().getBoolean("debug", false);
-                plugin.getConfig().set("debug", !currentDebug);
-                plugin.saveConfig();
-                plugin.getConfigManager().load();
-                sender.sendMessage(plugin.getLanguageManager().getWithContext(sender, "debug-toggled").replace("%state%", currentDebug ? "disabled" : "enabled"));
+                if (sender instanceof Player) {
+                    Player player = (Player) sender;
+                    if (plugin.getConfigManager().debugPlayer != null && plugin.getConfigManager().debugPlayer.equals(player.getUniqueId())) {
+                        plugin.getConfigManager().debugPlayer = null;
+                        player.sendMessage(ChatColor.translateAlternateColorCodes('&',
+                                plugin.getConfigManager().get().general.prefix + "&7Debug mode: &cdisabled"));
+                    } else {
+                        plugin.getConfigManager().debugPlayer = player.getUniqueId();
+                        player.sendMessage(ChatColor.translateAlternateColorCodes('&',
+                                plugin.getConfigManager().get().general.prefix + "&7Debug mode: &aenabled &7(messages sent to you)"));
+                    }
+                } else {
+                    boolean currentDebug = plugin.getConfig().getBoolean("debug", false);
+                    plugin.getConfig().set("debug", !currentDebug);
+                    plugin.saveConfig();
+                    plugin.getConfigManager().load();
+                    sender.sendMessage(ChatColor.translateAlternateColorCodes('&',
+                            plugin.getConfigManager().get().general.prefix + "&7Debug mode: " + (!currentDebug ? "&aenabled &7(console)" : "&cdisabled")));
+                }
                 break;
             default:
                 sender.sendMessage(plugin.getLanguageManager().getWithContext(sender, "unknown-command"));

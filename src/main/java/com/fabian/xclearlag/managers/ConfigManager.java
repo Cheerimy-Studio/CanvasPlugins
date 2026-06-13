@@ -7,6 +7,7 @@ import com.fabian.xclearlag.utils.DebugLogger;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import java.io.File;
+import java.util.UUID;
 
 /**
  * Manages the plugin configuration file and provides access to the XConfig POJO.
@@ -15,6 +16,7 @@ public class ConfigManager {
 
     private final XClearlag plugin;
     private XConfig config;
+    public UUID debugPlayer; // player who enabled debug via command (null = console-only via config)
 
     public ConfigManager(XClearlag plugin) {
         this.plugin = plugin;
