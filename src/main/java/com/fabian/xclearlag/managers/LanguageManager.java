@@ -82,7 +82,7 @@ public class LanguageManager {
             if (modified) {
                 try {
                     messagesConfig.save(messagesFile);
-                    plugin.logInfo("Synchronized missing keys in " + fileName);
+                    plugin.logInfo("&eSynchronized missing keys in &f" + fileName);
                 } catch (Exception e) {
                     plugin.logWarning("Failed to sync keys in " + fileName + ": " + e.getMessage());
                 }

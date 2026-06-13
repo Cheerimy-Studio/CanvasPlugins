@@ -225,7 +225,7 @@ public class XClearlag extends JavaPlugin {
                 tpsCleanupService.start();
             }
             DebugLogger.debug("Reload", "Reload complete.");
-            logInfo("X-Clearlag reloaded successfully.");
+            logInfo("&aX-Clearlag reloaded successfully.");
         } catch (Exception e) {
             logError("Failed to reload plugin: " + e.getMessage());
         }
@@ -249,11 +249,11 @@ public class XClearlag extends JavaPlugin {
 
         if (isFolia) {
             schedulerAdapter = new FoliaSchedulerAdapter(this);
-            logInfo("Folia detected! Using regional scheduler adapter.");
+            logInfo("&bFolia &fdetected&a! Using &fregional scheduler adapter&a.");
             DebugLogger.debug("Scheduler", "Folia detected, using FoliaSchedulerAdapter.");
         } else {
             schedulerAdapter = new BukkitSchedulerAdapter(this);
-            logInfo("Standard Bukkit/Paper detected! Using standard scheduler adapter.");
+            logInfo("&fStandard Bukkit/Paper &fdetected&7! Using &fstandard scheduler adapter&7.");
             DebugLogger.debug("Scheduler", "Standard Bukkit/Paper detected, using BukkitSchedulerAdapter.");
         }
     }
