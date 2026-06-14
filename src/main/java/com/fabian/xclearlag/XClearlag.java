@@ -1,6 +1,7 @@
 package com.fabian.xclearlag;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.event.EventHandler;
 import org.bukkit.plugin.java.JavaPlugin;
 import com.fabian.xclearlag.commands.*;
@@ -154,10 +155,14 @@ public class XClearlag extends JavaPlugin {
         // Initialize bStats Metrics
         setupMetrics();
 
-        getLogger().info(" ----------------------------------------------");
-        getLogger().info("   Enabled v" + getDescription().getVersion() + "! Lag is now managed.");
-        getLogger().info("   Language: " + configManager.get().general.language.toUpperCase());
-        getLogger().info(" ----------------------------------------------");
+        Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&',
+                "&8[&bX-Clearlag&8] &7----------------------------------------------"));
+        Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&',
+                "&8[&bX-Clearlag&8]   &aEnabled v" + getDescription().getVersion() + "! Lag is now managed."));
+        Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&',
+                "&8[&bX-Clearlag&8]   &7Language: &f" + configManager.get().general.language.toUpperCase()));
+        Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&',
+                "&8[&bX-Clearlag&8] &7----------------------------------------------"));
     }
 
     private void initServices() {
@@ -203,9 +208,12 @@ public class XClearlag extends JavaPlugin {
         if (tpsMonitorTask != null) { schedulerAdapter.cancelTask(tpsMonitorTask); }
         if (bossBarManager != null) { bossBarManager.hide(); }
 
-        getLogger().info(" ----------------------------------------------");
-        getLogger().info("   Disabled v" + getDescription().getVersion() + "! Out.");
-        getLogger().info(" ----------------------------------------------");
+        Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&',
+                "&8[&bX-Clearlag&8] &7----------------------------------------------"));
+        Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&',
+                "&8[&bX-Clearlag&8]   &cDisabled v" + getDescription().getVersion() + "! Out."));
+        Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&',
+                "&8[&bX-Clearlag&8] &7----------------------------------------------"));
     }
 
     private void setupMetrics() {
