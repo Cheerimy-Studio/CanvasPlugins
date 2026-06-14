@@ -1,6 +1,7 @@
 package com.fabian.xclearlag.managers;
 
 import com.fabian.xclearlag.managers.*;
+import com.fabian.xclearlag.utils.ColorUtils;
 import com.fabian.xclearlag.utils.DebugLogger;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -32,8 +33,8 @@ public class CleanupNotifier {
         String msgTemplate = raw ? keyOrRaw : languageManager.get(keyOrRaw);
         if (msgTemplate.isEmpty()) return;
 
-        // Use ConsoleSender to avoid double [X-Clearlag] prefix and preserve colors
-        Bukkit.getConsoleSender().sendMessage(msgTemplate);
+        // Use ConsoleSender to avoid double [X-Clearlag] prefix; strip colors for console
+        Bukkit.getConsoleSender().sendMessage(org.bukkit.ChatColor.stripColor(msgTemplate));
 
         boolean papiEnabled = Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI");
         

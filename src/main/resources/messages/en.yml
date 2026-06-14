@@ -56,5 +56,17 @@ lag-header: "&b&lX-ClearLag Performance Status"
 lag-tps: "&7TPS: %color%%tps%"
 lag-memory: "&7Memory: &e%used%MB&7 / &e%max%MB"
 
+# Force Messages Command
+force-messages-usage: "&7Usage: &e/xcl forcemessages <new|keep> <all|language>"
+force-messages-current: "&7Current language: &e%lang%"
+force-messages-success: "&aMessage file '&e%lang%&a' updated (missing keys added) and reloaded."
+force-messages-no-changes: "&7Message file '&e%lang%&7' updated on disk, but it is not the active language."
+force-messages-all: "&aForce-updated &e%count%&a language file(s) with missing keys."
+force-messages-reset-success: "&aMessage file '&e%lang%&a' regenerated from defaults and reloaded."
+force-messages-reset-no-active: "&7Message file '&e%lang%&7' regenerated from defaults, but it is not the active language."
+force-messages-reset-all: "&aRegenerated &e%count%&a language file(s) from defaults."
+force-messages-invalid-mode: "&cInvalid mode. Use &enew&c or &ekeep&c."
+language-not-found: "&cLanguage not found. Available: &e%langs%"
+
 # Technical Logs
 tps-critical: "&cCRITICAL: TPS dropped to &f%tps% &cfor &f%checks% &cconsecutive checks. Triggering anti-lag cleanup..."

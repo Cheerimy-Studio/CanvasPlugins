@@ -25,6 +25,9 @@ permissions:
   xclearlag.admin.reload:
     description: Allows reloading the plugin configuration.
     default: op
+  xclearlag.admin.forcemessages:
+    description: Allows force-updating or resetting message files.
+    default: op
   xclearlag.notify:
     description: Receive notifications when a cleanup is triggered.
     default: op

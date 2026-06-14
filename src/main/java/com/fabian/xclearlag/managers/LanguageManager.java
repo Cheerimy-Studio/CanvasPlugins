@@ -2,14 +2,19 @@ package com.fabian.xclearlag.managers;
 
 import com.fabian.xclearlag.XClearlag;
 import com.fabian.xclearlag.utils.ColorUtils;
+import com.fabian.xclearlag.utils.ConfigUpdater;
 import com.fabian.xclearlag.utils.DebugLogger;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -48,7 +53,7 @@ public class LanguageManager {
             }
         }
 
-        FileConfiguration messagesConfig = YamlConfiguration.loadConfiguration(messagesFile);
+        FileConfiguration messagesConfig = YamlConfiguration.loadConfiguration(new InputStreamReader(new FileInputStream(messagesFile), StandardCharsets.UTF_8));
 
         // Auto-sync missing keys
         YamlConfiguration defaults = null;
@@ -130,5 +135,126 @@ public class LanguageManager {
 
     public String get(String key, String... replacements) {
         return getWithContext(null, key, replacements);
+    }
+
+    /**
+     * Returns a list of available language codes (e.g. ["en", "es", "ja", "pt", "ru"])
+     * based on .yml files in the messages folder on disk, falling back to JAR resources.
+     */
+    public List<String> getAvailableLanguages() {
+        List<String> langs = new ArrayList<>();
+        File messagesFolder = new File(plugin.getDataFolder(), "messages");
+        if (messagesFolder.exists() && messagesFolder.isDirectory()) {
+            File[] files = messagesFolder.listFiles((dir, name) -> name.endsWith(".yml"));
+            if (files != null) {
+                for (File f : files) {
+                    langs.add(f.getName().replace(".yml", ""));
+                }
+            }
+        }
+        if (langs.isEmpty()) {
+            // Fallback: list JAR resources under messages/
+            try (InputStream is = plugin.getResource("messages/en.yml")) {
+                if (is != null) langs.add("en");
+            } catch (Exception ignored) {}
+            for (String name : Arrays.asList("es", "ja", "pt", "ru")) {
+                try (InputStream is = plugin.getResource("messages/" + name + ".yml")) {
+                    if (is != null) langs.add(name);
+                } catch (Exception ignored) {}
+            }
+        }
+        return langs;
+    }
+
+    /**
+     * Returns the currently active language code.
+     */
+    public String getActiveLanguage() {
+        XConfig config = plugin.getConfigManager().get();
+        if (config != null) {
+            return config.general.language.toLowerCase().trim();
+        }
+        return plugin.getConfig().getString("language", "en").toLowerCase().trim();
+    }
+
+    /**
+     * Force-updates a single language file by adding missing keys (preserves existing values).
+     * @return true if the file was updated
+     */
+    public boolean forceReloadMessages(String langCode) {
+        langCode = langCode.toLowerCase().trim();
+        String resourcePath = "messages/" + langCode + ".yml";
+        File messagesFolder = new File(plugin.getDataFolder(), "messages");
+        File messagesFile = new File(messagesFolder, langCode + ".yml");
+
+        if (!messagesFile.exists()) {
+            // Extract from JAR first
+            if (plugin.getResource(resourcePath) == null) return false;
+            plugin.saveResource(resourcePath, false);
+        }
+
+        ConfigUpdater.update(plugin, resourcePath, messagesFile);
+
+        // Reload if this is the active language
+        if (langCode.equalsIgnoreCase(getActiveLanguage())) {
+            load();
+        }
+        return true;
+    }
+
+    /**
+     * Force-updates all language files by adding missing keys.
+     * @return the number of files updated
+     */
+    public int forceReloadAllMessages() {
+        int count = 0;
+        for (String lang : getAvailableLanguages()) {
+            if (forceReloadMessages(lang)) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    /**
+     * Resets a single language file by deleting it and re-extracting from JAR defaults.
+     * @return true if the file was reset
+     */
+    public boolean forceResetMessages(String langCode) {
+        langCode = langCode.toLowerCase().trim();
+        String resourcePath = "messages/" + langCode + ".yml";
+        File messagesFolder = new File(plugin.getDataFolder(), "messages");
+        File messagesFile = new File(messagesFolder, langCode + ".yml");
+
+        // Check that the resource exists in JAR
+        if (plugin.getResource(resourcePath) == null) return false;
+
+        // Delete existing file
+        if (messagesFile.exists()) {
+            messagesFile.delete();
+        }
+
+        // Extract fresh from JAR
+        plugin.saveResource(resourcePath, true);
+
+        // Reload if this is the active language
+        if (langCode.equalsIgnoreCase(getActiveLanguage())) {
+            load();
+        }
+        return true;
+    }
+
+    /**
+     * Resets all language files by deleting and re-extracting from JAR defaults.
+     * @return the number of files reset
+     */
+    public int forceResetAllMessages() {
+        int count = 0;
+        for (String lang : getAvailableLanguages()) {
+            if (forceResetMessages(lang)) {
+                count++;
+            }
+        }
+        return count;
     }
 }
