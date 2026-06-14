@@ -53,7 +53,12 @@ public class LanguageManager {
             }
         }
 
-        FileConfiguration messagesConfig = YamlConfiguration.loadConfiguration(new InputStreamReader(new FileInputStream(messagesFile), StandardCharsets.UTF_8));
+        FileConfiguration messagesConfig;
+        try {
+            messagesConfig = YamlConfiguration.loadConfiguration(new InputStreamReader(new FileInputStream(messagesFile), StandardCharsets.UTF_8));
+        } catch (java.io.FileNotFoundException e) {
+            messagesConfig = YamlConfiguration.loadConfiguration(messagesFile);
+        }
 
         // Auto-sync missing keys
         YamlConfiguration defaults = null;
