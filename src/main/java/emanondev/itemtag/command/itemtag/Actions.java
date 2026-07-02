@@ -1,6 +1,5 @@
 package emanondev.itemtag.command.itemtag;
 
-import emanondev.itemedit.ItemEdit;
 import emanondev.itemedit.Util;
 import emanondev.itemedit.UtilsString;
 import emanondev.itemedit.aliases.Aliases;
@@ -100,6 +99,49 @@ public class Actions extends ListenerSubCmd {
             e.printStackTrace();
             onFail(p, alias);
         }
+    }
+
+    @Override
+    public List<String> onComplete(@NotNull CommandSender sender, String[] args) {
+        switch (args.length) {
+            case 2:
+                return CompleteUtility.complete(args[1], actionsSub);
+            case 3:
+                switch (args[1].toLowerCase(Locale.ENGLISH)) {
+                    case "add":
+                        return CompleteUtility.complete(args[2], ActionHandler.getTypes());
+                    case "uses":
+                    case "maxuses":
+                        return CompleteUtility.complete(args[2], Arrays.asList("-1", "1", "5", "10"));
+                    case "visualcooldown":
+                    case "consume":
+                    case "displayuses":
+                        return CompleteUtility.complete(args[2], Aliases.BOOLEAN);
+                    case "cooldownmsgtype": {
+                        return CompleteUtility.complete(args[2], VersionUtils.isVersionAfter(1, 11) ?
+                                Arrays.asList("chat", "actionbar") : Collections.singletonList("chat"));
+                    }
+                }
+                return Collections.emptyList();
+            case 4:
+                switch (args[1].toLowerCase(Locale.ENGLISH)) {
+                    case "add":
+                        return ActionHandler.tabComplete(sender, args[2].toLowerCase(Locale.ENGLISH), new ArrayList<>(Arrays.asList(args).subList(3, args.length)));
+                    case "set":
+                    case "addline":
+                        return CompleteUtility.complete(args[3], ActionHandler.getTypes());
+                }
+                return Collections.emptyList();
+            default:
+                switch (args[1].toLowerCase(Locale.ENGLISH)) {
+                    case "add":
+                        return ActionHandler.tabComplete(sender, args[2].toLowerCase(Locale.ENGLISH), new ArrayList<>(Arrays.asList(args).subList(3, args.length)));
+                    case "set":
+                    case "addline":
+                        return ActionHandler.tabComplete(sender, args[3].toLowerCase(Locale.ENGLISH), new ArrayList<>(Arrays.asList(args).subList(4, args.length)));
+                }
+        }
+        return Collections.emptyList();
     }
 
     //it actions displayUses [boolean]
@@ -238,7 +280,6 @@ public class Actions extends ListenerSubCmd {
                     getLanguageStringList("cooldown.description", null, p)));
         }
     }
-
 
     private void maxUses(Player p, String label, String[] args, ItemStack item) {
         try {
@@ -470,49 +511,6 @@ public class Actions extends ListenerSubCmd {
         }
     }
 
-    @Override
-    public List<String> onComplete(@NotNull CommandSender sender, String[] args) {
-        switch (args.length) {
-            case 2:
-                return CompleteUtility.complete(args[1], actionsSub);
-            case 3:
-                switch (args[1].toLowerCase(Locale.ENGLISH)) {
-                    case "add":
-                        return CompleteUtility.complete(args[2], ActionHandler.getTypes());
-                    case "uses":
-                    case "maxuses":
-                        return CompleteUtility.complete(args[2], Arrays.asList("-1", "1", "5", "10"));
-                    case "visualcooldown":
-                    case "consume":
-                    case "displayuses":
-                        return CompleteUtility.complete(args[2], Aliases.BOOLEAN);
-                    case "cooldownmsgtype":{
-                        return CompleteUtility.complete(args[2], VersionUtils.isVersionAfter(1,11 )?
-                                Arrays.asList("chat","actionbar"): Collections.singletonList("chat"));
-                    }
-                }
-                return Collections.emptyList();
-            case 4:
-                switch (args[1].toLowerCase(Locale.ENGLISH)) {
-                    case "add":
-                        return ActionHandler.tabComplete(sender, args[2].toLowerCase(Locale.ENGLISH), new ArrayList<>(Arrays.asList(args).subList(3, args.length)));
-                    case "set":
-                    case "addline":
-                        return CompleteUtility.complete(args[3], ActionHandler.getTypes());
-                }
-                return Collections.emptyList();
-            default:
-                switch (args[1].toLowerCase(Locale.ENGLISH)) {
-                    case "add":
-                        return ActionHandler.tabComplete(sender, args[2].toLowerCase(Locale.ENGLISH), new ArrayList<>(Arrays.asList(args).subList(3, args.length)));
-                    case "set":
-                    case "addline":
-                        return ActionHandler.tabComplete(sender, args[3].toLowerCase(Locale.ENGLISH), new ArrayList<>(Arrays.asList(args).subList(4, args.length)));
-                }
-        }
-        return Collections.emptyList();
-    }
-
     @SuppressWarnings("deprecation")
     @EventHandler
     private void event(PlayerInteractEvent event) {
@@ -534,24 +532,24 @@ public class Actions extends ListenerSubCmd {
                     String cooldownId = ActionsUtility.getCooldownId(tagItem);
                     if (ItemTag.get().getCooldownAPI().hasCooldown(event.getPlayer(), cooldownId)) {
                         String msg = ActionsUtility.getCooldownMsg(tagItem);
-                        if (msg==null){
+                        if (msg == null) {
                             return;
                         }
                         String type = ActionsUtility.getCooldownMsgType(tagItem);
-                        msg = UtilsString.fix(msg,event.getPlayer(),true);
-                        switch (type){
+                        msg = UtilsString.fix(msg, event.getPlayer(), true);
+                        switch (type) {
                             case "chat":
-                                Util.sendMessage(event.getPlayer(),msg);
+                                Util.sendMessage(event.getPlayer(), msg);
                                 break;
                             case "actionbar":
-                                if (VersionUtils.isVersionAfter(1,11,2)){
-                                    event.getPlayer().spigot().sendMessage(ChatMessageType.ACTION_BAR,new TextComponent(msg));
+                                if (VersionUtils.isVersionAfter(1, 11, 2)) {
+                                    event.getPlayer().spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(msg));
                                     break;
                                 }
-                                ItemTag.get().log("Invalid action cooldown message type &e"+type+"&f not available on this server version");
+                                ItemTag.get().log("Invalid action cooldown message type &e" + type + "&f not available on this server version");
                                 break;
                             default:
-                                ItemTag.get().log("Invalid action cooldown message type &e"+type);
+                                ItemTag.get().log("Invalid action cooldown message type &e" + type);
                         }
 
                         return;

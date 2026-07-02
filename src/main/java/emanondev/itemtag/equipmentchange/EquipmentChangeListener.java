@@ -3,7 +3,6 @@ package emanondev.itemtag.equipmentchange;
 import emanondev.itemedit.utility.InventoryUtils;
 import emanondev.itemedit.utility.ItemUtils;
 import emanondev.itemtag.ItemTag;
-import emanondev.itemtag.ItemTagUtility;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -30,7 +29,7 @@ public class EquipmentChangeListener extends EquipmentChangeListenerBase {
         if (event.getWhoClicked().hasMetadata("NPC") || event.getWhoClicked().hasMetadata("BOT"))
             return;
         Player p = (Player) event.getWhoClicked();
-        EquipmentSlot clickedSlot = getEquipmentSlotAtPosition(event.getRawSlot(), p, event.getView());
+        EquipmentSlot clickedSlot = getEquipmentSlotAtPosition(event.getRawSlot(), p, InventoryUtils.getTopInventory(event));
         switch (event.getAction()) {
             case CLONE_STACK:
             case NOTHING:
@@ -119,7 +118,7 @@ public class EquipmentChangeListener extends EquipmentChangeListenerBase {
             case COLLECT_TO_CURSOR:
                 ArrayList<EquipmentSlot> slots = new ArrayList<>();
                 if (InventoryUtils.getTopInventory(event).getType() == InventoryType.CRAFTING)
-                    for (EquipmentSlot slot : ItemTagUtility.getPlayerEquipmentSlots()) {
+                    for (EquipmentSlot slot : InventoryUtils.getPlayerEquipmentSlots()) {
                         if (event.getCursor().isSimilar(getEquip(p, slot)))
                             slots.add(slot);
                     }

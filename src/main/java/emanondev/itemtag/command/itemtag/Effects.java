@@ -2,11 +2,11 @@ package emanondev.itemtag.command.itemtag;
 
 import emanondev.itemedit.aliases.Aliases;
 import emanondev.itemedit.utility.CompleteUtility;
+import emanondev.itemedit.utility.InventoryUtils;
 import emanondev.itemedit.utility.ItemUtils;
 import emanondev.itemedit.utility.VersionUtils;
 import emanondev.itemtag.EffectsInfo;
 import emanondev.itemtag.ItemTag;
-import emanondev.itemtag.ItemTagUtility;
 import emanondev.itemtag.command.ItemTagCommand;
 import emanondev.itemtag.command.ListenerSubCmd;
 import emanondev.itemtag.equipmentchange.EquipmentChangeEvent;
@@ -42,9 +42,6 @@ public class Effects extends ListenerSubCmd {
         this.load();
     }
 
-    private void load() {
-    }
-
     @Override
     public void onCommand(@NotNull CommandSender sender, @NotNull String alias, String[] args) {
         Player p = (Player) sender;
@@ -71,6 +68,130 @@ public class Effects extends ListenerSubCmd {
             return;
         }
         p.openInventory(new EffectsGui(p, getItemInHand(p)).getInventory());
+    }
+
+    @Override
+    public List<String> onComplete(@NotNull CommandSender sender, String[] args) {
+        switch (args.length) {
+            case 2: {
+                return CompleteUtility.complete(args[1], "set", "modify", "slots", "remove");
+            }
+            case 3: {
+                switch (args[1].toLowerCase()) {
+                    case "set":
+                    case "modify":
+                    case "remove": {
+                        return CompleteUtility.complete(args[2], Aliases.POTION_EFFECT);
+                    }
+                    case "slots": {
+                        return CompleteUtility.complete(args[2], Aliases.EQUIPMENT_SLOTS);
+                    }
+                }
+                return Collections.emptyList();
+            }
+            case 4: {
+                switch (args[1].toLowerCase()) {
+                    case "set":
+                    case "modify": {
+                        return CompleteUtility.complete(args[3], "1", "2", "3");
+                    }
+                    case "slots": {
+                        return CompleteUtility.complete(args[3], Aliases.EQUIPMENT_SLOTS);
+                    }
+                }
+                return Collections.emptyList();
+            }
+            case 5:
+            case 6:
+            case 7: {
+                switch (args[1].toLowerCase()) {
+                    case "set":
+                    case "modify": {
+                        return CompleteUtility.complete(args[4], Aliases.BOOLEAN);
+                    }
+                    case "slots": {
+                        return CompleteUtility.complete(args[4], Aliases.EQUIPMENT_SLOTS);
+                    }
+                }
+                return Collections.emptyList();
+            }
+            case 8: {
+                if ("slots".equalsIgnoreCase(args[1])) {
+                    return CompleteUtility.complete(args[4], Aliases.EQUIPMENT_SLOTS);
+                }
+                return Collections.emptyList();
+            }
+        }
+        return Collections.emptyList();
+    }
+
+    @EventHandler
+    public void onEquipChange(EquipmentChangeEvent event) {
+        Map<PotionEffectType, PotionEffect> oldEffects = getPotionEffects(event.getFrom(), event.getSlotType(), true);
+        Map<PotionEffectType, PotionEffect> newEffects = new HashMap<>(getPotionEffects(event.getTo(), event.getSlotType(), false));
+        if (oldEffects.isEmpty() && newEffects.isEmpty())
+            return;
+        Map<PotionEffectType, PotionEffect> equipsEffects = new HashMap<>();
+        for (EquipmentSlot slot : InventoryUtils.getPlayerEquipmentSlots()) {
+            //for each slot (except event slot) look on effects
+            if (slot == event.getSlotType())
+                continue;
+            getPotionEffects(getEquip(event.getPlayer(), slot), slot, true).forEach((k, v) -> {
+                if (getAmplifier(equipsEffects, k) < v.getAmplifier())
+                    equipsEffects.put(k, v);
+            });
+        }
+        HashSet<PotionEffectType> keys = new HashSet<>(oldEffects.keySet());
+        keys.addAll(newEffects.keySet());
+        keys.forEach((k) -> {
+            if (k.isInstant()) {
+                addEffect(event.getPlayer(), k, newEffects.get(k));
+                return;
+            }
+            int newAmplifier = getAmplifier(newEffects, k);
+            int oldAmplifier = getAmplifier(oldEffects, k);
+            int equipAmplifier = getAmplifier(equipsEffects, k);
+            PotionEffect max = newAmplifier > equipAmplifier ? newEffects.get(k) : equipsEffects.get(k);
+            int maxAmplifier = Math.max(newAmplifier, equipAmplifier);
+            //Bukkit.broadcastMessage(oldAmplifier+" -> "+newAmplifier + " ("+equipAmplifier+") of "+k.getName() +" Replace "+(oldAmplifier != maxAmplifier));
+            if (oldAmplifier != maxAmplifier) //TODO has some unnecessary replacements
+                addEffect(event.getPlayer(), k, max);
+        });
+    }
+
+    public void restoreEffects(Player p) {
+        if (!p.isOnline() || p.isDead())
+            return;
+        HashMap<PotionEffectType, PotionEffect> newEffects = new HashMap<>();
+        for (EquipmentSlot slot : InventoryUtils.getPlayerEquipmentSlots()) {
+            Map<PotionEffectType, PotionEffect> newInfo = getPotionEffects(getEquip(p, slot), slot, true);
+            newInfo.forEach((k, v) -> {
+                if (getAmplifier(newEffects, k) < v.getAmplifier())
+                    newEffects.put(k, v);
+            });
+        }
+        newEffects.forEach((k, v) -> addEffect(p, k, v));
+    }
+
+    protected ItemStack getEquip(Player p, EquipmentSlot slot) {
+        switch (slot) {
+            case CHEST:
+                return p.getEquipment().getChestplate();
+            case FEET:
+                return p.getEquipment().getBoots();
+            case HAND:
+                return getItemInHand(p);
+            case HEAD:
+                return p.getEquipment().getHelmet();
+            case LEGS:
+                return p.getEquipment().getLeggings();
+        }// safe
+        if (VersionUtils.isVersionAfter(1, 9) && slot == EquipmentSlot.OFF_HAND)
+            return p.getInventory().getItemInOffHand();
+        return null;
+    }
+
+    private void load() {
     }
 
     //it effects set <type> <ampl> [] [] []
@@ -147,7 +268,7 @@ public class Effects extends ListenerSubCmd {
                 slots.add(Aliases.EQUIPMENT_SLOTS.convertAlias(args[i]));
 
             EffectsInfo info = new EffectsInfo(getItemInHand(p));
-            for (EquipmentSlot slot : ItemTagUtility.getPlayerEquipmentSlots())
+            for (EquipmentSlot slot : InventoryUtils.getPlayerEquipmentSlots())
                 if (slots.contains(slot) != info.isValidSlot(slot))
                     info.toggleSlot(slot);
             info.update();
@@ -156,61 +277,6 @@ public class Effects extends ListenerSubCmd {
             //TODO
             onFail(p, alias);
         }
-    }
-
-    @Override
-    public List<String> onComplete(@NotNull CommandSender sender, String[] args) {
-        switch (args.length) {
-            case 2: {
-                return CompleteUtility.complete(args[1], "set", "modify", "slots", "remove");
-            }
-            case 3: {
-                switch (args[1].toLowerCase()) {
-                    case "set":
-                    case "modify":
-                    case "remove": {
-                        return CompleteUtility.complete(args[2], Aliases.POTION_EFFECT);
-                    }
-                    case "slots": {
-                        return CompleteUtility.complete(args[2], Aliases.EQUIPMENT_SLOTS);
-                    }
-                }
-                return Collections.emptyList();
-            }
-            case 4: {
-                switch (args[1].toLowerCase()) {
-                    case "set":
-                    case "modify": {
-                        return CompleteUtility.complete(args[3], "1", "2", "3");
-                    }
-                    case "slots": {
-                        return CompleteUtility.complete(args[3], Aliases.EQUIPMENT_SLOTS);
-                    }
-                }
-                return Collections.emptyList();
-            }
-            case 5:
-            case 6:
-            case 7: {
-                switch (args[1].toLowerCase()) {
-                    case "set":
-                    case "modify": {
-                        return CompleteUtility.complete(args[4], Aliases.BOOLEAN);
-                    }
-                    case "slots": {
-                        return CompleteUtility.complete(args[4], Aliases.EQUIPMENT_SLOTS);
-                    }
-                }
-                return Collections.emptyList();
-            }
-            case 8: {
-                if ("slots".equalsIgnoreCase(args[1])) {
-                    return CompleteUtility.complete(args[4], Aliases.EQUIPMENT_SLOTS);
-                }
-                return Collections.emptyList();
-            }
-        }
-        return Collections.emptyList();
     }
 
     private Map<PotionEffectType, PotionEffect> getPotionEffects(ItemStack item, EquipmentSlot slot, boolean ignoreInstant) {
@@ -226,7 +292,6 @@ public class Effects extends ListenerSubCmd {
         return map;
     }
 
-
     private int getAmplifier(Map<PotionEffectType, PotionEffect> map, PotionEffectType type) {
         if (!map.containsKey(type))
             return -1;
@@ -234,44 +299,10 @@ public class Effects extends ListenerSubCmd {
     }
 
     @EventHandler
-    public void onEquipChange(EquipmentChangeEvent event) {
-        Map<PotionEffectType, PotionEffect> oldEffects = getPotionEffects(event.getFrom(), event.getSlotType(), true);
-        Map<PotionEffectType, PotionEffect> newEffects = new HashMap<>(getPotionEffects(event.getTo(), event.getSlotType(), false));
-        if (oldEffects.isEmpty() && newEffects.isEmpty())
-            return;
-        Map<PotionEffectType, PotionEffect> equipsEffects = new HashMap<>();
-        for (EquipmentSlot slot : ItemTagUtility.getPlayerEquipmentSlots()) {
-            //for each slot (except event slot) look on effects
-            if (slot == event.getSlotType())
-                continue;
-            getPotionEffects(getEquip(event.getPlayer(), slot), slot, true).forEach((k, v) -> {
-                if (getAmplifier(equipsEffects, k) < v.getAmplifier())
-                    equipsEffects.put(k, v);
-            });
-        }
-        HashSet<PotionEffectType> keys = new HashSet<>(oldEffects.keySet());
-        keys.addAll(newEffects.keySet());
-        keys.forEach((k) -> {
-            if (k.isInstant()) {
-                addEffect(event.getPlayer(), k, newEffects.get(k));
-                return;
-            }
-            int newAmplifier = getAmplifier(newEffects, k);
-            int oldAmplifier = getAmplifier(oldEffects, k);
-            int equipAmplifier = getAmplifier(equipsEffects, k);
-            PotionEffect max = newAmplifier > equipAmplifier ? newEffects.get(k) : equipsEffects.get(k);
-            int maxAmplifier = Math.max(newAmplifier, equipAmplifier);
-            //Bukkit.broadcastMessage(oldAmplifier+" -> "+newAmplifier + " ("+equipAmplifier+") of "+k.getName() +" Replace "+(oldAmplifier != maxAmplifier));
-            if (oldAmplifier != maxAmplifier) //TODO has some unnecessary replacements
-                addEffect(event.getPlayer(), k, max);
-        });
-    }
-
-    @EventHandler
     private void onPlayerRespawn(PlayerRespawnEvent event) {
         new BukkitRunnable() {
             public void run() {
-                for (EquipmentSlot slot : ItemTagUtility.getPlayerEquipmentSlots()) {
+                for (EquipmentSlot slot : InventoryUtils.getPlayerEquipmentSlots()) {
                     ItemStack equip = getEquip(event.getPlayer(), slot);
                     if (ItemUtils.isAirOrNull(equip))
                         continue;
@@ -306,7 +337,6 @@ public class Effects extends ListenerSubCmd {
 
     }
 
-
     private void addEffect(@NotNull Player target, @NotNull PotionEffectType type, @Nullable PotionEffect effect) {
         if (effect == null) {
             target.removePotionEffect(type);
@@ -328,38 +358,6 @@ public class Effects extends ListenerSubCmd {
     private void event(PlayerItemConsumeEvent event) {
         if (event.getItem().getType() == Material.MILK_BUCKET)
             Bukkit.getScheduler().runTaskLater(this.getPlugin(), () -> restoreEffects(event.getPlayer()), 1L);
-    }
-
-    public void restoreEffects(Player p) {
-        if (!p.isOnline() || p.isDead())
-            return;
-        HashMap<PotionEffectType, PotionEffect> newEffects = new HashMap<>();
-        for (EquipmentSlot slot : ItemTagUtility.getPlayerEquipmentSlots()) {
-            Map<PotionEffectType, PotionEffect> newInfo = getPotionEffects(getEquip(p, slot), slot, true);
-            newInfo.forEach((k, v) -> {
-                if (getAmplifier(newEffects, k) < v.getAmplifier())
-                    newEffects.put(k, v);
-            });
-        }
-        newEffects.forEach((k, v) -> addEffect(p, k, v));
-    }
-
-    protected ItemStack getEquip(Player p, EquipmentSlot slot) {
-        switch (slot) {
-            case CHEST:
-                return p.getEquipment().getChestplate();
-            case FEET:
-                return p.getEquipment().getBoots();
-            case HAND:
-                return getItemInHand(p);
-            case HEAD:
-                return p.getEquipment().getHelmet();
-            case LEGS:
-                return p.getEquipment().getLeggings();
-        }// safe
-        if (VersionUtils.isVersionAfter(1, 9) && slot == EquipmentSlot.OFF_HAND)
-            return p.getInventory().getItemInOffHand();
-        return null;
     }
 
 }

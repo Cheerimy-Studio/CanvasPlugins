@@ -111,7 +111,7 @@ public class EquipmentChangeListenerUpTo1_8 extends EquipmentChangeListenerBase 
         if (event.getWhoClicked().hasMetadata("NPC"))
             return;
         Player p = (Player) event.getWhoClicked();
-        EquipmentSlot clickedSlot = getEquipmentSlotAtPosition(event.getRawSlot(), p, event.getView());
+        EquipmentSlot clickedSlot = getEquipmentSlotAtPosition(event.getRawSlot(), p, InventoryUtils.getTopInventory(event));
 
         switch (event.getAction()) {
             case CLONE_STACK:

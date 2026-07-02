@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>emanondev.itemtag</groupId>
     <artifactId>ItemTag</artifactId>
-    <version>3.7.6</version>
+    <version>3.7.7</version>
     <packaging>jar</packaging>
 
     <properties>
@@ -107,7 +107,7 @@
         <dependency>
             <groupId>emanondev.itemedit</groupId>
             <artifactId>ItemEdit</artifactId>
-            <version>3.7.8</version>
+            <version>3.7.10</version>
             <scope>compile</scope>
             <exclusions>
                 <exclusion>

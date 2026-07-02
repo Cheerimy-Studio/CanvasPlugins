@@ -2,16 +2,8 @@ package emanondev.itemtag.equipmentchange;
 
 import emanondev.itemedit.utility.InventoryUtils;
 import emanondev.itemedit.utility.ItemUtils;
-import emanondev.itemedit.utility.VersionUtils;
 import emanondev.itemtag.ItemTag;
-import emanondev.itemtag.ItemTagUtility;
-import org.bukkit.GameMode;
-import org.bukkit.Material;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Sheep;
-import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.entity.PlayerDeathEvent;
@@ -24,8 +16,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 public class EquipmentChangeListenerUpTo1_13 extends EquipmentChangeListenerBase {
 
@@ -121,7 +111,7 @@ public class EquipmentChangeListenerUpTo1_13 extends EquipmentChangeListenerBase
         if (event.getWhoClicked().hasMetadata("NPC"))
             return;
         Player p = (Player) event.getWhoClicked();
-        EquipmentSlot clickedSlot = getEquipmentSlotAtPosition(event.getRawSlot(), p, event.getView());
+        EquipmentSlot clickedSlot = getEquipmentSlotAtPosition(event.getRawSlot(), p, InventoryUtils.getTopInventory(event));
 
         switch (event.getAction()) {
             case CLONE_STACK:

@@ -1,9 +1,9 @@
 package emanondev.itemtag.equipmentchange;
 
+import emanondev.itemedit.utility.InventoryUtils;
 import emanondev.itemedit.utility.ItemUtils;
 import emanondev.itemedit.utility.VersionUtils;
 import emanondev.itemtag.ItemTag;
-import emanondev.itemtag.ItemTagUtility;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
@@ -18,7 +18,7 @@ import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.*;
 import org.bukkit.inventory.EquipmentSlot;
-import org.bukkit.inventory.InventoryView;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -69,7 +69,7 @@ public abstract class EquipmentChangeListenerBase implements Listener {
             return false;
         EnumMap<EquipmentSlot, ItemStack> map = new EnumMap<>(EquipmentSlot.class);
         equips.put(p, map);
-        for (EquipmentSlot slot : ItemTagUtility.getPlayerEquipmentSlots()) {
+        for (EquipmentSlot slot : InventoryUtils.getPlayerEquipmentSlots()) {
             map.put(slot, null);
             onEquipChange(p, EquipmentChangeEvent.EquipMethod.JOIN, slot, null, getEquip(p, slot));
         }
@@ -98,7 +98,7 @@ public abstract class EquipmentChangeListenerBase implements Listener {
     protected void handle(PlayerDeathEvent event) {
         if (event.getEntity().hasMetadata("NPC") || event.getEntity().hasMetadata("BOT"))
             return;
-        for (EquipmentSlot type : ItemTagUtility.getPlayerEquipmentSlots()) {
+        for (EquipmentSlot type : InventoryUtils.getPlayerEquipmentSlots()) {
             ItemStack item = getEquip(event.getEntity(), type);
             if (!ItemUtils.isAirOrNull(item))
                 onEquipChange(event.getEntity(), EquipmentChangeEvent.EquipMethod.DEATH, type, item, null);
@@ -110,14 +110,14 @@ public abstract class EquipmentChangeListenerBase implements Listener {
             return;
         if (!equips.containsKey(event.getPlayer()))
             return; // some plugins teleport players just after login, before join this listener
-        new SlotCheck(event.getPlayer(), EquipmentChangeEvent.EquipMethod.PLUGIN_WORLD_CHANGE, ItemTagUtility.getPlayerEquipmentSlots())
+        new SlotCheck(event.getPlayer(), EquipmentChangeEvent.EquipMethod.PLUGIN_WORLD_CHANGE, InventoryUtils.getPlayerEquipmentSlots())
                 .runTaskLater(ItemTag.get(), 1L);
     }
 
     protected void handle(PlayerRespawnEvent event) {
         if (event.getPlayer().hasMetadata("NPC") || event.getPlayer().hasMetadata("BOT"))
             return;
-        for (EquipmentSlot type : ItemTagUtility.getPlayerEquipmentSlots()) {
+        for (EquipmentSlot type : InventoryUtils.getPlayerEquipmentSlots()) {
             ItemStack item = getEquip(event.getPlayer(), type);
             if (!ItemUtils.isAirOrNull(item))
                 onEquipChange(event.getPlayer(), EquipmentChangeEvent.EquipMethod.RESPAWN, type, null, item);
@@ -130,10 +130,10 @@ public abstract class EquipmentChangeListenerBase implements Listener {
         if (event.getWhoClicked().hasMetadata("NPC") || event.getWhoClicked().hasMetadata("BOT"))
             return;
         Player p = (Player) event.getWhoClicked();
-        for (EquipmentSlot type : ItemTagUtility.getPlayerEquipmentSlots()) {
-            int pos = getSlotPosition(type, p, event.getView());
+        for (EquipmentSlot type : InventoryUtils.getPlayerEquipmentSlots()) {
+            int pos = getSlotPosition(type, p, InventoryUtils.getTopInventory(event));
             if (pos != -1 && event.getNewItems().containsKey(pos)) {
-                ItemStack itemOld = event.getView().getItem(pos);
+                ItemStack itemOld = InventoryUtils.getTopInventory(event).getItem(pos);
                 ItemStack itemNew = event.getNewItems().get(pos);
                 if (!isSimilarIgnoreDamage(itemOld, itemNew))
                     onEquipChange(p, EquipmentChangeEvent.EquipMethod.INVENTORY_DRAG, type, itemOld, itemNew);
@@ -145,7 +145,7 @@ public abstract class EquipmentChangeListenerBase implements Listener {
         if (e.getPlayer().hasMetadata("NPC") || e.getPlayer().hasMetadata("BOT"))
             return;
         ArrayList<EquipmentSlot> slots = new ArrayList<>();
-        for (EquipmentSlot slot : ItemTagUtility.getPlayerEquipmentSlots()) {
+        for (EquipmentSlot slot : InventoryUtils.getPlayerEquipmentSlots()) {
             if (e.getBrokenItem().equals(getEquip(e.getPlayer(), slot)))
                 slots.add(slot);
         }
@@ -357,8 +357,8 @@ public abstract class EquipmentChangeListenerBase implements Listener {
     }
 
     @SuppressWarnings("incomplete-switch")
-    protected int getSlotPosition(EquipmentSlot slot, Player p, InventoryView view) {
-        if (view.getTopInventory().getType() == InventoryType.CRAFTING) {
+    protected int getSlotPosition(EquipmentSlot slot, Player p, Inventory topInventory) {
+        if (topInventory.getType() == InventoryType.CRAFTING) {
             switch (slot) {
                 case HAND:
                     return p.getInventory().getHeldItemSlot() + 36;
@@ -376,13 +376,13 @@ public abstract class EquipmentChangeListenerBase implements Listener {
             return -1;
         }
         if (slot == EquipmentSlot.HAND)
-            return p.getInventory().getHeldItemSlot() + view.getTopInventory().getSize() + 27;
+            return p.getInventory().getHeldItemSlot() + topInventory.getSize() + 27;
 
         return -1;
     }
 
-    protected EquipmentSlot getEquipmentSlotAtPosition(int pos, Player p, InventoryView view) {
-        if (view.getTopInventory().getType() == InventoryType.CRAFTING)
+    protected EquipmentSlot getEquipmentSlotAtPosition(int pos, Player p, Inventory topInventory) {
+        if (topInventory.getType() == InventoryType.CRAFTING)
             switch (pos) {
                 case 5:
                     return EquipmentSlot.HEAD;
@@ -398,7 +398,7 @@ public abstract class EquipmentChangeListenerBase implements Listener {
                 default:
                     return p.getInventory().getHeldItemSlot() + 36 == pos ? EquipmentSlot.HAND : null;
             }
-        return pos == p.getInventory().getHeldItemSlot() + view.getTopInventory().getSize() + 27 ? EquipmentSlot.HAND
+        return pos == p.getInventory().getHeldItemSlot() + topInventory.getSize() + 27 ? EquipmentSlot.HAND
                 : null;
     }
 
@@ -451,7 +451,7 @@ public abstract class EquipmentChangeListenerBase implements Listener {
                         continue;
                     trackPlayer(p);
                     counter++;
-                    for (EquipmentSlot slot : ItemTagUtility.getPlayerEquipmentSlots()) {
+                    for (EquipmentSlot slot : InventoryUtils.getPlayerEquipmentSlots()) {
                         ItemStack newItem = getEquip(p, slot);
                         ItemStack oldItem = equips.get(p).get(slot);
                         if (!isSimilarIgnoreDamage(oldItem, newItem))

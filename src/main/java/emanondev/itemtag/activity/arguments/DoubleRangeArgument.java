@@ -1,11 +1,14 @@
 package emanondev.itemtag.activity.arguments;
 
+import lombok.Getter;
+
 import java.util.Locale;
 
 public class DoubleRangeArgument extends Argument {
     private final double min;
     private final double max;
     private final boolean inclusive;
+    @Getter
     private final boolean percent;
 
     public DoubleRangeArgument(String info, boolean allowPercent) {
@@ -68,10 +71,6 @@ public class DoubleRangeArgument extends Argument {
             return;
         }
         throw new IllegalArgumentException();
-    }
-
-    public boolean isPercent() {
-        return percent;
     }
 
     public boolean isInside(double amount) {

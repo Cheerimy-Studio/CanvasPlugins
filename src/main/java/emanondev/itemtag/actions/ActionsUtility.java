@@ -1,6 +1,5 @@
 package emanondev.itemtag.actions;
 
-import emanondev.itemedit.ItemEdit;
 import emanondev.itemedit.utility.ItemUtils;
 import emanondev.itemtag.ItemTag;
 import emanondev.itemtag.TagItem;
@@ -182,7 +181,7 @@ public final class ActionsUtility {
     }
 
     public static void setCooldownMsgType(TagItem item, String value) {
-        if (value == null || value.isEmpty() || Objects.equals(value,"chat")) {// default
+        if (value == null || value.isEmpty() || Objects.equals(value, "chat")) {// default
             item.removeTag(ACTION_COOLDOWN_MSG_TYPE_KEY);
         } else {
             item.setTag(ACTION_COOLDOWN_MSG_TYPE_KEY, value.toLowerCase(Locale.ENGLISH));

@@ -2,11 +2,12 @@ package emanondev.itemtag.gui;
 
 import emanondev.itemedit.aliases.Aliases;
 import emanondev.itemedit.gui.PagedGui;
+import emanondev.itemedit.utility.InventoryUtils;
 import emanondev.itemedit.utility.ItemUtils;
 import emanondev.itemedit.utility.VersionUtils;
 import emanondev.itemtag.EffectsInfo;
 import emanondev.itemtag.ItemTag;
-import emanondev.itemtag.ItemTagUtility;
+import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
@@ -30,10 +31,12 @@ public class EffectsGui implements PagedGui {
 
     private static final int EFFECTS_SLOTS = 5 * 9;
     private final Player target;
+    @Getter
     private final Inventory inventory;
     private final List<EffectData> effects = new ArrayList<>();
     private final List<EquipData> equips = new ArrayList<>();
     private final EffectsInfo info;
+    @Getter
     private int page = 1;
 
     public EffectsGui(Player target, ItemStack item) {
@@ -57,7 +60,7 @@ public class EffectsGui implements PagedGui {
                 } else {
                     effects.add(new EffectData(type, -1, true, true, true));
                 }
-        for (EquipmentSlot slot : ItemTagUtility.getPlayerEquipmentSlots()) {
+        for (EquipmentSlot slot : InventoryUtils.getPlayerEquipmentSlots()) {
             equips.add(new EquipData(slot/*, info.isValidSlot(slot)*/));
         }
         effects.sort((e1, e2) -> Aliases.POTION_EFFECT.getName(e1.type).compareToIgnoreCase(Aliases.POTION_EFFECT.getName(e2.type)));
@@ -105,6 +108,30 @@ public class EffectsGui implements PagedGui {
         updateInventory();
     }
 
+    @Override
+    public Player getTargetPlayer() {
+        return target;
+    }
+
+    @Override
+    public @NotNull ItemTag getPlugin() {
+        return ItemTag.get();
+    }
+
+    public void setPage(int page) {
+        page = Math.max(1, Math.min(page, getMaxPage()));
+        if (page != this.page) {
+            this.inventory.clear();
+            this.page = page;
+            updateInventory();
+        }
+    }
+
+    public int getMaxPage() {
+        return effects.size() / EFFECTS_SLOTS +
+                (effects.size() % EFFECTS_SLOTS == 0 ? 0 : 1);
+    }
+
     private void updateInventory() {
         for (int i = 0; i + (page - 1) * EFFECTS_SLOTS < effects.size() && i < EFFECTS_SLOTS; i++)
             inventory.setItem(i, effects.get(i + (page - 1) * EFFECTS_SLOTS).getItem());
@@ -136,40 +163,6 @@ public class EffectsGui implements PagedGui {
         info.update();
         target.setItemInHand(info.getItem());
         updateInventory();
-    }
-
-    @Override
-    public @NotNull Inventory getInventory() {
-        return inventory;
-    }
-
-    @Override
-    public Player getTargetPlayer() {
-        return target;
-    }
-
-    @Override
-    public @NotNull ItemTag getPlugin() {
-        return ItemTag.get();
-    }
-
-    @Override
-    public int getPage() {
-        return page;
-    }
-
-    public void setPage(int page) {
-        page = Math.max(1, Math.min(page, getMaxPage()));
-        if (page != this.page) {
-            this.inventory.clear();
-            this.page = page;
-            updateInventory();
-        }
-    }
-
-    public int getMaxPage() {
-        return effects.size() / EFFECTS_SLOTS +
-                (effects.size() % EFFECTS_SLOTS == 0 ? 0 : 1);
     }
 
     private class EquipData {

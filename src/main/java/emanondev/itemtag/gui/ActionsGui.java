@@ -9,6 +9,7 @@ import emanondev.itemedit.utility.VersionUtils;
 import emanondev.itemtag.ItemTag;
 import emanondev.itemtag.TagItem;
 import emanondev.itemtag.actions.ActionsUtility;
+import lombok.Getter;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
@@ -339,6 +340,12 @@ public class ActionsGui implements Gui {
 
         private static final int ROWS = 5;
         private final Inventory inventory;
+        /**
+         * -- GETTER --
+         *
+         * @return 1+
+         */
+        @Getter
         private final int page;
         private final int maxPages;
 
@@ -360,13 +367,6 @@ public class ActionsGui implements Gui {
             this.maxPages = maxPages;
             this.page = page;
             updateInventory();
-        }
-
-        /**
-         * @return 1+
-         */
-        public int getPage() {
-            return this.page;
         }
 
         @Override

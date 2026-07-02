@@ -1,8 +1,11 @@
 package emanondev.itemtag.activity.arguments;
 
+import lombok.Getter;
+
 public class DoubleArgument extends Argument {
     private final double min;
     private final double max;
+    @Getter
     private double value;
 
     public DoubleArgument(double value) {
@@ -24,10 +27,6 @@ public class DoubleArgument extends Argument {
 
     public DoubleArgument(String info, double min, double max) {
         this(Double.parseDouble(info), min, max);
-    }
-
-    public double getValue() {
-        return value;
     }
 
     public void setValue(double value) {

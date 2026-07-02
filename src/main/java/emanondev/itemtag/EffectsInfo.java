@@ -1,5 +1,6 @@
 package emanondev.itemtag;
 
+import emanondev.itemedit.utility.InventoryUtils;
 import emanondev.itemedit.utility.VersionUtils;
 import lombok.Getter;
 import org.bukkit.inventory.EquipmentSlot;
@@ -29,7 +30,7 @@ public class EffectsInfo {
         if (tagItem.hasStringTag(EFFECTS_EQUIPS_KEY))
             slots.addAll(stringToEquips(tagItem.getString(EFFECTS_EQUIPS_KEY)));
         if (slots.isEmpty())
-            slots.addAll(ItemTagUtility.getPlayerEquipmentSlots());
+            slots.addAll(InventoryUtils.getPlayerEquipmentSlots());
     }
 
     /**
@@ -39,11 +40,68 @@ public class EffectsInfo {
                                                  boolean particles,
                                                  boolean icon) {
         int duration = type.isInstant() ? 1 : (VersionUtils.isVersionUpTo(1, 19, 3) ?
-                (20 * 3600 * 12) : PotionEffect.INFINITE_DURATION);
+                                               (20 * 3600 * 12) : PotionEffect.INFINITE_DURATION);
         if (VersionUtils.isVersionAfter(1, 13)) {
             return new PotionEffect(type, duration, amplifier, ambient, particles, icon);
         }
         return new PotionEffect(type, duration, amplifier, ambient, particles);
+    }
+
+    public PotionEffect getEffect(PotionEffectType type) {
+        return effects.get(type);
+    }
+
+    public boolean hasEffect(PotionEffectType type) {
+        return effects.containsKey(type);
+    }
+
+    public Collection<PotionEffect> getEffects() {
+        return effects.values();
+    }
+
+    public Map<PotionEffectType, PotionEffect> getEffectsMap() {
+        return Collections.unmodifiableMap(effects);
+    }
+
+    public boolean isValidSlot(EquipmentSlot slot) {
+        return slots.contains(slot);
+    }
+
+    public EnumSet<EquipmentSlot> getValidSlots() {
+        return slots;
+    }
+
+    public void addEffect(PotionEffect effect) {
+        effects.put(effect.getType(), effect);
+    }
+
+    public void removeEffect(PotionEffectType type) {
+        effects.remove(type);
+    }
+
+    public void toggleSlot(EquipmentSlot slot) {
+        if (slots.contains(slot)) {
+            slots.remove(slot);
+            if (slots.isEmpty())
+                slots.addAll(InventoryUtils.getPlayerEquipmentSlots());
+            return;
+        }
+        slots.add(slot);
+    }
+
+    public void update() {
+        if (effects.isEmpty())
+            tagItem.removeTag(EFFECTS_LIST_KEY);
+        else
+            tagItem.setTag(EFFECTS_LIST_KEY, effectsToString());
+        if (slots.size() == InventoryUtils.getPlayerEquipmentSlots().size())
+            tagItem.removeTag(EFFECTS_EQUIPS_KEY);
+        else
+            tagItem.setTag(EFFECTS_EQUIPS_KEY, equipsToString());
+    }
+
+    public boolean hasAnyEffects() {
+        return !effects.isEmpty();
     }
 
     private String effectsToString() {
@@ -90,7 +148,7 @@ public class EffectsInfo {
     }
 
     private String equipsToString() {
-        if (slots.size() == ItemTagUtility.getPlayerEquipmentSlots().size())
+        if (slots.size() == InventoryUtils.getPlayerEquipmentSlots().size())
             return null;
         List<EquipmentSlot> list = new ArrayList<>(slots);
         StringBuilder str = new StringBuilder();
@@ -108,62 +166,5 @@ public class EffectsInfo {
         for (String rawEq : eq)
             equips.add(EquipmentSlot.valueOf(rawEq));
         return equips;
-    }
-
-    public PotionEffect getEffect(PotionEffectType type) {
-        return effects.get(type);
-    }
-
-    public boolean hasEffect(PotionEffectType type) {
-        return effects.containsKey(type);
-    }
-
-    public Collection<PotionEffect> getEffects() {
-        return effects.values();
-    }
-
-    public Map<PotionEffectType, PotionEffect> getEffectsMap() {
-        return Collections.unmodifiableMap(effects);
-    }
-
-    public boolean isValidSlot(EquipmentSlot slot) {
-        return slots.contains(slot);
-    }
-
-    public EnumSet<EquipmentSlot> getValidSlots() {
-        return slots;
-    }
-
-    public void addEffect(PotionEffect effect) {
-        effects.put(effect.getType(), effect);
-    }
-
-    public void removeEffect(PotionEffectType type) {
-        effects.remove(type);
-    }
-
-    public void toggleSlot(EquipmentSlot slot) {
-        if (slots.contains(slot)) {
-            slots.remove(slot);
-            if (slots.isEmpty())
-                slots.addAll(ItemTagUtility.getPlayerEquipmentSlots());
-            return;
-        }
-        slots.add(slot);
-    }
-
-    public void update() {
-        if (effects.isEmpty())
-            tagItem.removeTag(EFFECTS_LIST_KEY);
-        else
-            tagItem.setTag(EFFECTS_LIST_KEY, effectsToString());
-        if (slots.size() == ItemTagUtility.getPlayerEquipmentSlots().size())
-            tagItem.removeTag(EFFECTS_EQUIPS_KEY);
-        else
-            tagItem.setTag(EFFECTS_EQUIPS_KEY, equipsToString());
-    }
-
-    public boolean hasAnyEffects() {
-        return !effects.isEmpty();
     }
 }
