@@ -12,6 +12,7 @@ import emanondev.itemtag.ItemTag;
 import emanondev.itemtag.TagItem;
 import emanondev.itemtag.command.ItemTagCommand;
 import emanondev.itemtag.command.itemtag.customflags.*;
+import lombok.extern.slf4j.Slf4j;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
@@ -29,6 +30,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
+@Slf4j
 public class Flag extends SubCmd {
 
     private final TreeSet<CustomFlag> flags = new TreeSet<>();
@@ -102,7 +104,7 @@ public class Flag extends SubCmd {
                             (value == flag.defaultValue() ? "standard" : "custom")
                     , null, p);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.warn(e.getMessage(), e);
             onFail(p, alias);
         }
 

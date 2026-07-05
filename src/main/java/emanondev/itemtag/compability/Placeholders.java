@@ -3,6 +3,7 @@ package emanondev.itemtag.compability;
 import emanondev.itemedit.utility.ItemUtils;
 import emanondev.itemtag.ItemTag;
 import emanondev.itemtag.actions.ActionsUtility;
+import lombok.extern.slf4j.Slf4j;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.entity.Player;
@@ -21,6 +22,7 @@ import java.util.concurrent.TimeUnit;
  * manually in your plugins {@code onEnable()} by using
  * {@code new YourExpansionClass().register();}
  */
+@Slf4j
 public class Placeholders extends PlaceholderExpansion {
     public Placeholders() {
 
@@ -145,7 +147,7 @@ public class Placeholders extends PlaceholderExpansion {
         } catch (Exception e) {
             ItemTag.get().log("&c! &fWrong PlaceHolderValue %" + getIdentifier() + "_" + ChatColor.YELLOW + value
                     + ChatColor.WHITE + "%");
-            e.printStackTrace();
+            log.warn(e.getMessage(), e);
         }
         return null;
     }

@@ -13,6 +13,7 @@ import emanondev.itemtag.actions.ActionsUtility;
 import emanondev.itemtag.command.ItemTagCommand;
 import emanondev.itemtag.command.ListenerSubCmd;
 import emanondev.itemtag.gui.ActionsGui;
+import lombok.extern.slf4j.Slf4j;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
@@ -28,6 +29,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
+@Slf4j
 public class Actions extends ListenerSubCmd {
 
     private static final String[] actionsSub = new String[]{"add", "addline", "set", "permission", "cooldown", "cooldownmsg", "cooldownmsgtype",
@@ -96,7 +98,7 @@ public class Actions extends ListenerSubCmd {
             }
             onFail(p, alias);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.warn(e.getMessage(), e);
             onFail(p, alias);
         }
     }
@@ -468,7 +470,7 @@ public class Actions extends ListenerSubCmd {
             sendLanguageString("add.feedback", "", p, "%action%",
                     originalAction);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.warn(e.getMessage(), e);
             Util.sendMessage(p, this.craftFailFeedback(label, getLanguageString("add.params", null, p),
                     getLanguageStringList("add.description", null, p)));
         }
@@ -573,7 +575,7 @@ public class Actions extends ListenerSubCmd {
                         ActionHandler.handleAction(event.getPlayer(), action.split(ActionsUtility.TYPE_SEPARATOR)[0],
                                 action.split(ActionsUtility.TYPE_SEPARATOR)[1]);
                     } catch (Exception e) {
-                        e.printStackTrace();
+                        log.warn(e.getMessage(), e);
                     }
                 event.setCancelled(true);
                 //event.setUseItemInHand(Event.Result.DENY);  TODO config

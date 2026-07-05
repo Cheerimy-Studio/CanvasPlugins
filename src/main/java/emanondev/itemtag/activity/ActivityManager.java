@@ -2,6 +2,7 @@ package emanondev.itemtag.activity;
 
 import emanondev.itemedit.YMLConfig;
 import emanondev.itemtag.ItemTag;
+import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -12,8 +13,8 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.regex.Pattern;
 
+@Slf4j
 public class ActivityManager {
-
 
     private static final HashMap<String, Activity> activities = new HashMap<>();
 
@@ -32,7 +33,7 @@ public class ActivityManager {
                 counter++;
             } catch (Exception e) {
                 ItemTag.get().log("Unable to load activity &e" + key + " &ffor unknown error");
-                e.printStackTrace();
+                log.warn(e.getMessage(), e);
             }
         }
         ItemTag.get().log("Loaded &e" + counter + " &factivities");

@@ -19,6 +19,7 @@ import emanondev.itemtag.equipmentchange.EquipmentChangeListenerBase;
 import emanondev.itemtag.equipmentchange.EquipmentChangeListenerUpTo1_13;
 import emanondev.itemtag.equipmentchange.EquipmentChangeListenerUpTo1_8;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -30,6 +31,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
+@Slf4j
 public class ItemTag extends APlugin {
 
     private static ItemTag plugin = null;
@@ -63,7 +65,7 @@ public class ItemTag extends APlugin {
             initDataPersistance();
         } catch (Exception e) {
             Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "Error while enabling ItemTag, disabling it");
-            e.printStackTrace();
+            log.warn(e.getMessage(), e);
             Bukkit.getServer().getPluginManager().disablePlugin(this);
             return;
         }
@@ -107,12 +109,12 @@ public class ItemTag extends APlugin {
                     this.log("Hooking into PlaceholderApi");
                     new Placeholders().register();
                 } catch (Throwable t) {
-                    t.printStackTrace();
+                    log.warn(t.getMessage(), t);
                 }
             }
         } catch (Exception e) {
             Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "Error while enabling ItemTag, disabling it");
-            e.printStackTrace();
+            log.warn(e.getMessage(), e);
             Bukkit.getServer().getPluginManager().disablePlugin(this);
         }
     }

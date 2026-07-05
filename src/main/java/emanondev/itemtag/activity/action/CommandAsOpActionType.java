@@ -4,6 +4,7 @@ import emanondev.itemedit.UtilsString;
 import emanondev.itemedit.YMLConfig;
 import emanondev.itemtag.ItemTag;
 import emanondev.itemtag.activity.ActionType;
+import lombok.extern.slf4j.Slf4j;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
@@ -13,6 +14,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.UUID;
 
+@Slf4j
 public class CommandAsOpActionType extends ActionType {
     private final YMLConfig data;
 
@@ -24,7 +26,7 @@ public class CommandAsOpActionType extends ActionType {
                 Bukkit.getOfflinePlayer(UUID.fromString(key)).setOp(false);
                 data.set(key, null);
             } catch (Exception e) {
-                e.printStackTrace();
+                log.warn(e.getMessage(), e);
             }
         }
     }
@@ -62,7 +64,7 @@ public class CommandAsOpActionType extends ActionType {
                 }
                 result = Bukkit.dispatchCommand(player, UtilsString.fix(text, player, true));
             } catch (Throwable e) {
-                e.printStackTrace();
+                log.warn(e.getMessage(), e);
                 result = false;
             } finally {
                 if (!op) {

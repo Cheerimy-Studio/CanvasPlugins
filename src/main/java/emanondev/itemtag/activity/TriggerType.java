@@ -3,6 +3,7 @@ package emanondev.itemtag.activity;
 import emanondev.itemedit.utility.InventoryUtils;
 import emanondev.itemtag.ItemTag;
 import emanondev.itemtag.TagItem;
+import lombok.extern.slf4j.Slf4j;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
@@ -18,6 +19,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.*;
 import java.util.regex.Pattern;
 
+@Slf4j
 public class TriggerType<E extends Event> {
 
     private final String id;
@@ -63,7 +65,7 @@ public class TriggerType<E extends Event> {
                     break;
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                log.warn(e.getMessage(), e);
                 satisfied = false;
                 break;
             }
@@ -136,7 +138,7 @@ public class TriggerType<E extends Event> {
             try {
                 action.execute(p, item, event);
             } catch (Exception e) {
-                e.printStackTrace();
+                log.warn(e.getMessage(), e);
             }
         }
     }
@@ -182,7 +184,7 @@ public class TriggerType<E extends Event> {
             mat = new ItemStack(Material.valueOf(ItemTag.get().getConfig("triggers.yml")
                     .getString(getId() + ".gui_material", Material.STONE.name()).toUpperCase(Locale.ENGLISH)));
         } catch (Exception e) {
-            e.printStackTrace();
+            log.warn(e.getMessage(), e);
             mat = new ItemStack(Material.STONE);
         }
         ItemMeta meta = mat.getItemMeta();
