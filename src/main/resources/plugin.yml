@@ -1,0 +1,13 @@
+name: DatapackLoader
+version: '${version}'
+main: com.lichenaut.datapackloader.Main
+api-version: "1.21"
+author: lichenaut
+description: Automatically add datapacks to your Minecraft server.
+load: STARTUP
+commands:
+  dl:
+    description: "Base command for 'help' and 'import' commands."
+  dltp:
+    description: "Teleport to the center of any world in spectator mode."
+folia-supported: true

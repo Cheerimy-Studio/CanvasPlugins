@@ -1,0 +1,32 @@
+package com.lichenaut.datapackloader.dp;
+
+import com.lichenaut.datapackloader.Main;
+import com.lichenaut.datapackloader.util.Copier;
+import lombok.RequiredArgsConstructor;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.logging.log4j.Logger;
+
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
+
+@RequiredArgsConstructor
+public class Importer {
+
+    private final Logger logger;
+    private final Main main;
+    private final String separator;
+
+    public void importUrl(String datapacksFolderPath, URL url) throws IOException, NullPointerException {
+        String packZipPath = datapacksFolderPath + separator + FilenameUtils.getName(url.getPath());
+        File packZip = new File(packZipPath);
+        if (!packZip.exists()) {
+            // try-with-resources 关闭下载流，避免泄漏网络连接/文件句柄
+            try (BufferedInputStream in = new BufferedInputStream(url.openStream())) {
+                Copier.copy(in, packZipPath);
+            }
+        }
+        new Finder(logger, main, separator).fileWalk(datapacksFolderPath, packZip, true);
+    }
+}

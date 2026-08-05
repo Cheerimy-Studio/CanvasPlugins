@@ -1,0 +1,18 @@
+#Turn DatapackLoader off.
+disable-plugin: false
+
+# Not relevant to the user.
+dev-mode-applied: false
+
+####################
+#Developer Options##
+####################
+
+#A starter datapack will generate inside the 'datapacks' folder if 'datapacks' is empty.
+starter-datapack: false
+#Uses misode's 'mcmeta' repository: https://github.com/misode/mcmeta
+
+#The server will always start up with new worlds loaded with the datapacks in 'datapacks'.
+developer-mode: false
+  #Recommendation: configure your server to auto-restart when using this.
+  #WARNING: This is done by changing 'level-name' in 'server.properties' and deleting old worlds on server startup!

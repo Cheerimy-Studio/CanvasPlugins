@@ -1,56 +1,60 @@
 <div align="center">
 
-# CanvasPlugins
+# DatapackLoader
 
-这里是 [Canvas](https://github.com/CraftCanvasMC/Canvas)(Folia 分支)相关的 2B2T 服务器插件集合
+Automatically add datapacks to your Minecraft server
 
-**欢迎点进来给我们所有人一个 Star ⭐**
+**Current version: v1.4.3 | Folia / Canvas 26.2**
 
 </div>
 
-## 简介
+## Introduction
 
-CanvasPlugins 管理和维护 Canvas(Folia 多线程服务端分支)上的 2B2T 服务器插件集合。所有插件都是面向 Canvas 26.2（MC 26.2）进行适配的公共插件，会在 Releases 中发布构建后的插件。建议自己使用 ./gradlew build 构建，产出的插件在uild/libs/ 目录下。
+DatapackLoader automatically adds datapacks to your server. Supports URL import, manual drop, and starter datapack mode. Fully compatible with Folia / Canvas multithreaded world generation.
 
-## 插件列表
+Based on [lichenaut/DatapackLoader](https://github.com/lichenaut/DatapackLoader).
 
-| 插件 | 分支 | 说明 |
-|---|---|---|
-| [Cheerimy-Studio](../Cheerimy-Studio) | [`Cheerimy-Studio`](../tree/Cheerimy-Studio) | 正版完整性验证与社区插件 |
-| [2B2TCore](../2B2TCore) | [`2B2TCore`](../tree/2B2TCore) | Anarchy 服务器核心插件，Folia/Canvas 26.2 |
-| [CnUsername](../CnUsername) | [`CnUsername`](../tree/CnUsername) | 中文名进入服务器，Folia/Canvas 26.2 |
-| [DatapackLoader](../DatapackLoader) | [`DatapackLoader`](../tree/DatapackLoader) | 自动加载数据包，Folia/Canvas 26.2 |
-| [SmartGateway](../SmartGateway) | [`SmartGateway`](../tree/SmartGateway) | Velocity 智能网关，地区分流+负载均衡+故障转移 |
+## Compatibility
 
-## 下载
-
-- 可以在 [Releases](../../releases) 中查看并下载最新构建的插件
-- **自己构建**：克隆仓库后在根目录运行 ./gradlew build，产出的插件在uild/libs/ 目录下
-
-## 环境要求
-
-| 项目 | 要求 |
+| Item | Requirement |
 |---|---|
-| 服务端版本 | Folia / Canvas 26.2（MC 26.2） |
-| Java 版本 | 25+ |
+| Server Core | Folia / Canvas 26.2 (MC 26.2), backward compatible with Spigot / Paper |
+| Java Version | 25+ |
 
-## 依赖
+## Download
 
-- [TabooLib](https://tabooproject.org) — 插件开发框架
-- [Canvas](https://github.com/CraftCanvasMC/Canvas) — Folia 多线程服务端分支
-- [PistonChat](https://github.com/AlexProgrammerDE/PistonChat) — 聊天：迷你信息和聊天管理
-- [AnarchyCore-NextGen](https://github.com/LuminusPlugins/AnarchyCore-NextGen) — 插件集合
+- **Pre-built**: Visit [Releases](../../releases) to download
+- **Build yourself**: `gradle shadowJar`
 
-## 许可证
+Output: `build/libs/DatapackLoader-1.4.3.jar`
 
-[GNU LGPL v3](LICENSE)
+## Methods
 
-> **注意：所有插件也同步发布在 [Cheerimy-Studio/MinecraftPlugins](https://github.com/Cheerimy-Studio/MinecraftPlugins)**
+There are three methods for adding datapacks:
 
----
+1. Paste a URL into the `/dl import <url>` console command
+2. Drag and drop into the plugin's `datapacks` folder (`plugins/DatapackLoader/datapacks/`)
+3. Enable `starter-datapack` in `config.yml`
 
-<div align="center">
+## Commands
 
-**欢迎点进来给我们所有人一个 Star ⭐**
+| Command | Permission | Description |
+|---|---|---|
+| `/dl` | `datapackloader.command` | Base command |
+| `/dl help` | `datapackloader.command.help` | Link to documentation |
+| `/dl import <url>` | (console only) | Import a datapack from a .zip URL |
+| `/dltp <worldname>` | `datapackloader.command.tp` | Teleport to world center in spectator |
 
-</div>
+## Notes
+
+- Datapacks are stored in `plugins/DatapackLoader/datapacks/`
+- New datapacks require a server restart to apply
+- Folia multithreaded chunk generation is fully supported
+
+## Dependency
+
+- **Optional soft dependency**: [Cheerimy-Studio](https://github.com/Cheerimy-Studio/MinecraftPlugins) — integrity verification
+
+## License
+
+[GPL-3.0](LICENSE.txt)
