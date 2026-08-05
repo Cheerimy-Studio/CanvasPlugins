@@ -22,6 +22,10 @@ taboolib {
         install(Database)
         install(DatabasePlayer)
         install(DatabasePlayerRedis)
+        // 本插件仅使用 Bukkit API，不依赖 NMS，跳过 TabooLib 的 Minecraft 版本检查
+        // 以兼容 TabooLib 尚未录入支持列表的新版本（如 Canvas 26.2 / MC 26.2）
+        disableOnUnsupportedVersion = false
+        disableOnSkippedVersion = false
     }
     description {
         name = "2B2TCore"
