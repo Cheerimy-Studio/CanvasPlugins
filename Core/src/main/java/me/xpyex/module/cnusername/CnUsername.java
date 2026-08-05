@@ -101,16 +101,16 @@ public class CnUsername {
         if (!f.exists()) f.createNewFile();
         String content = Files.readString(f.toPath());
         if (content.trim().isEmpty() || "[]".equals(content.trim())) {
-            Files.write(f.toPath(), ("[{\\"uuid\\":\\"" + UUID.nameUUIDFromBytes(("OfflinePlayer:" + name).getBytes())
-                + "\\",\\"name\\":\\"" + name + "\\",\\"created\\":\\""
+            Files.write(f.toPath(), ("[{\"uuid\":\"" + UUID.nameUUIDFromBytes(("OfflinePlayer:" + name).getBytes())
+                + "\",\"name\":\"" + name + "\",\"created\":\""
                 + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date())
-                + " +0800\\",\\"source\\":\\"CnUsername\\",\\"expires\\":\\"forever\\",\\"reason\\":\\"Invalid username\\"}]").getBytes());
+                + " +0800\",\"source\":\"CnUsername\",\"expires\":\"forever\",\"reason\":\"Invalid username\"}]").getBytes());
         } else if (!content.contains(name)) {
             Files.write(f.toPath(), (content.substring(0, content.length() - 1)
-                + ",{\\"uuid\\":\\"" + UUID.nameUUIDFromBytes(("OfflinePlayer:" + name).getBytes())
-                + "\\",\\"name\\":\\"" + name + "\\",\\"created\\":\\""
+                + ",{\"uuid\":\"" + UUID.nameUUIDFromBytes(("OfflinePlayer:" + name).getBytes())
+                + "\",\"name\":\"" + name + "\",\"created\":\""
                 + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date())
-                + " +0800\\",\\"source\\":\\"CnUsername\\",\\"expires\\":\\"forever\\",\\"reason\\":\\"Invalid username\\"}]").getBytes());
+                + " +0800\",\"source\":\"CnUsername\",\"expires\":\"forever\",\"reason\":\"Invalid username\"}]").getBytes());
         }
     }
 }

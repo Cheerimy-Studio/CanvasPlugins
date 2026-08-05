@@ -199,10 +199,10 @@ fi
 #     double quotes to make sure that they get re-expanded; and
 #   * put everything else in single quotes, so that it's not re-expanded.
 
-set -- \\
-        "-Dorg.gradle.appname=$APP_BASE_NAME" \\
-        -classpath "$CLASSPATH" \\
-        org.gradle.wrapper.GradleWrapperMain \\
+set -- \
+        "-Dorg.gradle.appname=$APP_BASE_NAME" \
+        -classpath "$CLASSPATH" \
+        org.gradle.wrapper.GradleWrapperMain \
         "$@"
 
 # Use "xargs" to parse quoted args.
@@ -225,10 +225,10 @@ set -- \\
 #
 
 eval "set -- $(
-        printf '%s\\n' "$DEFAULT_JVM_OPTS $JAVA_OPTS $GRADLE_OPTS" |
+        printf '%s\n' "$DEFAULT_JVM_OPTS $JAVA_OPTS $GRADLE_OPTS" |
         xargs -n1 |
-        sed ' s~[^-[:alnum:]+,./:=@_]~\\\\&~g; ' |
-        tr '\\n' ' '
+        sed ' s~[^-[:alnum:]+,./:=@_]~\\&~g; ' |
+        tr '\n' ' '
     )" '"$@"'
 
 exec "$JAVACMD" "$@"

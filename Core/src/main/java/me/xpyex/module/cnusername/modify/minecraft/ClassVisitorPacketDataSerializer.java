@@ -17,7 +17,7 @@ public class ClassVisitorPacketDataSerializer extends CUClassVisitor {
     public MethodVisitor onVisitMethod(int access, String name, String descriptor, String signature, String[] exceptions) {
         MethodVisitor mv = super.cv.visitMethod(access, name, descriptor, signature, exceptions);
         if ("(Ljava/lang/String;I)Lnet/minecraft/network/PacketDataSerializer;".equals(descriptor)) {
-            Logging.info("正在修改 " + getClassName() + " 类中的 " + name + "(String, int) 方法");
+            Logging.debug("正在修改 " + getClassName() + " 类中的 " + name + "(String, int) 方法");
             // 去除方法体内所有throw关键字
             return new MethodVisitor(Opcodes.ASM9, mv) {
                 private boolean expectAThrowing = false;

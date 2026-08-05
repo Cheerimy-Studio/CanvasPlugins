@@ -21,7 +21,7 @@ public class ClassVisitorLoginListener extends PatternVisitor {
     public MethodVisitor onVisitMethod(int access, String name, String descriptor, String signature, String[] exceptions) {
         MethodVisitor mv = super.cv.visitMethod(access, name, descriptor, signature, exceptions);
         if ("(Ljava/lang/String;)Z".equals(descriptor) && (access & Opcodes.ACC_STATIC) > 0) {  //类内静态isValidUsername(String)方法
-            Logging.info("正在修改 " + getClassName() + " 类中的 " + name + "(String) 方法");
+            Logging.debug("正在修改 " + getClassName() + " 类中的 " + name + "(String) 方法");
             mv.visitCode();
             Label label0 = new Label();
             mv.visitLabel(label0);

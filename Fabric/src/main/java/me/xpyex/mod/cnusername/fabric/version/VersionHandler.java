@@ -14,7 +14,7 @@ public class VersionHandler {
                                 .map(container -> container.getMetadata().getVersion().getFriendlyString())
                                 .orElse("unknown");
 
-        var array = MINECRAFT_VERSION.split("\\\\.");
+        var array = MINECRAFT_VERSION.split("\\.");
         MAJOR_VERSION_INT = ("1".equals(array[0])) ? Integer.parseInt(array[1]) : Integer.parseInt(array[0]);
     }
 

@@ -41,13 +41,13 @@ public class ClassVisitorCraftPlayerProfile extends PatternVisitor {
         if ("createAuthLibProfile".equals(name) && (access & Opcodes.ACC_STATIC) > 0) {
             // 三参数版本(Leaf等衍生服务端)
             if ("(Ljava/util/UUID;Ljava/lang/String;Z)Lcom/mojang/authlib/GameProfile;".equals(descriptor)) {
-                Logging.info("正在修改 " + getClassName() + " 类中的 " + name + "(UUID, String, boolean) 方法 [Leaf]");
+                Logging.debug("正在修改 " + getClassName() + " 类中的 " + name + "(UUID, String, boolean) 方法 [Leaf]");
                 leafLoaded = true;
                 return createRemoveLengthCheckVisitor(visitor);
             }
             // 两参数版本(原版Paper)
             if ("(Ljava/util/UUID;Ljava/lang/String;)Lcom/mojang/authlib/GameProfile;".equals(descriptor) && !leafLoaded) {
-                Logging.info("正在修改 " + getClassName() + " 类中的 " + name + "(UUID, String) 方法 [Paper]");
+                Logging.debug("正在修改 " + getClassName() + " 类中的 " + name + "(UUID, String) 方法 [Paper]");
                 return createRemoveLengthCheckVisitor(visitor);
             }
         }

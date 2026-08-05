@@ -6,7 +6,7 @@ import java.nio.file.Files;
 import lombok.Getter;
 
 public class CnUsernameConfig {
-    public static final String DEFAULT_PATTERN = "^[a-zA-Z0-9_]{3,16}|[a-zA-Z0-9_\\u4e00-\\u9fa5]{2,10}|CS\\\\-CoreLib$";
+    public static final String DEFAULT_PATTERN = "^[a-zA-Z0-9_]{3,16}|[a-zA-Z0-9_\u4e00-\u9fa5]{2,10}|CS\\-CoreLib$";
     @Getter
     public static File folder = null;
     @Getter
@@ -31,7 +31,7 @@ public class CnUsernameConfig {
         CnUsernameConfig.folder = folder;
         debugFile = new File(folder, "debug.txt");
         patternFile = new File(folder, "pattern.txt");
-        Logging.info("CnUsername的文件将会存放在: " + folder.getAbsolutePath());
+        Logging.debug("文件存放: " + folder.getAbsolutePath());
     }
 
     public static String getPattern() {
@@ -67,6 +67,6 @@ public class CnUsernameConfig {
             pattern = DEFAULT_PATTERN;
             e.printStackTrace();
         }
-        Logging.info("当前使用的正则为: " + pattern);
+        Logging.debug("当前使用的正则为: " + pattern);
     }
 }

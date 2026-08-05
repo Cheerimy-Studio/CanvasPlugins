@@ -103,7 +103,7 @@ public final class CnUsernameBK extends JavaPlugin implements CnUsernamePlugin {
             public void onPreLogin(AsyncPlayerPreLoginEvent event) {
                 if ("CS-CoreLib".equals(event.getName())) {
                     event.setLoginResult(AsyncPlayerPreLoginEvent.Result.KICK_BANNED);
-                    event.setKickMessage("Invalid username\\nCnUsername Defend");
+                    event.setKickMessage("Invalid username\nCnUsername Defend");
                 }
             }
         }, this);
