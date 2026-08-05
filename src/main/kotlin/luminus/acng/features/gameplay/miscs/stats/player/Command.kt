@@ -76,7 +76,7 @@ object Command {
                     }
                 }
             }
-            processedMessages += processedMessage + "\n"
+            processedMessages += processedMessage + "\\n"
         }
         return processedMessages
     }
