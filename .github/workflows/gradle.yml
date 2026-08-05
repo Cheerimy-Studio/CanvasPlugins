@@ -1,0 +1,52 @@
+name: Build Kotlin Project and Release JAR
+
+# 触发条件：push 到任意分支（如需限定分支，可改为 branches: [main, master]）
+on:
+  push:
+    branches: ['*']
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write  # 授予发布 Release 的权限
+
+    steps:
+      # 1. 拉取仓库代码
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 2. 配置 JDK 环境（根据你的项目需求调整版本，如 17、21）
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: gradle  # 缓存 Gradle 依赖，加速构建
+
+      # 3. 赋予 Gradle 执行权限（Linux/macOS 必需）
+      - name: Make gradlew executable
+        run: chmod +x ./gradlew
+
+      # 4. 编译项目生成 JAR 文件
+      - name: Build with Gradle
+        run: ./gradlew clean build  # clean 清空旧构建产物，build 执行编译打包
+
+      # 5. 生成 YYYYMMDDHHMMSS 格式的版本号（添加了小时分钟秒）
+      - name: Generate release version (YYYYMMDDHHMMSS)
+        id: generate_version
+        run: echo "VERSION=$(date +'%Y%m%d%H%M%S')" >> $GITHUB_ENV
+
+      # 6. 发布 Release 并上传 JAR 文件
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          # Release 标签和名称均使用 YYYYMMDDHHMMSS 格式
+          tag_name: dev_branch${{ env.VERSION }}
+          name: Developmental Version ${{ env.VERSION }}
+          # 上传 build/libs 下的所有 jar 文件（通常只有一个）
+          files: build/libs/*.jar
+          # 可选：是否为预发布版本（false 为正式发布）
+          prerelease: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # GitHub 自动生成的令牌，无需手动配置
