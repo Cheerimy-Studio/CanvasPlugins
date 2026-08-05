@@ -16,11 +16,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # 2. 配置 JDK 环境（根据你的项目需求调整版本，如 17、21）
+      # 2. 配置 JDK 环境（项目要求 Java 25+）
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
-          java-version: '17'
+          java-version: '25'
           distribution: 'temurin'
           cache: gradle  # 缓存 Gradle 依赖，加速构建
 
