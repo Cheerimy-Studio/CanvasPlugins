@@ -1,56 +1,81 @@
 <div align="center">
 
-# CanvasPlugins
+# CnUsername
 
-这里是 [Canvas](https://github.com/CraftCanvasMC/Canvas)(Folia 分支)相关的 2B2T 服务器插件集合
+允许玩家使用中文名甚至特殊字符进入 Minecraft 服务器
 
-**欢迎点进来给我们所有人一个 Star ⭐**
+**当前版本：v1.2.3 | Folia / Canvas 26.2 适配版**
 
 </div>
 
 ## 简介
 
-CanvasPlugins 管理和维护 Canvas(Folia 多线程服务端分支)上的 2B2T 服务器插件集合。所有插件都是面向 Canvas 26.2（MC 26.2）进行适配的公共插件，会在 Releases 中发布构建后的插件。建议自己使用 ./gradlew build 构建，产出的插件在uild/libs/ 目录下。
+CnUsername 通过字节码修改（ASM）解除 Minecraft 服务端对玩家用户名的字符限制，允许使用中文名、特殊字符等进入服务器。
 
-## 插件列表
+本分支为 **Folia / Canvas 26.2 适配版**，仅支持 Bukkit 系服务端（Spigot / Paper / Folia / Canvas）。
 
-| 插件 | 分支 | 说明 |
-|---|---|---|
-| [Cheerimy-Studio](../Cheerimy-Studio) | [`Cheerimy-Studio`](../tree/Cheerimy-Studio) | 正版完整性验证与社区插件 |
-| [2B2TCore](../2B2TCore) | [`2B2TCore`](../tree/2B2TCore) | Anarchy 服务器核心插件，Folia/Canvas 26.2 |
-| [CnUsername](../CnUsername) | [`CnUsername`](../tree/CnUsername) | 中文名进入服务器，Folia/Canvas 26.2 |
-| [DatapackLoader](../DatapackLoader) | [`DatapackLoader`](../tree/DatapackLoader) | 自动加载数据包，Folia/Canvas 26.2 |
-| [SmartGateway](../SmartGateway) | [`SmartGateway`](../tree/SmartGateway) | Velocity 智能网关，地区分流+负载均衡+故障转移 |
-
-## 下载
-
-- 可以在 [Releases](../../releases) 中查看并下载最新构建的插件
-- **自己构建**：克隆仓库后在根目录运行 ./gradlew build，产出的插件在uild/libs/ 目录下
-
-## 环境要求
+## 兼容性
 
 | 项目 | 要求 |
 |---|---|
-| 服务端版本 | Folia / Canvas 26.2（MC 26.2） |
+| 服务端核心 | Folia / Canvas 26.2（MC 26.2），向下兼容 Spigot / Paper |
 | Java 版本 | 25+ |
+
+## 支持平台
+
+| 平台 | 加载方式 | 说明 |
+|---|---|---|
+| Bukkit / Spigot / Paper / Folia / Canvas | 插件模式 + JavaAgent | 推荐使用 JavaAgent 解锁全部功能 |
+
+## 下载
+
+- **预构建版本**：前往 [Releases](../../releases) 页面下载最新构建
+- **自行构建**：`gradle :BuildAllPlatforms:shadowJar`
+
+产物：`BuildAllPlatforms/build/libs/CnUsername-<version>.jar`（全平台统一包，插件 + JavaAgent）
+
+## 插件方式使用
+
+1. 下载 `CnUsername-<version>.jar`
+2. 放入服务端 `plugins/` 目录
+3. 重启服务端
+4. 如需自定义正则，在 `plugins/CnUsername/pattern.txt` 中填写
+
+## JavaAgent 方式使用（推荐）
+
+1. 下载 `CnUsername-<version>.jar`
+2. 放入服务端根目录
+3. 启动命令中添加 `-javaagent:CnUsername-<version>.jar`，例如：
+   ```
+   java -javaagent:CnUsername-1.2.3.jar -jar server.jar
+   ```
+
+## 注意事项
+
+1. Paper 及其分支需在配置文件中设置 `perform-validate-username: false`
+2. 安装 AuthMe 需修改 `config.yml` 中 `allowedNicknameCharacters` 正则
+3. 安装 LuckPerms 需设置 `config.yml` 中 `allow-invalid-usernames: true`
+4. 玩家名长度不能超过 16 个字符（双端解包器限制）
+5. 默认正则：`^[a-zA-Z0-9_]{3,16}|[a-zA-Z0-9_一-龥]{2,10}$`
 
 ## 依赖
 
-- [TabooLib](https://tabooproject.org) — 插件开发框架
-- [Canvas](https://github.com/CraftCanvasMC/Canvas) — Folia 多线程服务端分支
-- [PistonChat](https://github.com/AlexProgrammerDE/PistonChat) — 聊天：迷你信息和聊天管理
-- [AnarchyCore-NextGen](https://github.com/LuminusPlugins/AnarchyCore-NextGen) — 插件集合
+- **可选软依赖**：[Cheerimy-Studio](https://github.com/Cheerimy-Studio/MinecraftPlugins) — 正版完整性验证，未安装时输出警告（不影响功能）
+
+## 衍生作品声明
+
+All derivative works **must retain** the [Cheerimy-Studio](https://github.com/Cheerimy-Studio/MinecraftPlugins) plugin dependency and integrity verification content. If the Cheerimy-Studio verification plugin does not support the target version, the soft dependency and warning text **must not** be removed.
+
+Commercial use requires obtaining a commercial license for the integrity verification plugin. Contact: QQ 3573840976.
+
+Derivatives may also contact QQ to discuss removal of the soft dependency. This policy exists to ensure derivatives properly credit the original author.
+
+## 致谢
+
+- [XPPlugins/CnUsername](https://github.com/XPPlugins/CnUsername) — 原始项目
+- [ASM](https://asm.ow2.io/) — Java 字节码操作框架
+- [acj](https://github.com/InkerBot/acj) — JVM Agent 工具
 
 ## 许可证
 
-[GNU LGPL v3](LICENSE)
-
-> **注意：所有插件也同步发布在 [Cheerimy-Studio/MinecraftPlugins](https://github.com/Cheerimy-Studio/MinecraftPlugins)**
-
----
-
-<div align="center">
-
-**欢迎点进来给我们所有人一个 Star ⭐**
-
-</div>
+[GPL-3.0](LICENSE)
