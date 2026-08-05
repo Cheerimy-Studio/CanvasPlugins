@@ -16,7 +16,7 @@ CanvasPlugins 是一组基于 Canvas（Folia 多线程服务端分支）的 2B2T
 
 | 插件 | 分支 | 说明 |
 |---|---|---|
-| [2B2TCore](../tree/2B2TCore) | [`2B2TCore`](../tree/2B2TCore) | Anarchy 服务器核心插件，提供复制漏洞、玩家统计、自杀命令等功能 |
+| [2B2TCore](../../tree/2B2TCore) | [`2B2TCore`](../../tree/2B2TCore) | Anarchy 服务器核心插件，提供复制漏洞、玩家统计、自杀命令等功能 |
 
 ## 下载
 
