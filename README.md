@@ -16,11 +16,11 @@ CanvasPlugins 管理和维护 Canvas(Folia 多线程服务端分支)上的 2B2T 
 
 | 插件 | 分支 | 版本 | 说明 |
 |---|---|---|---|
-| [Cheerimy-Studio](../Cheerimy-Studio) | [`Cheerimy-Studio`](../tree/Cheerimy-Studio) | v1.0.1 | 正版完整性验证与社区插件 |
-| [2B2TCore](../2B2TCore) | [`2B2TCore`](../tree/2B2TCore) | v1.0.3 | Anarchy 服务器核心插件，Folia/Canvas 26.2 |
-| [CnUsername](../CnUsername) | [`CnUsername`](../tree/CnUsername) | v1.2.4 | 中文名进入服务器，Folia/Canvas 26.2 |
-| [DatapackLoader](../DatapackLoader) | [`DatapackLoader`](../tree/DatapackLoader) | v1.4.4 | 自动加载数据包，Folia/Canvas 26.2 |
-| [SmartGateway](../SmartGateway) | [`SmartGateway`](../tree/SmartGateway) | v1.0.0 | Velocity 智能网关，地区分流+负载均衡+故障转移 |
+| [Cheerimy-Studio](../Cheerimy-Studio) | [`Cheerimy-Studio`](../tree/Cheerimy-Studio) | v1.0.2 | 正版完整性验证与社区插件 |
+| [2B2TCore](../2B2TCore) | [`2B2TCore`](../tree/2B2TCore) | v1.0.4 | Anarchy 服务器核心插件，Folia/Canvas 26.2 |
+| [CnUsername](../CnUsername) | [`CnUsername`](../tree/CnUsername) | v1.2.5 | 中文名进入服务器，Folia/Canvas 26.2 |
+| [DatapackLoader](../DatapackLoader) | [`DatapackLoader`](../tree/DatapackLoader) | v1.4.5 | 自动加载数据包，Folia/Canvas 26.2 |
+| [SmartGateway](../SmartGateway) | [`SmartGateway`](../tree/SmartGateway) | v1.0.2 | Velocity 智能网关，地区分流+负载均衡 |
 
 ## 下载
 
