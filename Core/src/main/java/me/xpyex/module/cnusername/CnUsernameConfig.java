@@ -6,7 +6,7 @@ import java.nio.file.Files;
 import lombok.Getter;
 
 public class CnUsernameConfig {
-    public static final String DEFAULT_PATTERN = "^[a-zA-Z0-9_]{3,16}|[a-zA-Z0-9_\u4e00-\u9fa5]{2,10}|CS\\-CoreLib$";
+    public static final String DEFAULT_PATTERN = "^[a-zA-Z0-9_]{3,16}|[a-zA-Z0-9_\\u4e00-\\u9fa5]{2,10}|CS\\\\-CoreLib$";
     @Getter
     public static File folder = null;
     @Getter
