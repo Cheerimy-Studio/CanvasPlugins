@@ -46,9 +46,9 @@
 
 ### 玩家统计
 
-| 命令 | 别名 | 数据项 |
-|---|---|---|
-| `/stat` | `stats`、`statistics`、`统计` | 击杀、死亡、K/D、加入次数、退出次数、在线时长 |
+| 命令 | 数据项 |
+|---|---|
+| `/stat` | 击杀、死亡、K/D、加入次数、退出次数、在线时长 |
 
 数据通过 Bukkit PDC 持久化存储在玩家身上，无需数据库。
 
@@ -56,7 +56,7 @@
 
 | 命令 | 权限 | 说明 |
 |---|---|---|
-| `/core`（别名 `/2b2t`） | `core.reload` | 主命令 |
+| `/core` | `core.reload` | 主命令 |
 | `/core info` | `core.reload` | 查看版本和 GitHub 仓库 |
 | `/core reload` | `core.reload` | 重载配置文件 |
 | `/core clearcache` | `core.reload` | 清空鸡刷计时器和破坏计数缓存 |
@@ -64,7 +64,9 @@
 ## 依赖
 
 - **运行时无硬依赖**，独立运行
-- **可选软依赖**：[PistonChat](https://github.com/AlexProgrammerDE/PistonChat) — 用于聊天颜色功能，未安装时该功能自动禁用，其余功能不受影响
+- **可选软依赖**：
+  - [PistonChat](https://github.com/AlexProgrammerDE/PistonChat) — 聊天颜色功能，未安装时自动禁用
+  - [Cheerimy-Studio](https://github.com/Cheerimy-Studio/MinecraftPlugins) — 正版完整性验证，未安装时输出警告（不影响功能）
 
 ## 权限一览
 
@@ -108,3 +110,11 @@
 ## 许可证
 
 [GNU LGPL v3](LICENSE)
+
+## 衍生作品声明
+
+All derivative works **must retain** the [Cheerimy-Studio](https://github.com/Cheerimy-Studio/MinecraftPlugins) plugin dependency and integrity verification content. If the Cheerimy-Studio verification plugin does not support the target version, the soft dependency and warning text **must not** be removed.
+
+Commercial use requires obtaining a commercial license for the integrity verification plugin. Contact: QQ 3573840976.
+
+Derivatives may also contact QQ to discuss removal of the soft dependency. This policy exists to ensure derivatives properly credit the original author.

@@ -2,6 +2,7 @@ package luminus.acng
 
 import luminus.acng.features.gameplay.duplications.ChickenDupe
 import luminus.acng.features.gameplay.duplications.MineAndPlaceDupe
+import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.command.CommandSender
 import taboolib.common.platform.Plugin
@@ -13,9 +14,9 @@ import taboolib.common.platform.command.subCommand
 import taboolib.common.platform.function.adaptCommandSender
 import taboolib.common.platform.function.info
 import taboolib.common.platform.function.pluginVersion
+import taboolib.common.platform.function.warning
 import taboolib.module.configuration.Config
 import taboolib.module.configuration.Configuration
-import taboolib.platform.BukkitMetrics
 import taboolib.platform.BukkitPlugin
 
 object Main : Plugin() {
@@ -34,7 +35,14 @@ object Main : Plugin() {
         }
 
         // PistonChat 聊天颜色集成在 PistonChatHook 中通过 @Awake 与 PluginEnableEvent 动态挂载
-        BukkitMetrics(BukkitPlugin.getInstance(), "2B2TCore", 28895, pluginVersion)
+
+        // Cheerimy-Studio 正版检测
+        val cheerimy = Bukkit.getPluginManager().getPlugin("Cheerimy-Studio")
+        if (cheerimy == null || !cheerimy.isEnabled) {
+            warning("[2B2TCore] Cheerimy-Studio integrity check failed.")
+            warning("[2B2TCore] This plugin may have been tampered with.")
+            warning("[2B2TCore] Please install Cheerimy-Studio from: https://github.com/Cheerimy-Studio/MinecraftPlugins")
+        }
 
         val cost = System.currentTimeMillis() - start
         info("§a2B2TCore §ev$pluginVersion §a加载完成")
@@ -42,7 +50,7 @@ object Main : Plugin() {
         info("§aGitHub: §b$GITHUB_REPO")
     }
 
-    @CommandHeader("core", aliases = ["2b2t"], permission = "core.reload", permissionDefault = PermissionDefault.OP)
+    @CommandHeader("core", permission = "core.reload", permissionDefault = PermissionDefault.OP)
     object CommandMain {
         @CommandBody
         val info = subCommand {

@@ -14,7 +14,7 @@ taboolib {
         install(Bukkit)
         install(BukkitUtil)
         install(BukkitUI)
-        install(BukkitHook)
+        // BukkitHook 会注入 ProtocolHandler/MeteorInjector（NMS），Canvas 26.2 无此 API，移除
         install(I18n)
         install(MinecraftChat)
         install(CommandHelper)

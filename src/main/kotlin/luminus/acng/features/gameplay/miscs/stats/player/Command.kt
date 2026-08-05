@@ -14,7 +14,7 @@ object Command {
 
     @Awake(LifeCycle.ENABLE)
     fun onEnable() {
-        command("stat", aliases = listOf("stats", "statistics", "统计")) {
+        command("stat") {
             execute<CommandSender> { sender, _, _ ->
                 if (sender is Player) {
                     sender.msg(buildStatisticsMessage(sender))
