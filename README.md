@@ -4,7 +4,7 @@
 
 面向 Folia / Canvas 分支核心的 Anarchy 服务器核心插件
 
-**当前版本：v1.0.0-beta**
+**当前版本：v1.0.0**
 
 </div>
 

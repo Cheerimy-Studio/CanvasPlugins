@@ -39,7 +39,7 @@ object MineAndPlaceDupe {
         }
     }
 
-    /** 清空计数缓存（由 /copy clearcache 调用） */
+    /** 清空计数缓存（由 /core clearcache 调用） */
     fun clear() {
         map.clear()
     }

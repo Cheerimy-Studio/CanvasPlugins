@@ -84,21 +84,12 @@ object Command {
     data class PlayerData(val kills: Int, val deaths: Int, val kds: Double, val joins: Int, val quits: Int, val onlineTime: DateTime)
     data class DateTime(val days: Int, val hours: Int, val minutes: Int, val seconds: Int) {
         fun format(day: String, hrs: String, min: String, sec: String): String {
-            if (days != 0 && hours != 0 && minutes != 0 && seconds != 0) return "$days $day $hours $hrs $minutes $min $seconds $sec"
-            var result = ""
-            if (days != 0) {
-                result += "$days $day "
-            }
-            if (hours != 0) {
-                result += "$hours $hrs "
-            }
-            if (minutes != 0) {
-                result += "$minutes $min "
-            }
-            if (seconds != 0) {
-                result += "$seconds $sec"
-            }
-            return result
+            val parts = mutableListOf<String>()
+            if (days != 0) parts += "$days $day"
+            if (hours != 0) parts += "$hours $hrs"
+            if (minutes != 0) parts += "$minutes $min"
+            if (seconds != 0 || parts.isEmpty()) parts += "$seconds $sec"
+            return parts.joinToString(" ")
         }
 
         companion object {
