@@ -5,9 +5,11 @@ api-version: "1.21"
 author: lichenaut
 description: Automatically add datapacks to your Minecraft server.
 load: STARTUP
+folia-supported: true
+softdepend:
+  - Cheerimy-Studio
 commands:
   dl:
     description: "Base command for 'help' and 'import' commands."
   dltp:
     description: "Teleport to the center of any world in spectator mode."
-folia-supported: true

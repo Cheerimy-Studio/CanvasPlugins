@@ -24,7 +24,7 @@ public class LevelChanger {
                 lines.add(line);
             }
         } catch (IOException e) {
-            throw new IOException("IOException: Could not read 'server.properties'.\n" + e.getMessage());
+            throw new IOException("IOException: Could not read 'server.properties'.\\n" + e.getMessage());
         }
 
         for (String line : lines) {
@@ -41,10 +41,10 @@ public class LevelChanger {
 
         try (FileWriter fileWriter = new FileWriter("server.properties")) {
             for (String string : lines) {
-                fileWriter.write(string + "\n");
+                fileWriter.write(string + "\\n");
             }
         } catch (IOException e) {
-            throw new IOException("IOException: Could not write to 'server.properties'.\n" + e.getMessage());
+            throw new IOException("IOException: Could not write to 'server.properties'.\\n" + e.getMessage());
         }
     }
 }

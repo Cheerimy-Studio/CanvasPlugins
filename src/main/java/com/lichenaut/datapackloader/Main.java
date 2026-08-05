@@ -44,7 +44,7 @@ public final class Main extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        new Metrics(this, 17272);
+        long startTime = System.currentTimeMillis();
         noConfig = !new File(getDataFolder(), "config.yml").exists();
         getConfig().options().copyDefaults(true);
         saveDefaultConfig();
@@ -53,12 +53,6 @@ public final class Main extends JavaPlugin {
             logger.info("Plugin disabled in config.yml.");
             return;
         }
-
-        new VersionGetter(this, genUtil).getVersion(version -> {
-            if (!this.getDescription().getVersion().equals(version)) {
-                logger.info("Update available.");
-            }
-        });
 
         String datapacksFolderPath = getDataFolder().getPath() + separator + "datapacks";
         File datapacksFolder = new File(datapacksFolderPath);
@@ -192,5 +186,15 @@ public final class Main extends JavaPlugin {
         } else {
             logger.warn("Command 'dltp' is not defined in plugin.yml!");
         }
+
+        // Cheerimy-Studio 正版检测
+        if (getServer().getPluginManager().getPlugin("Cheerimy-Studio") == null) {
+            logger.warn("[DatapackLoader] Cheerimy-Studio not found, integrity check failed.");
+            logger.warn("[DatapackLoader] https://github.com/Cheerimy-Studio/MinecraftPlugins");
+        }
+
+        long cost = System.currentTimeMillis() - startTime;
+        logger.info("[DatapackLoader] v{} loaded in {}ms", getDescription().getVersion(), cost);
+        logger.info("[DatapackLoader] GitHub: https://github.com/Cheerimy-Studio/CanvasPlugins");
     }
 }

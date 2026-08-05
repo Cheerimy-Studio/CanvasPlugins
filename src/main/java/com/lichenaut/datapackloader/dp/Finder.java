@@ -105,7 +105,7 @@ public class Finder extends SimpleFileVisitor<Path> {
 
             @Override
             public @NotNull FileVisitResult visitFileFailed(@NotNull Path file, @NotNull IOException e) throws IOException {
-                throw new IOException("IOException: Failed to visit file '" + file + "'!\n", e);
+                throw new IOException("IOException: Failed to visit file '" + file + "'!\\n", e);
             }
         });
 

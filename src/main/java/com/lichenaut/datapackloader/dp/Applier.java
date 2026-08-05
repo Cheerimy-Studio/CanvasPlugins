@@ -38,7 +38,7 @@ public class Applier {
                 importEvent = true;
             } catch (IOException e) {
                 throw new IOException(
-                        "IOException: Could not copy directory '" + datapack + "' to '" + datapackTarget + "'!\n", e);
+                        "IOException: Could not copy directory '" + datapack + "' to '" + datapackTarget + "'!\\n", e);
             }
         }
 
