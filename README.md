@@ -14,12 +14,13 @@ CanvasPlugins 管理和维护 Canvas(Folia 多线程服务端分支)上的 2B2T 
 
 ## 插件列表
 
-| 插件 | 仓库 | 简介 |
+| 鎻掍欢 | 鍒嗘敮 | 璇存槑 |
 |---|---|---|
-| [2B2TCore](../2B2TCore) | [2B2TCore](../tree/2B2TCore) | Anarchy 服务器插件集合，适配 Canvas 26.2（MC 26.2），包含：公共硬币/Nick皮肤/复制漏洞/自动重启/实体清除/垃圾邮件过滤/统计/自杀/反作弊 等功能 |
-| [CnUsername](../CnUsername) | [CnUsername](../tree/CnUsername) | 允许玩家在服务器中使用中文名称进入服务器，Canvas/Leaf 26.2 适配 |
-| [Cheerimy-Studio](https://github.com/Cheerimy-Studio/Cheerimy-Studio) | [Cheerimy-Studio](https://github.com/Cheerimy-Studio/Cheerimy-Studio) | Anarchy 服务器插件集合，Canvas 26.2 适配 |
-| [DatapackLoader](../DatapackLoader) | [DatapackLoader](../tree/DatapackLoader) | 自动加载数据包，Folia/Canvas 26.2 适配版 |
+| [Cheerimy-Studio](../Cheerimy-Studio) | [`Cheerimy-Studio`](../tree/Cheerimy-Studio) | 姝ｇ増瀹屾暣鎬ч獙璇佷笌绀惧尯鎻掍欢 |
+| [2B2TCore](../2B2TCore) | [`2B2TCore`](../tree/2B2TCore) | Anarchy 鏈嶅姟鍣ㄦ牳蹇冩彃浠讹紝Folia/Canvas 26.2 |
+| [CnUsername](../CnUsername) | [`CnUsername`](../tree/CnUsername) | 涓枃鍚嶈繘鍏ユ湇鍔″櫒锛孎olia/Canvas 26.2 |
+| [DatapackLoader](../DatapackLoader) | [`DatapackLoader`](../tree/DatapackLoader) | 鑷姩鍔犺浇鏁版嵁鍖咃紝Folia/Canvas 26.2 |
+
 
 ## 下载
 
