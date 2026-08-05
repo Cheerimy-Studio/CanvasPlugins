@@ -1,0 +1,74 @@
+# 2B2TCore 配置文件
+# 适用核心：Folia / Canvas（26.2）
+# 所有功能均已在区域线程内同步执行，符合 Folia 线程安全规则
+# GitHub: https://github.com/Cheerimy-Studio/CanvasPlugins
+
+# 配置版本号（请勿手动修改，由插件自动管理）
+config-ver: 6
+
+# ===================== 复制功能 =====================
+duplication:
+  # 命令复制：通过 /dupe 复制手持物品（权限：core.dupe.command）
+  command:
+    enable: true
+    multiply-times: 2  # 复制倍数
+    max-amount: 2333   # 单次复制数量上限
+
+  # 物品展示框复制：旋转展示框时有概率掉落其内物品（权限：core.dupe.item-frame）
+  item-frame:
+    enable: false
+    possibility: 10  # 触发概率（百分比，0-100）
+
+  # 鸡刷复制
+  chicken:
+    # Xin 模式：将潜影盒存入鸡中，在指定分钟数掉落（权限：core.dupe.chicken.xin）
+    xin-mode: false
+    xin-mode-periods:  # 触发掉落的分钟数（0-59）
+      - 15
+      - 30
+      - 45
+      - 0
+    # 点击模式：右键鸡时复制手持物品（权限：core.dupe.chicken.click）
+    click-mode: false
+    click-mode-cooldown: 3  # 冷却时间（秒）
+
+  # 驴复制
+  donkey:
+    # Xin 模式：击杀驮兽时掉落其库存（权限：core.dupe.donkey.xin）
+    xin-mode: false
+    # Org 模式：骑乘驮兽下线时复制其库存（权限：core.dupe.donkey.org）
+    org-mode: false
+    # Org 模式下是否允许处理船链上的驮兽
+    org-mode-allow-boat-chain: false
+
+  # 破坏放置复制：累计破坏潜影盒到指定次数时复制（权限：core.dupe.mine-and-place）
+  mine-and-place:
+    enable: false
+    amount: 10  # 触发复制所需破坏次数
+
+# ===================== 自杀命令 =====================
+# 启用后玩家可使用 /suicide（别名 514、kill）自杀（权限：core.suicide，默认允许）
+suicide-enable: true
+
+# ===================== 聊天颜色（需安装 PistonChat） =====================
+# 未安装 PistonChat 时本段无效，不会触发其事件类加载
+chat-color:
+  enable: false  # 总开关
+  # 默认颜色：当玩家不匹配任何权限组时使用，留空表示不修改原颜色
+  # 支持 & 代码（如 &7）、#RRGGBB（如 #AAAAAA）
+  default-color: "&7"
+  # 权限组：自上而下匹配，首个命中的权限组生效
+  groups:
+    vip:
+      permission: "core.chatcolor.vip"
+      color: "&e"
+    op:
+      permission: "core.chatcolor.op"
+      color: "&c"
+
+# ===================== 消息文本 =====================
+# 支持旧版 & 颜色代码
+messages:
+  success-dupe: "&e&l成功复制物品！"
+  no-item: "&c你必须手持一个物品才能复制！"
+  suicide: "&7你已自杀。"

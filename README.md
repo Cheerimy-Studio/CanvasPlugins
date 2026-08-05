@@ -1,56 +1,120 @@
 <div align="center">
 
-# CanvasPlugins
+# 2B2TCore
 
-这里是 [Canvas](https://github.com/CraftCanvasMC/Canvas)(Folia 分支)相关的 2B2T 服务器插件集合
+面向 Folia / Canvas 分支核心的 Anarchy 服务器核心插件
 
-**欢迎点进来给我们所有人一个 Star ⭐**
+**当前版本：v1.0.2**
 
 </div>
 
 ## 简介
 
-CanvasPlugins 管理和维护 Canvas(Folia 多线程服务端分支)上的 2B2T 服务器插件集合。所有插件都是面向 Canvas 26.2（MC 26.2）进行适配的公共插件，会在 Releases 中发布构建后的插件。建议自己使用 ./gradlew build 构建，产出的插件在uild/libs/ 目录下。
+2B2TCore 是一款为 Folia 多线程服务端及其分支（如 Canvas 26.2）设计的 Anarchy 服务器核心插件，提供复制漏洞、玩家统计、自杀命令等常用功能。所有功能均严格遵循 Folia 线程安全规则，通过区域线程调度和 EntityScheduler 确保多线程环境下的稳定性。
 
-## 插件列表
-
-| 插件 | 分支 | 说明 |
-|---|---|---|
-| [Cheerimy-Studio](../Cheerimy-Studio) | [`Cheerimy-Studio`](../tree/Cheerimy-Studio) | 正版完整性验证与社区插件 |
-| [2B2TCore](../2B2TCore) | [`2B2TCore`](../tree/2B2TCore) | Anarchy 服务器核心插件，Folia/Canvas 26.2 |
-| [CnUsername](../CnUsername) | [`CnUsername`](../tree/CnUsername) | 中文名进入服务器，Folia/Canvas 26.2 |
-| [DatapackLoader](../DatapackLoader) | [`DatapackLoader`](../tree/DatapackLoader) | 自动加载数据包，Folia/Canvas 26.2 |
-| [SmartGateway](../SmartGateway) | [`SmartGateway`](../tree/SmartGateway) | Velocity 智能网关，地区分流+负载均衡+故障转移 |
-
-## 下载
-
-- 可以在 [Releases](../../releases) 中查看并下载最新构建的插件
-- **自己构建**：克隆仓库后在根目录运行 ./gradlew build，产出的插件在uild/libs/ 目录下
-
-## 环境要求
+## 兼容性
 
 | 项目 | 要求 |
 |---|---|
-| 服务端版本 | Folia / Canvas 26.2（MC 26.2） |
+| 服务端核心 | Folia / Canvas 26.2（MC 26.2），向下兼容 Spigot / Paper |
 | Java 版本 | 25+ |
+| Kotlin | 2.3.21 |
+| TabooLib | 6.2.4 |
+
+## 功能列表
+
+所有功能均可在 `config.yml` 中独立开关。
+
+### 复制漏洞
+
+| 功能 | 触发方式 | 权限节点 |
+|---|---|---|
+| 命令复制 | `/dupe` | `core.dupe.command` |
+| 物品展示框复制 | 旋转展示框（概率触发） | `core.dupe.item-frame` |
+| 鸡刷复制 - Xin 模式 | 右键鸡存入潜影盒，到点掉落 | `core.dupe.chicken.xin` |
+| 鸡刷复制 - 点击模式 | 右键鸡复制手持物品（带冷却） | `core.dupe.chicken.click` |
+| 驴复制 - Xin 模式 | 击杀驮兽掉落其库存 | `core.dupe.donkey.xin` |
+| 驴复制 - Org 模式 | 骑驮兽下线复制其库存 | `core.dupe.donkey.org` |
+| 破坏放置复制 | 累计破坏潜影盒到指定次数 | `core.dupe.mine-and-place` |
+
+### 杂项功能
+
+| 功能 | 命令 | 权限节点 | 说明 |
+|---|---|---|---|
+| 自杀 | `/suicide`（别名 `514`、`kill`） | `core.suicide`（默认允许） | OP 走原版 kill 支持选择器 |
+| 聊天颜色 | 自动生效 | `core.chatcolor.vip` / `core.chatcolor.op` | 需安装 PistonChat |
+
+### 玩家统计
+
+| 命令 | 数据项 |
+|---|---|
+| `/stat` | 击杀、死亡、K/D、加入次数、退出次数、在线时长 |
+
+数据通过 Bukkit PDC 持久化存储在玩家身上，无需数据库。
+
+### 管理命令
+
+| 命令 | 权限 | 说明 |
+|---|---|---|
+| `/core` | `core.reload` | 主命令 |
+| `/core info` | `core.reload` | 查看版本和 GitHub 仓库 |
+| `/core reload` | `core.reload` | 重载配置文件 |
+| `/core clearcache` | `core.reload` | 清空鸡刷计时器和破坏计数缓存 |
 
 ## 依赖
 
+- **运行时无硬依赖**，独立运行
+- **可选软依赖**：
+  - [PistonChat](https://github.com/AlexProgrammerDE/PistonChat) — 聊天颜色功能，未安装时自动禁用
+  - [Cheerimy-Studio](https://github.com/Cheerimy-Studio/MinecraftPlugins) — 正版完整性验证，未安装时输出警告（不影响功能）
+
+## 权限一览
+
+| 权限节点 | 默认 | 说明 |
+|---|---|---|
+| `core.reload` | OP | 管理命令（重载/清缓存/信息） |
+| `core.suicide` | 所有玩家 | 自杀命令 |
+| `core.dupe.command` | OP | 命令复制 |
+| `core.dupe.item-frame` | OP | 物品展示框复制 |
+| `core.dupe.chicken.xin` | OP | 鸡刷复制 - Xin 模式 |
+| `core.dupe.chicken.click` | OP | 鸡刷复制 - 点击模式 |
+| `core.dupe.donkey.xin` | OP | 驴复制 - Xin 模式 |
+| `core.dupe.donkey.org` | OP | 驴复制 - Org 模式 |
+| `core.dupe.mine-and-place` | OP | 破坏放置复制 |
+| `core.chatcolor.vip` | OP | 聊天颜色 - VIP 组 |
+| `core.chatcolor.op` | OP | 聊天颜色 - OP 组 |
+
+## 构建
+
+```
+./gradlew build
+```
+
+产物位于 `build/libs/2B2TCore-<version>.jar`。
+
+## Folia 线程安全实现
+
+- 所有事件监听器在对应区域线程内同步执行实体/世界/库存操作
+- 鸡刷复制 Xin 模式使用 `EntityScheduler.runAtFixedRate` 在鸡自身区域线程周期检测
+- 驴复制 Org 模式延迟打开库存使用 `EntityScheduler.runDelayed`
+- 在线时长 PDC 操作在玩家区域线程内同步执行
+- 异步任务仅遍历 `ConcurrentHashMap`，不操作实体/世界
+
+## 衍生作品声明
+
+All derivative works **must retain** the [Cheerimy-Studio](https://github.com/Cheerimy-Studio/MinecraftPlugins) plugin dependency and integrity verification content. If the Cheerimy-Studio verification plugin does not support the target version, the soft dependency and warning text **must not** be removed.
+
+Commercial use requires obtaining a commercial license for the integrity verification plugin. Contact: QQ 3573840976.
+
+Derivatives may also contact QQ to discuss removal of the soft dependency. This policy exists to ensure derivatives properly credit the original author.
+
+## 致谢
+
 - [TabooLib](https://tabooproject.org) — 插件开发框架
-- [Canvas](https://github.com/CraftCanvasMC/Canvas) — Folia 多线程服务端分支
-- [PistonChat](https://github.com/AlexProgrammerDE/PistonChat) — 聊天：迷你信息和聊天管理
-- [AnarchyCore-NextGen](https://github.com/LuminusPlugins/AnarchyCore-NextGen) — 插件集合
+- [PistonChat](https://github.com/AlexProgrammerDE/PistonChat) — 聊天颜色集成
+- [AnarchyCore-NextGen](https://github.com/LuminusPlugins/AnarchyCore-NextGen) — 原始项目
+- [Canvas](https://github.com/CraftCanvasMC/Canvas) — Folia 分支核心
 
 ## 许可证
 
 [GNU LGPL v3](LICENSE)
-
-> **注意：所有插件也同步发布在 [Cheerimy-Studio/MinecraftPlugins](https://github.com/Cheerimy-Studio/MinecraftPlugins)**
-
----
-
-<div align="center">
-
-**欢迎点进来给我们所有人一个 Star ⭐**
-
-</div>
