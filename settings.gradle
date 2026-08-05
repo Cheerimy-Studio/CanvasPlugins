@@ -29,12 +29,14 @@ plugins {
 rootProject.name = 'CnUsername'
 include 'Core'
 include 'BuildAllPlatforms'
-include 'Fabric'
-include 'Fabric:Fabric_18'
-include 'Fabric:Fabric_19'
-include 'Fabric:Fabric_20'
-include 'Fabric:Fabric_21'
-include 'Fabric:Fabric_26'  // 暂时禁用，需要独立构建
+// Folia/Canvas 适配：暂移除 Fabric 与 NeoForge 模块（需独立构建链）
+// 如需构建这些平台，请还原以下 include 并使用对应平台的 Gradle 版本
+// include 'Fabric'
+// include 'Fabric:Fabric_18'
+// include 'Fabric:Fabric_19'
+// include 'Fabric:Fabric_20'
+// include 'Fabric:Fabric_21'
+// include 'Fabric:Fabric_26'
 include 'Plugins'
-include 'NeoForge'
-include 'NeoForge:NeoForge_21'
+// include 'NeoForge'
+// include 'NeoForge:NeoForge_21'

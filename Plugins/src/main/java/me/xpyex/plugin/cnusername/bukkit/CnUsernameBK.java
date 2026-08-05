@@ -159,7 +159,9 @@ public final class CnUsernameBK extends JavaPlugin implements CnUsernamePlugin {
     @Override
     public void onEnable() {
         Logging.info("进入插件启用流程");
-        getServer().getScheduler().runTaskAsynchronously(this, UpdateChecker::check);
+        // Folia 兼容：不使用 BukkitScheduler（Folia 中已禁用），改用纯 JDK 异步
+        // 这样在 Folia / Canvas / Spigot / Paper 上均能正常工作
+        java.util.concurrent.CompletableFuture.runAsync(UpdateChecker::check);
         getServer().getPluginManager().registerEvents(new Listener() {
             @EventHandler
             public void onPreLogin(AsyncPlayerPreLoginEvent event) {

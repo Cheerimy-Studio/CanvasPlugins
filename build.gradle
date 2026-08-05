@@ -1,14 +1,15 @@
 plugins {
     id 'java'
     id 'idea'
-    id 'net.neoforged.moddev' version '2.0.141' apply false
+    // Folia/Canvas 适配：暂移除 NeoForge moddev 插件（与 Gradle 9.1.0 不兼容）
+    // id 'net.neoforged.moddev' version '2.0.141' apply false
 }
 
 allprojects {
     apply plugin: 'java'
 
     group = 'me.xpyex'
-    version = '1.2.1'
+    version = '1.2.2'
 
     repositories {
         mavenCentral()

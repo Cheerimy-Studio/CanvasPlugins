@@ -20,13 +20,14 @@ configurations {
 dependencies {
     shadowMe project(":Core")
     shadowMe project(":Plugins")
-    shadowMe project(":Fabric")
-    shadowMe project(":Fabric:Fabric_18")
-    shadowMe project(":Fabric:Fabric_19")
-    shadowMe project(":Fabric:Fabric_20")
-    shadowMe project(":Fabric:Fabric_21")
-    shadowMe project(":Fabric:Fabric_26")
-    shadowMe project(":NeoForge:NeoForge_21")
+    // Folia/Canvas 适配：暂移除 Fabric 与 NeoForge 模块
+    // shadowMe project(":Fabric")
+    // shadowMe project(":Fabric:Fabric_18")
+    // shadowMe project(":Fabric:Fabric_19")
+    // shadowMe project(":Fabric:Fabric_20")
+    // shadowMe project(":Fabric:Fabric_21")
+    // shadowMe project(":Fabric:Fabric_26")
+    // shadowMe project(":NeoForge:NeoForge_21")
 }
 
 shadowJar {
@@ -67,7 +68,8 @@ processResources {
     filesMatching('version') {
         expand props
     }
-    filesMatching("fabric.mod.json") {
-        expand "version": version
-    }
+    // Folia/Canvas 适配：暂移除 Fabric 模块
+    // filesMatching("fabric.mod.json") {
+    //     expand "version": version
+    // }
 }

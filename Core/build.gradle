@@ -15,7 +15,7 @@ dependencies {
     implementation 'org.ow2.asm:asm:9.10.1'
 }
 
-def targetJavaVersion = 11
+def targetJavaVersion = 25
 java {
     def javaVersion = JavaVersion.toVersion(targetJavaVersion)
     sourceCompatibility = javaVersion
