@@ -15,7 +15,7 @@ CanvasPlugins 管理和维护 Canvas(Folia 多线程服务端分支)上的 2B2T 
 ## 插件列表
 
 | 插件 | 分支 | 说明 |
-|---|---|---|
+|---|---|---|---|
 | [Cheerimy-Studio](../Cheerimy-Studio) | [`Cheerimy-Studio`](../tree/Cheerimy-Studio) | 正版完整性验证与社区插件 |
 | [2B2TCore](../2B2TCore) | [`2B2TCore`](../tree/2B2TCore) | Anarchy 服务器核心插件，Folia/Canvas 26.2 |
 | [CnUsername](../CnUsername) | [`CnUsername`](../tree/CnUsername) | 中文名进入服务器，Folia/Canvas 26.2 |
