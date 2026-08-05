@@ -1,0 +1,12 @@
+name: Cheerimy-Studio
+version: '1.0.0'
+main: studio.cheerimy.plugin.CheerimyStudio
+api-version: 1.13
+folia-supported: true
+author: Cheerimy-Studio
+description: Cheerimy-Studio integrity verification and community plugin
+load: STARTUP
+commands:
+  cheerimy-studio:
+    description: Show Cheerimy-Studio information
+    usage: /cheerimy-studio
