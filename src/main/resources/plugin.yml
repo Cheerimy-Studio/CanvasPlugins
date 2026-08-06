@@ -1,6 +1,6 @@
-name: ${project.name}
-main: ${groupId}.${project.name}
-version: "${project.version}"
+name: ItemTag
+main: emanondev.itemtag.ItemTag
+version: "3.7.7"
 author: emanon
 api-version: 1.13
 depend: [ ItemEdit ]
