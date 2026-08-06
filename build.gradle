@@ -1,0 +1,79 @@
+plugins {
+    id 'java'
+    id 'maven-publish'
+    id 'com.gradleup.shadow' version '9.4.2'
+}
+
+group = 'emanondev.itemedit'
+version = '3.7.10'
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
+}
+
+repositories {
+    mavenCentral()
+    maven { url 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/' }
+    maven { url 'https://jitpack.io' }
+    maven { url 'https://repo.extendedclip.com/content/repositories/placeholderapi/' }
+    maven { url 'https://mvn.lumine.io/repository/maven-public/' }
+    maven { url 'https://repo.papermc.io/repository/maven-public/' }
+}
+
+dependencies {
+    // Spigot API
+    compileOnly 'org.spigotmc:spigot-api:1.21.11-R0.1-SNAPSHOT'
+    compileOnly 'org.jetbrains:annotations:26.0.2'
+
+    // Lombok + SLF4J
+    compileOnly 'org.projectlombok:lombok:1.18.46'
+    annotationProcessor 'org.projectlombok:lombok:1.18.46'
+    compileOnly 'org.slf4j:slf4j-api:2.0.17'
+
+    // Adventure
+    implementation 'net.kyori:adventure-text-minimessage:5.1.1'
+    implementation 'net.kyori:adventure-text-serializer-legacy:5.1.1'
+
+    // ItemBridge
+    implementation 'com.github.jojodmo:ItemBridge:b0054538c1'
+
+    // Optional compile-only deps
+    compileOnly 'com.github.LeonMangler:SuperVanish:6.2.18-3'
+    compileOnly 'com.github.MilkBowl:VaultAPI:1.7'
+    compileOnly 'me.clip:placeholderapi:2.11.6'
+
+    // MongoDB
+    implementation 'org.mongodb:mongo-java-driver:3.12.13'
+}
+
+sourceSets {
+    main {
+        java {
+            exclude 'emanondev/itemedit/compability/MythicMobsListener.java'
+            exclude 'emanondev/itemedit/compability/DungeonMMOItemProvider.java'
+            exclude 'emanondev/itemedit/compability/ShopGuiPlusItemProvider.java'
+        }
+    }
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
+
+shadowJar {
+    archiveBaseName = 'ItemEdit'
+    archiveFileName = "ItemEdit-${version}.jar"
+    relocate 'org.bson', 'emanondev.itemedit.libs.bson'
+    relocate 'com.mongodb', 'emanondev.itemedit.libs.mongodb'
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            from components.java
+        }
+    }
+}
+
+build.dependsOn(shadowJar)

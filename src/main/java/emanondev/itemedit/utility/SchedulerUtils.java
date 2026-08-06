@@ -7,7 +7,6 @@ import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Range;
 
-import java.util.concurrent.TimeUnit;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
@@ -40,16 +39,16 @@ public final class SchedulerUtils {
     }
 
     /**
-     * Runs a task synchronously.
+     * Runs a task synchronously on the global region thread.
      *
      * @param plugin the plugin instance requesting the task.
      * @param task   the task to run synchronously.
      */
     public static void run(@NotNull Plugin plugin, @NotNull Runnable task) {
         if (VersionUtils.hasFoliaAPI()) {
-            foliaSchedulerInvoker(plugin.getServer(), "getAsyncScheduler", task,
+            foliaSchedulerInvoker(plugin.getServer(), "getGlobalRegionScheduler", task,
                     (scheduler, taskConsumer) ->
-                            ReflectionUtils.invokeMethod(scheduler, "runNow",
+                            ReflectionUtils.invokeMethod(scheduler, "run",
                                     Plugin.class, plugin,
                                     Consumer.class, taskConsumer));
             return;
@@ -58,7 +57,7 @@ public final class SchedulerUtils {
     }
 
     /**
-     * Schedules a task to run later.
+     * Schedules a task to run later on the global region thread.
      *
      * @param plugin     the plugin instance requesting the task.
      * @param delayTicks the delay in ticks before the task is executed.
@@ -68,12 +67,11 @@ public final class SchedulerUtils {
                                 @Range(from = 1L, to = Long.MAX_VALUE) long delayTicks,
                                 @NotNull Runnable task) {
         if (VersionUtils.hasFoliaAPI()) {
-            foliaSchedulerInvoker(plugin.getServer(), "getAsyncScheduler", task,
+            foliaSchedulerInvoker(plugin.getServer(), "getGlobalRegionScheduler", task,
                     (scheduler, taskConsumer) ->
                             ReflectionUtils.invokeMethod(scheduler, "runDelayed",
                                     Plugin.class, plugin, Consumer.class,
-                                    taskConsumer, long.class, delayTicks * 50L,
-                                    TimeUnit.class, TimeUnit.MILLISECONDS));
+                                    taskConsumer, long.class, delayTicks));
             return;
         }
         Bukkit.getScheduler().runTaskLater(plugin, task, delayTicks);
@@ -88,11 +86,10 @@ public final class SchedulerUtils {
      */
     public static void runAsync(@NotNull Plugin plugin, @NotNull Location location, @NotNull Runnable task) {
         if (VersionUtils.hasFoliaAPI()) {
-            foliaSchedulerInvoker(plugin.getServer(), "getRegionScheduler", task,
+            foliaSchedulerInvoker(plugin.getServer(), "getAsyncScheduler", task,
                     (scheduler, taskConsumer) ->
-                            ReflectionUtils.invokeMethod(scheduler, "run",
+                            ReflectionUtils.invokeMethod(scheduler, "runNow",
                                     Plugin.class, plugin,
-                                    Location.class, location,
                                     Consumer.class, taskConsumer));
             return;
         }
@@ -155,12 +152,11 @@ public final class SchedulerUtils {
                                 @NotNull Player player,
                                 @NotNull Runnable task) {
         if (VersionUtils.hasFoliaAPI()) {
-            foliaSchedulerInvoker(player, "getScheduler", task,
+            foliaSchedulerInvoker(plugin.getServer(), "getAsyncScheduler", task,
                     (scheduler, taskConsumer) ->
-                            ReflectionUtils.invokeMethod(scheduler, "run",
+                            ReflectionUtils.invokeMethod(scheduler, "runNow",
                                     Plugin.class, plugin,
-                                    Consumer.class, taskConsumer,
-                                    Runnable.class, null));
+                                    Consumer.class, taskConsumer));
             return;
         }
         Bukkit.getScheduler().runTaskAsynchronously(plugin, task);

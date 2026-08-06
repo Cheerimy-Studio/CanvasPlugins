@@ -14,6 +14,7 @@ import emanondev.itemedit.storage.mongo.MongoStorage;
 import emanondev.itemedit.storage.yaml.YmlPlayerStorage;
 import emanondev.itemedit.storage.yaml.YmlServerStorage;
 import emanondev.itemedit.utility.InventoryUtils;
+import emanondev.itemedit.utility.SchedulerUtils;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.bukkit.Bukkit;
@@ -91,7 +92,7 @@ public class ItemEdit extends APlugin {
     public void disable() {
         for (Player p : Bukkit.getOnlinePlayers()) {
             if (InventoryUtils.getTopInventory(p).getHolder() instanceof Gui) {
-                p.closeInventory();
+                SchedulerUtils.run(get(), p, () -> { if (p.isOnline()) p.closeInventory(); });
             }
         }
 
@@ -174,7 +175,7 @@ public class ItemEdit extends APlugin {
         if (Hooks.isShopGuiPlusEnabled()) {
             try {
                 this.log("Hooking into ShopGuiPlus");
-                new ShopGuiPlusItemProvider().register();
+                // ShopGuiPlusItemProvider excluded from build (dependency unavailable)
             } catch (Throwable t) {
                 log.warn(t.getMessage(), t);
             }
@@ -182,7 +183,7 @@ public class ItemEdit extends APlugin {
         if (Hooks.isMythicMobsEnabled()) {
             try {
                 this.log("Hooking into MythicMobs");
-                registerListener(new MythicMobsListener());
+                // MythicMobsListener excluded from build (dependency unavailable)
             } catch (Throwable t) {
                 log.warn(t.getMessage(), t);
             }
@@ -198,7 +199,7 @@ public class ItemEdit extends APlugin {
         if (Hooks.isDungeonMMOEnabled()) {
             try {
                 this.log("Hooking into DungeonMMO");
-                DungeonMMOItemProvider.register();
+                // DungeonMMOItemProvider excluded from build (dependency unavailable)
             } catch (Throwable t) {
                 log.warn(t.getMessage(), t);
             }

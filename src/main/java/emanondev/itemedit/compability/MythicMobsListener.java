@@ -19,14 +19,12 @@ import io.lumine.mythic.bukkit.adapters.item.ItemComponentBukkitItemStack;
 import io.lumine.mythic.bukkit.events.MythicDropLoadEvent;
 import io.lumine.mythic.bukkit.events.MythicMechanicLoadEvent;
 import lombok.extern.slf4j.Slf4j;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Locale;
@@ -193,15 +191,8 @@ class DropServerItemMechanic implements ISkillMechanic, ITargetedEntitySkill, IT
         if (Math.random() > chance) {
             return SkillResult.CONDITION_FAILED;
         }
-        if (Bukkit.isPrimaryThread()) {
-            drop(target.getLocation());
-        } else {//TODO folia compability
-            new BukkitRunnable() {
-                public void run() {
-                    drop(target.getLocation());
-                }
-            }.runTask(ItemEdit.get());
-        }
+        Location loc = BukkitAdapter.adapt(target.getLocation());
+        SchedulerUtils.run(ItemEdit.get(), loc, () -> drop(target.getLocation()));
         return SkillResult.SUCCESS;
     }
 
@@ -221,15 +212,8 @@ class DropServerItemMechanic implements ISkillMechanic, ITargetedEntitySkill, IT
         if (Math.random() > chance) {
             return SkillResult.CONDITION_FAILED;
         }
-        if (Bukkit.isPrimaryThread()) {
-            drop(location);
-        } else { //TODO folia compability
-            new BukkitRunnable() {
-                public void run() {
-                    drop(location);
-                }
-            }.runTask(ItemEdit.get());
-        }
+        Location loc = BukkitAdapter.adapt(location);
+        SchedulerUtils.run(ItemEdit.get(), loc, () -> drop(location));
         return SkillResult.SUCCESS;
     }
 }
@@ -302,15 +286,8 @@ class GiveServerItemMechanic implements ISkillMechanic, ITargetedEntitySkill {
             absPlayer = (AbstractPlayer) target;
         }
 
-        if (Bukkit.isPrimaryThread()) {
-            give(absPlayer);
-        } else {
-            new BukkitRunnable() {
-                public void run() {
-                    give(absPlayer);
-                }
-            }.runTask(ItemEdit.get());
-        }
+        Player bukkitPlayer = BukkitAdapter.adapt(absPlayer);
+        SchedulerUtils.run(ItemEdit.get(), bukkitPlayer, () -> give(absPlayer));
         return SkillResult.SUCCESS;
     }
 

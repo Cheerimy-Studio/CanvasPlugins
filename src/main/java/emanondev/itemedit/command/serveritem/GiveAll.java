@@ -9,6 +9,7 @@ import emanondev.itemedit.command.SubCmd;
 import emanondev.itemedit.utility.CompleteUtility;
 import emanondev.itemedit.utility.InventoryUtils;
 import emanondev.itemedit.utility.ItemUtils;
+import emanondev.itemedit.utility.SchedulerUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -19,6 +20,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class GiveAll extends SubCmd {
 
@@ -45,50 +47,54 @@ public class GiveAll extends SubCmd {
                 throw new IllegalArgumentException("Wrong amount number");
             }
             ItemStack item = ItemEdit.get().getServerStorage().getItem(args[1]);
-            ItemMeta meta = null;
-            List<String> lore = null;
-            String title = null;
-            if (ItemEdit.get().getConfig().loadBoolean("serveritem.replace-holders", true)) {
-                meta = ItemUtils.getMeta(item);
-                lore = meta.hasLore() ? meta.getLore() : null;
-                title = meta.hasDisplayName() ? meta.getDisplayName() : null;
-            }
-            int total = 0;
+            final boolean replaceHolders = ItemEdit.get().getConfig().loadBoolean("serveritem.replace-holders", true);
+            final boolean dropExcess = ItemEdit.get().getConfig().loadBoolean("serveritem.give-drops-excess", true);
+            final String nick = ItemEdit.get().getServerStorage().getNick(args[1]);
+            AtomicInteger total = new AtomicInteger(0);
             for (Player target : Bukkit.getOnlinePlayers()) {
-                if (ItemEdit.get().getConfig().loadBoolean("serveritem.replace-holders", true)) {
-                    meta.setDisplayName(UtilsString.fix(title, target, true, "%player_name%",
+                ItemStack playerItem = item.clone();
+                if (replaceHolders) {
+                    ItemMeta playerMeta = ItemUtils.getMeta(playerItem);
+                    List<String> playerLore = playerMeta.hasLore() ? playerMeta.getLore() : null;
+                    String playerTitle = playerMeta.hasDisplayName() ? playerMeta.getDisplayName() : null;
+                    playerMeta.setDisplayName(UtilsString.fix(playerTitle, target, true, "%player_name%",
                             target.getName(), "%player_uuid%", target.getUniqueId().toString()));
-                    meta.setLore(UtilsString.fix(lore, target, true, "%player_name%", target.getName(),
+                    playerMeta.setLore(UtilsString.fix(playerLore, target, true, "%player_name%", target.getName(),
                             "%player_uuid%", target.getUniqueId().toString()));
-                    item.setItemMeta(meta);
+                    playerItem.setItemMeta(playerMeta);
                 }
-                int given = InventoryUtils.giveAmount(target, item, amount, ItemEdit.get().getConfig()
-                        .loadBoolean("serveritem.give-drops-excess", true) ?
-                        InventoryUtils.ExcessMode.DROP_EXCESS : InventoryUtils.ExcessMode.DELETE_EXCESS);
-                total += given;
-                if (given > 0 && !silent) {
-                    sendLanguageString("feedback", null, target, "%id%", args[1].toLowerCase(),
-                            "%nick%", ItemEdit.get().getServerStorage().getNick(args[1]), "%amount%",
-                            String.valueOf(given));
-                }
+                final ItemStack finalItem = playerItem;
+                final boolean finalSilent = silent;
+                SchedulerUtils.run(ItemEdit.get(), target, () -> {
+                    if (!target.isOnline()) return;
+                    int given = InventoryUtils.giveAmount(target, finalItem, amount,
+                            dropExcess ? InventoryUtils.ExcessMode.DROP_EXCESS : InventoryUtils.ExcessMode.DELETE_EXCESS);
+                    total.addAndGet(given);
+                    if (given > 0 && !finalSilent) {
+                        sendLanguageString("feedback", null, target, "%id%", args[1].toLowerCase(),
+                                "%nick%", nick, "%amount%", String.valueOf(given));
+                    }
+                });
             }
 
-            if (total > 0 && ItemEdit.get().getConfig().loadBoolean("log.action.giveall", true)) {
-                StringBuilder sb = new StringBuilder("[");
-                for (Player target : Bukkit.getOnlinePlayers()) {
-                    sb.append(target.getName()).append(", ");
-                }
+            SchedulerUtils.runLater(ItemEdit.get(), 2L, () -> {
+                if (total.get() > 0 && ItemEdit.get().getConfig().loadBoolean("log.action.giveall", true)) {
+                    StringBuilder sb = new StringBuilder("[");
+                    for (Player target : Bukkit.getOnlinePlayers()) {
+                        sb.append(target.getName()).append(", ");
+                    }
 
-                String msg = UtilsString.fix(this.getConfigString("log"), null, true, "%id%", args[1].toLowerCase(),
-                        "%nick%", ItemEdit.get().getServerStorage().getNick(args[1]), "%amount%",
-                        amount + " (for a total of " + total + " given)", "%targets%", sb.delete(sb.length() - 2, sb.length()).append("]").toString());
-                if (ItemEdit.get().getConfig().loadBoolean("log.console", true)) {
-                    Util.sendMessage(Bukkit.getConsoleSender(), msg);
+                    String msg = UtilsString.fix(this.getConfigString("log"), null, true, "%id%", args[1].toLowerCase(),
+                            "%nick%", nick, "%amount%",
+                            amount + " (for a total of " + total.get() + " given)", "%targets%", sb.delete(sb.length() - 2, sb.length()).append("]").toString());
+                    if (ItemEdit.get().getConfig().loadBoolean("log.console", true)) {
+                        Util.sendMessage(Bukkit.getConsoleSender(), msg);
+                    }
+                    if (ItemEdit.get().getConfig().loadBoolean("log.file", true)) {
+                        Util.logToFile(msg);
+                    }
                 }
-                if (ItemEdit.get().getConfig().loadBoolean("log.file", true)) {
-                    Util.logToFile(msg);
-                }
-            }
+            });
         } catch (Exception e) {
             onFail(sender, alias);
         }
