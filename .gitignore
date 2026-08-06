@@ -12,9 +12,13 @@
 
 # maven
 /target
+/.mvn
+
+# gradle
+/.gradle
+/build
 
 # various other potential build files
-/build
 /bin
 /dist
 /manifest.mf
