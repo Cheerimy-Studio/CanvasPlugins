@@ -28,7 +28,6 @@
                 <configuration>
                     <source>1.8</source>
                     <target>1.8</target>
-                    <release>8</release>
                     <annotationProcessorPaths>
                         <path>
                             <groupId>org.projectlombok</groupId>

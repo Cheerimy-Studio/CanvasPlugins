@@ -1,0 +1,60 @@
+plugins {
+    id 'java'
+    id 'com.gradleup.shadow' version '9.4.2'
+}
+
+group = 'emanondev.itemtag'
+version = '3.7.7'
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
+}
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+    maven { url 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/' }
+    maven { url 'https://jitpack.io' }
+    maven { url 'https://repo.extendedclip.com/content/repositories/placeholderapi/' }
+    maven { url 'https://repo.codemc.io/repository/maven-public/' }
+    maven { url 'https://repo.papermc.io/repository/maven-public/' }
+    maven { url 'https://nexus.tr7zw.net/repository/releases/' }
+}
+
+dependencies {
+    compileOnly 'org.spigotmc:spigot-api:1.21.11-R0.1-SNAPSHOT'
+    compileOnly 'org.jetbrains:annotations:26.0.2'
+    compileOnly 'org.projectlombok:lombok:1.18.46'
+    annotationProcessor 'org.projectlombok:lombok:1.18.46'
+    compileOnly 'org.slf4j:slf4j-api:2.0.17'
+
+    implementation('emanondev.itemedit:ItemEdit:3.7.10') {
+        exclude group: '*', module: '*'
+    }
+
+    compileOnly 'com.github.LeonMangler:SuperVanish:6.2.18-3'
+    compileOnly 'com.github.MilkBowl:VaultAPI:1.7'
+    compileOnly 'me.clip:placeholderapi:2.11.6'
+    compileOnly 'de.tr7zw:item-nbt-api:2.9.0'
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
+
+sourceSets {
+    main {
+        java {
+            exclude 'emanondev/itemtag/NBTAPITagItem.java'
+            exclude 'emanondev/itemtag/NBTAPITagManager.java'
+        }
+    }
+}
+
+shadowJar {
+    archiveBaseName = 'ItemTag'
+    archiveFileName = "ItemTag-${version}.jar"
+}
+
+build.dependsOn(shadowJar)

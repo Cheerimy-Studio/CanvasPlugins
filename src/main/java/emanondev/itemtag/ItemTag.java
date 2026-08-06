@@ -47,7 +47,7 @@ public class ItemTag extends APlugin {
     }
 
     public static TagItem getTagItem(@Nullable ItemStack item) {
-        return USE_NBTAPI ? new NBTAPITagItem(item) : new SpigotTagItem(item);
+        return new SpigotTagItem(item);
     }
 
     @Deprecated
@@ -199,10 +199,8 @@ public class ItemTag extends APlugin {
     }
 
     private void initNBTAPI() throws Exception {
-        new NBTAPITagItem(new ItemStack(Material.STONE));//force load NBTAPI classes or fails
-        USE_NBTAPI = true;
-        tagManager = new NBTAPITagManager();
-        this.log("Data using NBTAPI");
+        // NBTAPI excluded from build, fallback to Spigot PersistentDataContainer
+        initSpigotPersistentDataAPI();
     }
 
     private void initSpigotPersistentDataAPI() throws Exception {
