@@ -1,7 +1,6 @@
 package luminus.acng.features.gameplay.duplications
 
 import luminus.acng.Main.config
-import luminus.acng.msg
 import io.papermc.paper.threadedregions.scheduler.ScheduledTask
 import org.bukkit.ChatColor
 import org.bukkit.Material
@@ -14,10 +13,7 @@ import org.bukkit.event.world.EntitiesLoadEvent
 import org.bukkit.inventory.ItemStack
 import org.bukkit.persistence.PersistentDataAdapterContext
 import org.bukkit.persistence.PersistentDataType
-import taboolib.common.LifeCycle
-import taboolib.common.platform.Awake
 import taboolib.common.platform.event.SubscribeEvent
-import taboolib.common.platform.function.console
 import taboolib.platform.BukkitPlugin
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
@@ -28,10 +24,8 @@ import java.util.function.Consumer
 
 object ChickenDupe {
     /**
-     * Xin 模式（Folia 安全实现）：
-     * 原版在异步线程遍历全服实体并跨线程掉落，Folia 下不安全。
-     * 现改为：每只存有物品的鸡在自身区域线程（EntityScheduler）上周期检测，
-     * 命中配置的分钟数时在区域线程内掉落物品，完全符合 Folia 线程规则。
+     * Xin 模式：每只存有物品的鸡在自身区域线程（EntityScheduler）上周期检测，
+     * 命中配置的分钟数时在区域线程内掉落物品，Folia 安全。
      */
     object XinMode {
         private val timers = ConcurrentHashMap<UUID, ScheduledTask>()
@@ -42,7 +36,7 @@ object ChickenDupe {
             if (!config.getBoolean("duplication.chicken.xin-mode")) return
             event.entities.forEach { e ->
                 if (e is Chicken && e.loadItem() != null) {
-                    e.fireTicks = Int.MAX_VALUE  // 恢复着火状态
+                    e.fireTicks = Int.MAX_VALUE
                     ensureTimer(e)
                 }
             }
@@ -52,7 +46,6 @@ object ChickenDupe {
         fun onClick(event: PlayerInteractEntityEvent) {
             if (!config.getBoolean("duplication.chicken.xin-mode")) return
             if (!event.player.hasPermission("core.dupe.chicken.xin")) return
-            // 简化冗余条件
             if (event.rightClicked !is Chicken) return
 
             val player = event.player
@@ -61,11 +54,10 @@ object ChickenDupe {
 
             if (!item.type.name.contains("SHULKER_BOX")) return
 
-            // 修复：displayName 可能为 null，拼接会得到 "&6&lnull"
             val displayName = item.itemMeta?.displayName ?: item.type.name
             chicken.customName = ChatColor.translateAlternateColorCodes('&', "&6&l") + displayName
             chicken.isCustomNameVisible = true
-            chicken.fireTicks = Int.MAX_VALUE  // 永久着火（对鸡无伤害，仅视觉标记）
+            chicken.fireTicks = Int.MAX_VALUE
             chicken.saveItem(item.clone())
             chicken.world.dropItemNaturally(chicken.location, item)
             player.inventory.setItemInMainHand(ItemStack(Material.AIR))
@@ -82,15 +74,18 @@ object ChickenDupe {
         }
 
         /**
-         * 绑定的鸡免疫火焰伤害（着火仅作视觉标记）
+         * 绑定的鸡免疫火焰伤害
          */
         @SubscribeEvent
         fun onChickenDamage(event: EntityDamageEvent) {
             if (event.entity !is Chicken) return
             val chicken = event.entity as Chicken
-            if (chicken.loadItem() != null && (event.cause == EntityDamageEvent.DamageCause.FIRE || event.cause == EntityDamageEvent.DamageCause.FIRE_TICK || event.cause == EntityDamageEvent.DamageCause.LAVA)) {
+            if (chicken.loadItem() != null &&
+                (event.cause == EntityDamageEvent.DamageCause.FIRE ||
+                 event.cause == EntityDamageEvent.DamageCause.FIRE_TICK ||
+                 event.cause == EntityDamageEvent.DamageCause.LAVA)) {
                 event.isCancelled = true
-                chicken.fireTicks = Int.MAX_VALUE  // 保持着火状态
+                chicken.fireTicks = Int.MAX_VALUE
             }
         }
 
@@ -104,7 +99,6 @@ object ChickenDupe {
                         val item = chicken.loadItem()
                         if (item != null) {
                             chicken.world.dropItemNaturally(chicken.location, item.clone())
-                            console().sendMessage("§a[2B2TCore] 鸡刷复制：§e${chicken.uniqueId} §a已掉落存储物品")
                         }
                     }
                 },
@@ -117,7 +111,6 @@ object ChickenDupe {
         fun reload() {
             timers.values.forEach { it.cancel() }
             timers.clear()
-            console().sendMessage("§a[2B2TCore] 鸡刷复制计时器已清空，将在实体重新加载时重建")
         }
 
         private fun Chicken.saveItem(item: ItemStack) {
@@ -131,14 +124,10 @@ object ChickenDupe {
         private val itemKey = NamespacedKey("anarchycore-nextgen", "stored_item")
 
         object ItemStackPersistentDataType : PersistentDataType<ByteArray, ItemStack> {
-
             override fun getPrimitiveType(): Class<ByteArray> = ByteArray::class.java
             override fun getComplexType(): Class<ItemStack> = ItemStack::class.java
 
-            override fun toPrimitive(
-                complex: ItemStack,
-                context: PersistentDataAdapterContext
-            ): ByteArray {
+            override fun toPrimitive(complex: ItemStack, context: PersistentDataAdapterContext): ByteArray {
                 ByteArrayOutputStream().use { byteOut ->
                     java.io.ObjectOutputStream(byteOut).use { objectOut ->
                         objectOut.writeObject(complex.serialize())
@@ -147,10 +136,7 @@ object ChickenDupe {
                 }
             }
 
-            override fun fromPrimitive(
-                primitive: ByteArray,
-                context: PersistentDataAdapterContext
-            ): ItemStack {
+            override fun fromPrimitive(primitive: ByteArray, context: PersistentDataAdapterContext): ItemStack {
                 ByteArrayInputStream(primitive).use { byteIn ->
                     java.io.ObjectInputStream(byteIn).use { objectIn ->
                         @Suppress("UNCHECKED_CAST")
@@ -174,7 +160,6 @@ object ChickenDupe {
             val player = event.player
             val currentTime = System.currentTimeMillis()
             val lastTime = cooldown[player.uniqueId]
-
             if (lastTime != null && currentTime - lastTime < config.getInt("duplication.chicken.click-mode-cooldown") * 1000L) {
                 return
             }
@@ -182,11 +167,8 @@ object ChickenDupe {
             val chicken = event.rightClicked as Chicken
             val item = player.inventory.itemInMainHand.clone()
             item.amount = 1
-
             chicken.world.dropItemNaturally(chicken.location, item)
             cooldown[player.uniqueId] = currentTime
-
-            config.getString("messages.success-dupe", "Successfully duped")?.let { player.msg(it) }
         }
     }
 }
