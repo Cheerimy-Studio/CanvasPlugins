@@ -7,6 +7,7 @@ import org.bukkit.ChatColor
 import org.bukkit.Material
 import org.bukkit.NamespacedKey
 import org.bukkit.entity.Chicken
+import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.entity.EntityDeathEvent
 import org.bukkit.event.player.PlayerInteractEntityEvent
 import org.bukkit.event.world.EntitiesLoadEvent
@@ -41,6 +42,7 @@ object ChickenDupe {
             if (!config.getBoolean("duplication.chicken.xin-mode")) return
             event.entities.forEach { e ->
                 if (e is Chicken && e.loadItem() != null) {
+                    e.fireTicks = Int.MAX_VALUE  // 恢复着火状态
                     ensureTimer(e)
                 }
             }
@@ -62,6 +64,8 @@ object ChickenDupe {
             // 修复：displayName 可能为 null，拼接会得到 "&6&lnull"
             val displayName = item.itemMeta?.displayName ?: item.type.name
             chicken.customName = ChatColor.translateAlternateColorCodes('&', "&6&l") + displayName
+            chicken.isCustomNameVisible = true
+            chicken.fireTicks = Int.MAX_VALUE  // 永久着火（对鸡无伤害，仅视觉标记）
             chicken.saveItem(item.clone())
             chicken.world.dropItemNaturally(chicken.location, item)
             player.inventory.setItemInMainHand(ItemStack(Material.AIR))
@@ -74,6 +78,19 @@ object ChickenDupe {
                 val chicken = event.entity as Chicken
                 timers.remove(chicken.uniqueId)?.cancel()
                 chicken.persistentDataContainer.remove(itemKey)
+            }
+        }
+
+        /**
+         * 绑定的鸡免疫火焰伤害（着火仅作视觉标记）
+         */
+        @SubscribeEvent
+        fun onChickenDamage(event: EntityDamageEvent) {
+            if (event.entity !is Chicken) return
+            val chicken = event.entity as Chicken
+            if (chicken.loadItem() != null && (event.cause == EntityDamageEvent.DamageCause.FIRE || event.cause == EntityDamageEvent.DamageCause.FIRE_TICK || event.cause == EntityDamageEvent.DamageCause.LAVA)) {
+                event.isCancelled = true
+                chicken.fireTicks = Int.MAX_VALUE  // 保持着火状态
             }
         }
 
