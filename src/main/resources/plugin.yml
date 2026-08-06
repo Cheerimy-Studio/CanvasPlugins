@@ -1,6 +1,6 @@
-name: ${project.name}
-main: ${groupId}.${project.name}
-version: "${project.version}"
+name: ItemEdit
+main: emanondev.itemedit.ItemEdit
+version: "3.7.10"
 author: emanon
 api-version: 1.13
 softdepend: [ SCore,Vault,SuperVanish,PremiumVanish,PlaceholderAPI,ShopGUIPlus,ItemBridge,MythicMobs,IridiumSkyblock,ASkyBlock,BentoBox-BSkyBlock,uSkyBlock,IslandWorld,FabledSkyBlock,SimpleSkyblock,SkyBlock,SuperiorSkyblock2,SuperiorSkyblock,DungeonMMO ]
