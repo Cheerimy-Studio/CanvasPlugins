@@ -16,7 +16,7 @@ public abstract class PatternVisitor extends CUClassVisitor {
         String s;
         if (pattern == null || pattern.isEmpty()) {
             s = CnUsernameConfig.DEFAULT_PATTERN;
-            Logging.info("当前玩家名规则将使用本组件的默认正则规则");
+            Logging.debug("当前玩家名规则将使用本组件的默认正则规则");
         } else {
             try {
                 Pattern.compile(pattern);
@@ -24,12 +24,10 @@ public abstract class PatternVisitor extends CUClassVisitor {
             } catch (PatternSyntaxException e) {
                 s = CnUsernameConfig.DEFAULT_PATTERN;
                 e.printStackTrace();
-                Logging.warning("你自定义的正则格式无效: " + pattern);
-                Logging.info("当前玩家名规则将使用本组件的默认正则规则");
-                Logging.info("不用担心，该错误不会影响本组件正常工作，但你需要改改你写的正则规则了 :)");
+                Logging.warning("自定义正则格式无效，已恢复默认规则: " + pattern);
             }
         }
-        Logging.info("当前组件使用的正则规则为: §6" + s);
+        Logging.debug("当前组件使用的正则规则为: §6" + s);
         this.pattern = s;
     }
 }

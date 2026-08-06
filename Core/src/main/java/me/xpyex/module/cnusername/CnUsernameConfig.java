@@ -31,7 +31,7 @@ public class CnUsernameConfig {
         CnUsernameConfig.folder = folder;
         debugFile = new File(folder, "debug.txt");
         patternFile = new File(folder, "pattern.txt");
-        Logging.info("CnUsername的文件将会存放在: " + folder.getAbsolutePath());
+        Logging.debug("文件存放: " + folder.getAbsolutePath());
     }
 
     public static String getPattern() {
@@ -67,6 +67,6 @@ public class CnUsernameConfig {
             pattern = DEFAULT_PATTERN;
             e.printStackTrace();
         }
-        Logging.info("当前使用的正则为: " + pattern);
+        Logging.debug("当前使用的正则为: " + pattern);
     }
 }

@@ -7,6 +7,7 @@ import java.lang.instrument.Instrumentation;
 import java.lang.instrument.UnmodifiableClassException;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodType;
+import java.io.PrintStream;
 import java.security.ProtectionDomain;
 import java.util.Arrays;
 import java.util.Map;
@@ -37,29 +38,26 @@ public interface CnUsernamePlugin {
     }
 
     default Instrumentation instrumentationOrNull() {
+        // 抑制 JDK 21+ 动态加载 JavaAgent 时产生的 STDERR 警告
+        // "WARNING: A Java agent has been loaded dynamically"
+        PrintStream originalErr = System.err;
         try {
+            System.setErr(new PrintStream(new java.io.OutputStream() { public void write(int b) {} }));
             return JvmHacker.instrumentation();
         } catch (Throwable e) {
+            System.setErr(originalErr);
             String errorMsg = e.getMessage();
             if (errorMsg != null && (errorMsg.contains("Permission denied") || errorMsg.contains("Read-only file system"))) {
-                Logging.warning("检测到容器环境限制(只读文件系统/权限不足)，无法动态加载JavaAgent");
-                Logging.warning("当前将使用直接加载字节码的方案");
-                Logging.warning("建议解决方案: ");
-                Logging.warning("1. 使用 普通JavaAgent 启动，详见ReadMe");
-                Logging.warning("2. 确保容器 tmp 目录可写");
+                Logging.warning("容器环境限制，无法动态加载JavaAgent，使用直接字节码方案");
             } else if (errorMsg != null && errorMsg.contains("tools.jar")) {
-                Logging.warning("未找到 tools.jar，当前可能运行在JRE而非JDK，无法动态加载JavaAgent");
-                Logging.warning("当前将使用直接加载字节码的方案");
-                Logging.warning("建议解决方案: ");
-                Logging.warning("1. 使用 JDK 而非 JRE");
-                Logging.warning("2. 使用 普通JavaAgent 启动，详见ReadMe");
+                Logging.warning("未找到 tools.jar，使用直接字节码方案");
             } else {
-                Logging.warning("无法获取Instrumentation实例: " + e);
-                if (CnUsernameConfig.isDebug()) {
-                    e.printStackTrace();
-                }
+                Logging.warning("无法获取Instrumentation: " + e);
+                if (CnUsernameConfig.isDebug()) e.printStackTrace();
             }
             return null;
+        } finally {
+            System.setErr(originalErr);
         }
     }
 

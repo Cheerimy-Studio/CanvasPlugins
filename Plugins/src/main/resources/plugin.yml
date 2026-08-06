@@ -1,9 +1,10 @@
 name: CnUsername
 version: '${version}'
 main: ${bk}
-api-version: 1.13
+api-version: 1.21
 folia-supported: true
 author: XPYEX
+description: Allow Chinese usernames on Minecraft servers
 load: STARTUP
 softdepend:
-  - XPLib
+  - Cheerimy-Studio

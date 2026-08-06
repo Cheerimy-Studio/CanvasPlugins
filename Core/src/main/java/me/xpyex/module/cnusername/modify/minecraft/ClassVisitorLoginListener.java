@@ -20,8 +20,10 @@ public class ClassVisitorLoginListener extends PatternVisitor {
     @Override
     public MethodVisitor onVisitMethod(int access, String name, String descriptor, String signature, String[] exceptions) {
         MethodVisitor mv = super.cv.visitMethod(access, name, descriptor, signature, exceptions);
-        if ("(Ljava/lang/String;)Z".equals(descriptor) && (access & Opcodes.ACC_STATIC) > 0) {  //类内静态isValidUsername(String)方法
-            Logging.info("正在修改 " + getClassName() + " 类中的 " + name + "(String) 方法");
+        // 只匹配用户名校验方法，避免误改公钥验证等其它 static (String)Z 方法
+        if ("(Ljava/lang/String;)Z".equals(descriptor) && (access & Opcodes.ACC_STATIC) > 0
+                && isUsernameValidationMethod(name)) {
+            Logging.debug("正在修改 " + getClassName() + " 类中的 " + name + "(String) 方法");
             mv.visitCode();
             Label label0 = new Label();
             mv.visitLabel(label0);
@@ -39,5 +41,13 @@ public class ClassVisitorLoginListener extends PatternVisitor {
             return null;
         }
         return mv;
+    }
+
+    private static boolean isUsernameValidationMethod(String name) {
+        return "isValidUsername".equals(name)
+            || "isValidName".equals(name)
+            || "hasValidNameIfNeeded".equals(name)
+            || ((name.contains("Valid") || name.contains("valid"))
+                && (name.contains("Name") || name.contains("name")));
     }
 }

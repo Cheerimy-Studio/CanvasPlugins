@@ -18,7 +18,7 @@ public class ClassVisitorUtilColor extends PatternVisitor {
     public MethodVisitor onVisitMethod(int access, String name, String descriptor, String signature, String[] exceptions) {
         MethodVisitor visitor = super.cv.visitMethod(access, name, descriptor, signature, exceptions);
         if ("f".equals(name) && "(Ljava/lang/String;)Z".equals(descriptor) && (access & Opcodes.ACC_STATIC) > 0) {  // static boolean f(String string)
-            Logging.info("正在修改 " + getClassName() + " 类中的 " + name + "(String) 方法");
+            Logging.debug("正在修改 " + getClassName() + " 类中的 " + name + "(String) 方法");
             visitor.visitCode();
             Label label0 = new Label();
             visitor.visitLabel(label0);

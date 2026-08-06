@@ -18,7 +18,7 @@ public class ClassVisitorAllowedCharacters extends PatternVisitor {
     public MethodVisitor onVisitMethod(int access, String name, String descriptor, String signature, String[] exceptions) {
         MethodVisitor mv = super.cv.visitMethod(access, name, descriptor, signature, exceptions);
         if ("isValidName".equals(name) && (access & Opcodes.ACC_STATIC) > 0) {  //静态isValidName方法，无视参数
-            Logging.info("正在修改 " + getClassName() + " 类中的 " + name + "(String, boolean) 方法");
+            Logging.debug("正在修改 " + getClassName() + " 类中的 " + name + "(String, boolean) 方法");
             mv.visitCode();
             Label label0 = new Label();
             mv.visitLabel(label0);
