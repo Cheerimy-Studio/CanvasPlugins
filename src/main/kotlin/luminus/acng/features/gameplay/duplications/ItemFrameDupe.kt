@@ -14,6 +14,7 @@ object ItemFrameDupe {
     @SubscribeEvent
     fun onRotate(event: PlayerInteractEntityEvent) {
         if (!config.getBoolean("duplication.item-frame.enable")) return
+        if (event.hand != org.bukkit.inventory.EquipmentSlot.HAND) return
         if (!event.player.hasPermission("core.dupe.item-frame")) return
 
         val entity = event.rightClicked
