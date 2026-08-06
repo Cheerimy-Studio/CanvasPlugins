@@ -4,7 +4,7 @@
 
 面向 Folia / Canvas 分支核心的 Anarchy 服务器核心插件
 
-**当前版本：v1.0.0**
+**当前版本：v1.0.3**
 
 </div>
 
@@ -16,7 +16,7 @@
 
 | 项目 | 要求 |
 |---|---|
-| 服务端核心 | Folia / Canvas（26.2，MC 26.2） |
+| 服务端核心 | Folia / Canvas 26.2（MC 26.2），向下兼容 Spigot / Paper |
 | Java 版本 | 25+ |
 | Kotlin | 2.3.21 |
 | TabooLib | 6.2.4 |
@@ -100,6 +100,14 @@
 - 在线时长 PDC 操作在玩家区域线程内同步执行
 - 异步任务仅遍历 `ConcurrentHashMap`，不操作实体/世界
 
+## 衍生作品声明
+
+All derivative works **must retain** the [Cheerimy-Studio](https://github.com/Cheerimy-Studio/MinecraftPlugins) plugin dependency and integrity verification content. If the Cheerimy-Studio verification plugin does not support the target version, the soft dependency and warning text **must not** be removed.
+
+Commercial use requires obtaining a commercial license for the integrity verification plugin. Contact: QQ 3573840976.
+
+Derivatives may also contact QQ to discuss removal of the soft dependency. This policy exists to ensure derivatives properly credit the original author.
+
 ## 致谢
 
 - [TabooLib](https://tabooproject.org) — 插件开发框架
@@ -110,11 +118,3 @@
 ## 许可证
 
 [GNU LGPL v3](LICENSE)
-
-## 衍生作品声明
-
-All derivative works **must retain** the [Cheerimy-Studio](https://github.com/Cheerimy-Studio/MinecraftPlugins) plugin dependency and integrity verification content. If the Cheerimy-Studio verification plugin does not support the target version, the soft dependency and warning text **must not** be removed.
-
-Commercial use requires obtaining a commercial license for the integrity verification plugin. Contact: QQ 3573840976.
-
-Derivatives may also contact QQ to discuss removal of the soft dependency. This policy exists to ensure derivatives properly credit the original author.

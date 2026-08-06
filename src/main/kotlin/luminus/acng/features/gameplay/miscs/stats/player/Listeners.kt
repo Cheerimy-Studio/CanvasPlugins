@@ -3,11 +3,10 @@ package luminus.acng.features.gameplay.miscs.stats.player
 import luminus.acng.features.gameplay.miscs.stats.player.Listeners.JoinQuit.getPlayerJoins
 import luminus.acng.features.gameplay.miscs.stats.player.Listeners.JoinQuit.getPlayerQuits
 import luminus.acng.features.gameplay.miscs.stats.player.Listeners.KillDeath.calculateKD
-import luminus.acng.features.gameplay.miscs.stats.player.Listeners.KillDeath.deathsKey
 import luminus.acng.features.gameplay.miscs.stats.player.Listeners.KillDeath.getPlayerDeaths
 import luminus.acng.features.gameplay.miscs.stats.player.Listeners.KillDeath.getPlayerKills
-import luminus.acng.features.gameplay.miscs.stats.player.Listeners.KillDeath.killsKey
 import luminus.acng.features.gameplay.miscs.stats.player.Listeners.OnlineTime.getTotalOnlineTime
+import org.bukkit.Bukkit
 import org.bukkit.NamespacedKey
 import org.bukkit.entity.Player
 import org.bukkit.event.entity.PlayerDeathEvent
@@ -23,6 +22,7 @@ import taboolib.common.platform.function.submit
 import taboolib.module.configuration.Config
 import taboolib.module.configuration.ConfigFile
 import taboolib.platform.util.killer
+import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicBoolean
 
@@ -129,7 +129,10 @@ object Listeners {
 
     object OnlineTime {
 
-        private val joinTimeMap = ConcurrentHashMap<ProxyPlayer, Long>()
+        // 以玩家 UUID 作为 key：TabooLib 的 ProxyPlayer 包装对象每次 adaptPlayer()
+        // 可能返回不同实例，若其未按 UUID 重写 equals/hashCode，用它当 key 会导致
+        // 退出时 remove 不到进入时的记录 → 在线时长恒为 0。改用 UUID 从根上杜绝。
+        private val joinTimeMap = ConcurrentHashMap<UUID, Long>()
 
         private val ONLINE_TIME_KEY by lazy {
             NamespacedKey("anarchycore-nextgen", "online-time")
@@ -148,17 +151,15 @@ object Listeners {
 
         @SubscribeEvent
         fun onPlayerJoin(event: PlayerJoinEvent) {
-            val player = adaptPlayer(event.player)
-            joinTimeMap[player] = System.currentTimeMillis()
+            joinTimeMap[event.player.uniqueId] = System.currentTimeMillis()
         }
 
         @SubscribeEvent
         fun onPlayerQuit(event: PlayerQuitEvent) {
-            val player = adaptPlayer(event.player)
-            val joinTime = joinTimeMap.remove(player) ?: return
+            val joinTime = joinTimeMap.remove(event.player.uniqueId) ?: return
 
             val sessionSeconds = (System.currentTimeMillis() - joinTime) / 1000
-            updatePDCOnQuit(player, sessionSeconds)
+            updatePDCOnQuit(adaptPlayer(event.player), sessionSeconds)
         }
 
         private fun updatePDCOnQuit(player: ProxyPlayer, sessionSeconds: Long) {
@@ -174,14 +175,14 @@ object Listeners {
         fun getTotalOnlineTime(player: ProxyPlayer): Long {
             val bukkitPlayer = player.castSafely<Player>() ?: return 0L
             val pdcTotal = bukkitPlayer.persistentDataContainer.get(ONLINE_TIME_KEY, PersistentDataType.LONG) ?: 0L
-            val currentSessionSeconds = joinTimeMap[player]?.let { joinTime ->
+            val currentSessionSeconds = joinTimeMap[player.uniqueId]?.let { joinTime ->
                 (System.currentTimeMillis() - joinTime) / 1000
             } ?: 0L
             return pdcTotal + currentSessionSeconds
         }
 
         fun getCurrentSessionTime(player: ProxyPlayer): Long {
-            return joinTimeMap[player]?.let { joinTime ->
+            return joinTimeMap[player.uniqueId]?.let { joinTime ->
                 (System.currentTimeMillis() - joinTime) / 1000
             } ?: 0L
         }
@@ -195,19 +196,19 @@ object Listeners {
         private fun cleanupOfflinePlayers() {
             val iterator = joinTimeMap.iterator()
             while (iterator.hasNext()) {
-                val (player, _) = iterator.next()
-                if (!player.isOnline()) {
+                val (uuid, _) = iterator.next()
+                if (Bukkit.getPlayer(uuid) == null) {
                     iterator.remove()
                 }
             }
         }
 
         fun getJoinTime(player: ProxyPlayer): Long? {
-            return joinTimeMap[player]
+            return joinTimeMap[player.uniqueId]
         }
 
         fun isTracking(player: ProxyPlayer): Boolean {
-            return joinTimeMap.containsKey(player)
+            return joinTimeMap.containsKey(player.uniqueId)
         }
 
         fun resetOnlineTime(player: ProxyPlayer, clearCurrentSession: Boolean = true) {
@@ -216,21 +217,23 @@ object Listeners {
                 bukkitPlayer.persistentDataContainer.remove(ONLINE_TIME_KEY)
             }
             if (clearCurrentSession) {
-                joinTimeMap.remove(player)
+                joinTimeMap.remove(player.uniqueId)
             }
         }
 
         fun saveCurrentSession(player: ProxyPlayer): Boolean {
-            val joinTime = joinTimeMap[player] ?: return false
+            val joinTime = joinTimeMap[player.uniqueId] ?: return false
             val sessionSeconds = (System.currentTimeMillis() - joinTime) / 1000
             if (sessionSeconds <= 0) return false
             updatePDCOnQuit(player, sessionSeconds)
-            joinTimeMap[player] = System.currentTimeMillis()
+            joinTimeMap[player.uniqueId] = System.currentTimeMillis()
             return true
         }
 
         fun getTrackedPlayers(): Set<ProxyPlayer> {
-            return joinTimeMap.keys.filter { it.isOnline() }.toSet()
+            return joinTimeMap.keys
+                .mapNotNull { uuid -> Bukkit.getPlayer(uuid)?.let { adaptPlayer(it) } }
+                .toSet()
         }
     }
 }

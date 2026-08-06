@@ -18,6 +18,7 @@ import taboolib.platform.BukkitPlugin
  */
 object PistonChatHook {
 
+    @Volatile
     private var registered = false
 
     @Awake(LifeCycle.ENABLE)

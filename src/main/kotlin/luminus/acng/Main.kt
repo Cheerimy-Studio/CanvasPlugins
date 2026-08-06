@@ -6,7 +6,6 @@ import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.command.CommandSender
 import taboolib.common.platform.Plugin
-import taboolib.common.platform.ProxyCommandSender
 import taboolib.common.platform.command.CommandBody
 import taboolib.common.platform.command.CommandHeader
 import taboolib.common.platform.command.PermissionDefault
@@ -81,13 +80,6 @@ object Main : Plugin() {
 }
 
 fun CommandSender.msg(vararg args: Any) {
-    adaptCommandSender(this).message(args)
-}
-
-fun ProxyCommandSender.message(vararg args: Any) {
-    var message = ""
-    args.forEach {
-        message += it.toString()
-    }
-    sendMessage(ChatColor.translateAlternateColorCodes('&', message))
+    val message = args.joinToString("") { it.toString() }
+    adaptCommandSender(this).sendMessage(ChatColor.translateAlternateColorCodes('&', message))
 }

@@ -21,13 +21,10 @@ duplication:
 
   # 鸡刷复制
   chicken:
-    # Xin 模式：将潜影盒存入鸡中，在指定分钟数掉落（权限：core.dupe.chicken.xin）
+    # Xin 模式：将潜影盒存入鸡中，每隔指定分钟数掉落（权限：core.dupe.chicken.xin）
     xin-mode: false
-    xin-mode-periods:  # 触发掉落的分钟数（0-59）
-      - 15
-      - 30
-      - 45
-      - 0
+    xin-mode-interval: 15        # 每隔多少分钟刷新一次
+    xin-mode-max-per-chunk: 3   # 每个区块最多几只有效鸡（超出的显示浓烟，不刷物）
     # 点击模式：右键鸡时复制手持物品（权限：core.dupe.chicken.click）
     click-mode: false
     click-mode-cooldown: 3  # 冷却时间（秒）

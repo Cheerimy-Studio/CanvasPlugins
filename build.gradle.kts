@@ -13,17 +13,13 @@ taboolib {
         install(Basic)
         install(Bukkit)
         install(BukkitUtil)
-        install(BukkitUI)
-        // BukkitHook 会注入 ProtocolHandler/MeteorInjector（NMS），Canvas 26.2 无此 API，移除
-        install(I18n)
+        // BukkitUI 引入 NMS（平台缓存），Canvas 26.2 不兼容，移除
+        // BukkitHook 已移除（ProtocolHandler/MeteorInjector NMS）
+        // I18n / Database* 未使用，移除
         install(MinecraftChat)
         install(CommandHelper)
         install(Metrics)
-        install(Database)
-        install(DatabasePlayer)
-        install(DatabasePlayerRedis)
         // 本插件仅使用 Bukkit API，不依赖 NMS，跳过 TabooLib 的 Minecraft 版本检查
-        // 以兼容 TabooLib 尚未录入支持列表的新版本（如 Canvas 26.2 / MC 26.2）
         disableOnUnsupportedVersion = false
         disableOnSkippedVersion = false
     }

@@ -8,6 +8,7 @@ import taboolib.common.platform.Awake
 import taboolib.common.platform.command.command
 import taboolib.common.platform.command.player
 import taboolib.common.platform.function.adaptPlayer
+import taboolib.platform.BukkitPlugin
 
 
 object Command {
@@ -17,12 +18,27 @@ object Command {
         command("stat") {
             execute<CommandSender> { sender, _, _ ->
                 if (sender is Player) {
+                    // 查看自己的统计：PDC 操作在当前玩家区域线程，安全
                     sender.msg(buildStatisticsMessage(sender))
                 }
             }
             player {
                 execute<CommandSender> { sender, context, _ ->
-                    sender.msg(context.player().castSafely<Player>()?.let { buildStatisticsMessage(it) } ?: "Error Statistics")
+                    val target = context.player().castSafely<Player>()
+                    if (target == null) {
+                        sender.msg("Error Statistics")
+                        return@execute
+                    }
+                    if (target.uniqueId == (sender as? Player)?.uniqueId) {
+                        sender.msg(buildStatisticsMessage(target))
+                    } else {
+                        // 查看其他玩家的统计：PDC 操作调度到目标玩家的区域线程
+                        target.scheduler.runDelayed(BukkitPlugin.getInstance(), {
+                            if (target.isOnline) {
+                                sender.msg(buildStatisticsMessage(target))
+                            }
+                        }, {}, 1L)
+                    }
                 }
             }
         }

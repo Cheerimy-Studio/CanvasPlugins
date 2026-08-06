@@ -15,12 +15,13 @@ object CommandDupe {
 
     @Awake(LifeCycle.ENABLE)
     fun init() {
+        if (!config.getBoolean("duplication.command.enable")) return
+
         simpleCommand(
             "dupe",
             permission = "core.dupe.command"
         ) { sender, _ ->
             if (sender !is Player) return@simpleCommand
-            if (!config.getBoolean("duplication.command.enable")) return@simpleCommand
 
             val item = sender.inventory.itemInMainHand
             if (item.type.isAir) {
