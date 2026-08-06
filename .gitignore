@@ -1,2 +1,15 @@
 # maven
 /target
+/.mvn
+
+# gradle
+/.gradle
+/build
+
+# various other potential build files
+/bin
+/dist
+/manifest.mf
+
+# Other Libraries
+*.jar
