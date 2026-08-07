@@ -22,8 +22,8 @@ repositories {
 }
 
 dependencies {
-    // Folia API 26.2（Canvas 26.2 = MC 26.2），向下兼容 Spigot/Paper
-    compileOnly 'dev.folia:folia-api:26.2.build.1-beta'
+    // Paper API 26.2（Canvas 26.2 = MC 26.2），向下兼容 Spigot/Paper/Folia
+    compileOnly 'io.papermc.paper:paper-api:26.2.build.105-stable'
     compileOnly 'org.ow2.asm:asm:9.10.1'
     compileOnly 'org.ow2.asm:asm-commons:9.10.1'
     implementation 'bot.inker.acj:runtime:1.5'
