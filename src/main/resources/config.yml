@@ -69,3 +69,24 @@ messages:
   success-dupe: "&e&l成功复制物品！"
   no-item: "&c你必须手持一个物品才能复制！"
   suicide: "&7你已自杀。"
+  # /help 命令输出格式（支持 %placeholder% 占位符）
+  # 含功能占位符的行在该功能未启用时整行不输出
+  # 可用功能占位符：%suicide% %dupe-cmd% %item-frame% %chicken% %donkey% %mine-place% %chat-color%
+  help:
+    lines:
+      - "&e===== &62B2TCore &e====="
+      - " "
+      - "%suicide%"
+      - "%dupe-cmd%"
+      - "%item-frame%"
+      - "%chicken%"
+      - "%donkey%"
+      - "%mine-place%"
+      - "%chat-color%"
+      - "&7出生点随机传送 + 10秒无敌"
+      - "&e/stat &7[玩家] — 查看玩家统计"
+      - " "
+      - "&e管理命令："
+      - "&e/core info &7— 查看插件信息"
+      - "&e/core reload &7— 重载配置文件"
+      - "&e/core clearcache &7— 清空复制缓存"
