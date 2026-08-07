@@ -8,6 +8,8 @@ import taboolib.common.platform.Awake
 import taboolib.common.platform.command.command
 import taboolib.common.platform.command.player
 import taboolib.common.platform.function.adaptPlayer
+import taboolib.platform.BukkitPlugin
+import java.util.Locale
 
 
 object Command {
@@ -17,21 +19,23 @@ object Command {
         command("stat") {
             execute<CommandSender> { sender, _, _ ->
                 if (sender is Player) {
-                    sender.msg(buildStatisticsMessage(sender))
+                    // 调度到自身实体线程，Folia 线程安全
+                    sender.scheduler.run(BukkitPlugin.getInstance(), { _ ->
+                        sender.msg(buildStatisticsMessage(sender))
+                    }, null)
                 }
             }
             player {
                 execute<CommandSender> { sender, context, _ ->
-                    // 查看他人统计需要 admin 权限
+                    // 所有玩家都可以查看其他玩家的统计
                     val target = context.player().castSafely<Player>() ?: run {
                         sender.msg("&c无法找到该玩家")
                         return@execute
                     }
-                    if (target.uniqueId != (sender as? Player)?.uniqueId && !sender.hasPermission("2b2tcore.admin")) {
-                        sender.msg("&c你没有权限查看其他玩家的统计")
-                        return@execute
-                    }
-                    sender.msg(buildStatisticsMessage(target))
+                    // Folia：目标玩家可能在别的区域线程，统计构建必须调度到目标玩家的实体线程
+                    target.scheduler.run(BukkitPlugin.getInstance(), { _ ->
+                        sender.msg(buildStatisticsMessage(target))
+                    }, null)
                 }
             }
         }
@@ -59,7 +63,7 @@ object Command {
                 .replace("%name%", player.name)
                 .replace("%kills%", data.kills.toString())
                 .replace("%deaths%", data.deaths.toString())
-                .replace("%kd%", String.format("%.2f", data.kd))
+                .replace("%kd%", String.format(Locale.US, "%.2f", data.kd))
                 .replace("%joins%", data.joins.toString())
                 .replace("%quits%", data.quits.toString())
                 .replace("%online-time-days%", data.onlineTime.days.toString())
