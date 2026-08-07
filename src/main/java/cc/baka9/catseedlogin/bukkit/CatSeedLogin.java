@@ -10,7 +10,6 @@ import cc.baka9.catseedlogin.bukkit.task.Task;
 import org.bukkit.Bukkit;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.scheduler.BukkitScheduler;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -19,7 +18,6 @@ import java.util.Collections;
 public class CatSeedLogin extends JavaPlugin {
 
     public static CatSeedLogin instance;
-    public static BukkitScheduler scheduler = Bukkit.getScheduler();
     public static SQL sql;
     public static boolean loadProtocolLib = false;
 
@@ -117,7 +115,6 @@ public class CatSeedLogin extends JavaPlugin {
 
     @Override
     public void onDisable(){
-        Task.cancelAll();
         Bukkit.getOnlinePlayers().forEach(p -> {
             if (!LoginPlayerHelper.isLogin(p.getName())) return;
             if (!p.isDead() || Config.Settings.DeathStateQuitRecordLocation) {
@@ -136,7 +133,7 @@ public class CatSeedLogin extends JavaPlugin {
     }
 
     public void runTaskAsync(Runnable runnable){
-        scheduler.runTaskAsynchronously(this, runnable);
+        Scheduler.runAsync(this, runnable);
     }
 
 

@@ -1,0 +1,68 @@
+plugins {
+    id 'java'
+    id 'com.gradleup.shadow' version '9.4.2'
+}
+
+group = 'cc.baka9'
+version = '1.4.1-paper26.2'
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_25
+    targetCompatibility = JavaVersion.VERSION_25
+}
+
+repositories {
+    mavenCentral()
+    maven {
+        name = 'papermc-repo'
+        url = 'https://repo.papermc.io/repository/maven-public/'
+    }
+    maven {
+        name = 'dmulloy2-repo'
+        url = 'https://repo.dmulloy2.net/repository/public/'
+    }
+    maven {
+        name = 'sonatype'
+        url = 'https://oss.sonatype.org/content/groups/public/'
+    }
+    maven { url 'https://jitpack.io' }
+}
+
+dependencies {
+    // Paper API 26.2（Canvas 26.2 = MC 26.2），向下兼容 Spigot/Paper/Folia
+    compileOnly 'io.papermc.paper:paper-api:26.2.build.105-stable'
+    // ProtocolLib（softdepend，可选）
+    compileOnly 'com.comphenix.protocol:ProtocolLib:5.3.0'
+    // Lombok
+    compileOnly 'org.projectlombok:lombok:1.18.46'
+    annotationProcessor 'org.projectlombok:lombok:1.18.46'
+
+    // 运行时依赖（shade 进 jar）
+    implementation 'org.xerial:sqlite-jdbc:3.21.0.1'
+    implementation 'com.sun.mail:jakarta.mail:1.6.7'
+    compileOnly 'mysql:mysql-connector-java:8.0.28'
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
+
+sourceSets {
+    main {
+        java {
+            // BungeeCord 端源码保留但排除编译（Paper 端不需要，避免 Bungee API 依赖）
+            exclude 'cc/baka9/catseedlogin/bungee/**'
+        }
+    }
+}
+
+shadowJar {
+    archiveBaseName = 'CatSeedLogin'
+    archiveClassifier = ''
+    archiveVersion = project.version
+    // 注意：不能 relocate org.sqlite —— SQLite.java 用 Class.forName("org.sqlite.JDBC") 字符串加载，
+    // relocate 不会改写字符串，会导致 ClassNotFoundException。
+    // 不用 minimize —— sqlite-jdbc 通过反射加载，静态分析会误删。
+}
+
+build.dependsOn(shadowJar)

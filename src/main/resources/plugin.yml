@@ -1,9 +1,10 @@
 name: CatSeedLogin
 main: cc.baka9.catseedlogin.bukkit.CatSeedLogin
 author: CatSeed
-version: ${version}
+version: "1.4.1-paper26.2"
 softdepend: [Multiverse-Core, Citizens, Essentials, EssentialsSpawn, ProtocolLib]
-api-version: 1.13
+api-version: "1.21"
+folia-supported: true
 commands:
   login:
     description: 使用密码登录

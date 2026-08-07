@@ -11,12 +11,15 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import java.lang.reflect.InvocationTargetException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 public class LoginPlayerHelper {
-    private static final Set<LoginPlayer> set = new HashSet<>();
+    private static final Set<LoginPlayer> set = ConcurrentHashMap.newKeySet();
 
     public static List<LoginPlayer> getList(){
         return new ArrayList<>(set);
@@ -105,7 +108,7 @@ public class LoginPlayerHelper {
 
         try {
             protocolManager.sendServerPacket(player, inventoryPacket, false);
-        } catch (InvocationTargetException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }

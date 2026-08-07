@@ -14,6 +14,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -27,7 +28,7 @@ import java.util.stream.Collectors;
  */
 public class Config {
     private static CatSeedLogin plugin = CatSeedLogin.instance;
-    private static Map<String, String> offlineLocations = new HashMap<>();
+    private static Map<String, String> offlineLocations = new ConcurrentHashMap<>();
 
     /**
      * 数据库

@@ -1,6 +1,7 @@
 package cc.baka9.catseedlogin.bukkit.command;
 
 import cc.baka9.catseedlogin.bukkit.CatSeedLogin;
+import cc.baka9.catseedlogin.bukkit.Scheduler;
 import cc.baka9.catseedlogin.bukkit.Config;
 import cc.baka9.catseedlogin.bukkit.database.Cache;
 import cc.baka9.catseedlogin.bukkit.object.EmailCode;
@@ -50,10 +51,10 @@ public class CommandResetPassword implements CommandExecutor {
                                     "你的验证码是 <strong>" + emailCode.getCode() + "</strong>" +
                                             "<br/>在服务器中使用帐号 " + name + " 输入指令<strong>/resetpassword re " + emailCode.getCode() + " 新密码</strong> 来重置新密码" +
                                             "<br/>此验证码有效期为 " + (emailCode.getDurability() / (1000 * 60)) + "分钟");
-                            Bukkit.getScheduler().runTask(CatSeedLogin.instance, () ->
+                            Scheduler.runGlobal(CatSeedLogin.instance, () ->
                                     sender.sendMessage(Config.Language.RESETPASSWORD_EMAIL_SENT_MESSAGE.replace("{email}", emailCode.getEmail())));
                         } catch (Exception e) {
-                            Bukkit.getScheduler().runTask(CatSeedLogin.instance, () -> sender.sendMessage(Config.Language.RESETPASSWORD_EMAIL_WARN));
+                            Scheduler.runGlobal(CatSeedLogin.instance, () -> sender.sendMessage(Config.Language.RESETPASSWORD_EMAIL_WARN));
                             e.printStackTrace();
                         }
                     });
@@ -84,12 +85,12 @@ public class CommandResetPassword implements CommandExecutor {
                                 CatSeedLogin.sql.edit(lp);
                                 LoginPlayerHelper.remove(lp);
                                 EmailCode.removeByName(name, EmailCode.Type.ResetPassword);
-                                Bukkit.getScheduler().runTask(CatSeedLogin.instance, () -> {
+                                Scheduler.runGlobal(CatSeedLogin.instance, () -> {
                                     Player p = Bukkit.getPlayer(lp.getName());
                                     if (p != null && p.isOnline()) {
                                         if (Config.Settings.CanTpSpawnLocation) {
 //                                            PlayerTeleport.teleport(p, Config.Settings.SpawnLocation);
-                                            p.teleport(Config.Settings.SpawnLocation);
+                                            Scheduler.safeTeleport(p, Config.Settings.SpawnLocation);
                                         }
                                         p.sendMessage(Config.Language.RESETPASSWORD_SUCCESS);
                                         if (CatSeedLogin.loadProtocolLib) {
@@ -99,7 +100,7 @@ public class CommandResetPassword implements CommandExecutor {
 
                                 });
                             } catch (Exception e) {
-                                Bukkit.getScheduler().runTask(CatSeedLogin.instance, () -> sender.sendMessage("§c数据库异常!"));
+                                Scheduler.runGlobal(CatSeedLogin.instance, () -> sender.sendMessage("§c数据库异常!"));
                                 e.printStackTrace();
                             }
 

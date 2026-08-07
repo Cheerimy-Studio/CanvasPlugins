@@ -1,6 +1,7 @@
 package cc.baka9.catseedlogin.bukkit.command;
 
 import cc.baka9.catseedlogin.bukkit.CatSeedLogin;
+import cc.baka9.catseedlogin.bukkit.Scheduler;
 import cc.baka9.catseedlogin.bukkit.Config;
 import cc.baka9.catseedlogin.util.Crypt;
 import cc.baka9.catseedlogin.util.Util;
@@ -55,13 +56,13 @@ public class CommandChangePassword implements CommandExecutor {
                 CatSeedLogin.sql.edit(lp);
                 LoginPlayerHelper.remove(lp);
 
-                Bukkit.getScheduler().runTask(CatSeedLogin.instance, () -> {
+                Scheduler.runGlobal(CatSeedLogin.instance, () -> {
                     Player player = Bukkit.getPlayer(((Player) sender).getUniqueId());
                     if (player != null && player.isOnline()) {
                         player.sendMessage(Config.Language.CHANGEPASSWORD_SUCCESS);
                         Config.setOfflineLocation(player);
                         if (Config.Settings.CanTpSpawnLocation) {
-                            player.teleport(Config.Settings.SpawnLocation);
+                            Scheduler.safeTeleport(player, Config.Settings.SpawnLocation);
                             if (CatSeedLogin.loadProtocolLib) {
                                 LoginPlayerHelper.sendBlankInventoryPacket(player);
                             }

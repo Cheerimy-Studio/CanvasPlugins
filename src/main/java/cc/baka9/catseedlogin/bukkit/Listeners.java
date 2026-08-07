@@ -158,7 +158,8 @@ public class Listeners implements Listener {
         }
 
         if (Config.Settings.CanTpSpawnLocation) {
-            player.teleport(Config.Settings.SpawnLocation);
+            // Folia: 跨世界传送使用 teleportAsync，避免阻塞区域线程
+            Scheduler.safeTeleport(player, Config.Settings.SpawnLocation);
         } else {
             event.setCancelled(true);
         }
@@ -172,8 +173,7 @@ public class Listeners implements Listener {
             if (!player.isDead() || Config.Settings.DeathStateQuitRecordLocation) {
                 Config.setOfflineLocation(player);
             }
-            Bukkit.getScheduler().runTaskLater(CatSeedLogin.instance, () -> LoginPlayerHelper.remove(player.getName()), Config.Settings.ReenterInterval);
-        }
+            Scheduler.runGlobalLater(CatSeedLogin.instance, () -> LoginPlayerHelper.remove(player.getName()), Config.Settings.ReenterInterval);        }
         Task.getTaskAutoKick().playerJoinTime.remove(player.getName());
 
     }
@@ -183,7 +183,8 @@ public class Listeners implements Listener {
         Player p = event.getPlayer();
         Cache.refresh(p.getName());
         if (Config.Settings.CanTpSpawnLocation) {
-            p.teleport(Config.Settings.SpawnLocation);
+            // Folia: 跨世界传送必须用 teleportAsync（异步），同步 teleport 会阻塞区域线程
+            Scheduler.safeTeleport(p, Config.Settings.SpawnLocation);
         }
     }
 

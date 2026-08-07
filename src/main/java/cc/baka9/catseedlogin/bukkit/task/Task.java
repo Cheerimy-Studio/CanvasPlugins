@@ -1,7 +1,7 @@
 package cc.baka9.catseedlogin.bukkit.task;
 
 import cc.baka9.catseedlogin.bukkit.CatSeedLogin;
-import org.bukkit.scheduler.BukkitTask;
+import cc.baka9.catseedlogin.bukkit.Scheduler;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -13,7 +13,7 @@ public abstract class Task implements Runnable {
 
     private static TaskAutoKick taskAutoKick;
     private static TaskSendLoginMessage taskSendLoginMessage;
-    private static List<BukkitTask> bukkitTaskList = new ArrayList<>();
+    private static List<Object> bukkitTaskList = new ArrayList<>();
 
     public static TaskAutoKick getTaskAutoKick(){
         if (taskAutoKick == null) {
@@ -40,16 +40,29 @@ public abstract class Task implements Runnable {
     }
 
     public static void cancelAll(){
-        Iterator<BukkitTask> iterator = bukkitTaskList.iterator();
+        Iterator<Object> iterator = bukkitTaskList.iterator();
         while (iterator.hasNext()) {
-            iterator.next().cancel();
+            Object task = iterator.next();
+            try {
+                task.getClass().getMethod("cancel").invoke(task);
+            } catch (Exception ignored) {
+            }
             iterator.remove();
         }
 
     }
 
     public static void runTaskTimer(Runnable runnable, long l){
-        bukkitTaskList.add(plugin.getServer().getScheduler().runTaskTimer(plugin, runnable, 0, l));
+        // Folia: GlobalRegionScheduler.runAtFixedRate(plugin, task, 0, l)
+        try {
+            Object globalScheduler = org.bukkit.Bukkit.class.getMethod("getGlobalRegionScheduler").invoke(null);
+            Object task = globalScheduler.getClass().getMethod("runAtFixedRate", org.bukkit.plugin.Plugin.class, java.util.function.Consumer.class, long.class, long.class)
+                    .invoke(globalScheduler, plugin, (java.util.function.Consumer<Object>) ignored -> runnable.run(), 0L, l);
+            bukkitTaskList.add(task);
+        } catch (Exception fallback) {
+            // Spigot/Paper 旧版回退
+            bukkitTaskList.add(plugin.getServer().getScheduler().runTaskTimer(plugin, runnable, 0, l));
+        }
 
     }
 }
