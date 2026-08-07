@@ -22,7 +22,16 @@ object Command {
             }
             player {
                 execute<CommandSender> { sender, context, _ ->
-                    sender.msg(context.player().castSafely<Player>()?.let { buildStatisticsMessage(it) } ?: "Error Statistics")
+                    // 查看他人统计需要 admin 权限
+                    val target = context.player().castSafely<Player>() ?: run {
+                        sender.msg("&c无法找到该玩家")
+                        return@execute
+                    }
+                    if (target.uniqueId != (sender as? Player)?.uniqueId && !sender.hasPermission("2b2tcore.admin")) {
+                        sender.msg("&c你没有权限查看其他玩家的统计")
+                        return@execute
+                    }
+                    sender.msg(buildStatisticsMessage(target))
                 }
             }
         }
@@ -50,7 +59,7 @@ object Command {
                 .replace("%name%", player.name)
                 .replace("%kills%", data.kills.toString())
                 .replace("%deaths%", data.deaths.toString())
-                .replace("%kd%", data.kds.toString())
+                .replace("%kd%", String.format("%.2f", data.kd))
                 .replace("%joins%", data.joins.toString())
                 .replace("%quits%", data.quits.toString())
                 .replace("%online-time-days%", data.onlineTime.days.toString())
@@ -76,19 +85,24 @@ object Command {
                     }
                 }
             }
-            processedMessages += processedMessage + "\n"
+
+            if (processedMessage.isNotBlank()) {
+                processedMessages += processedMessage + "\n"
+            }
         }
-        return processedMessages
+        return processedMessages.trimEnd()
     }
 
-    data class PlayerData(val kills: Int, val deaths: Int, val kds: Double, val joins: Int, val quits: Int, val onlineTime: DateTime)
+    data class PlayerData(val kills: Int, val deaths: Int, val kd: Double, val joins: Int, val quits: Int, val onlineTime: DateTime)
     data class DateTime(val days: Int, val hours: Int, val minutes: Int, val seconds: Int) {
-        fun format(day: String, hrs: String, min: String, sec: String): String {
+        fun format(dayLabel: String, hourLabel: String, minuteLabel: String, secondLabel: String): String {
             val parts = mutableListOf<String>()
-            if (days != 0) parts += "$days $day"
-            if (hours != 0) parts += "$hours $hrs"
-            if (minutes != 0) parts += "$minutes $min"
-            if (seconds != 0 || parts.isEmpty()) parts += "$seconds $sec"
+            if (days > 0) parts.add("$days $dayLabel")
+            if (hours > 0) parts.add("$hours $hourLabel")
+            if (minutes > 0) parts.add("$minutes $minuteLabel")
+            if (seconds > 0) parts.add("$seconds $secondLabel")
+            // 全为 0 时显示 "0 $secondLabel"
+            if (parts.isEmpty()) parts.add("0 $secondLabel")
             return parts.joinToString(" ")
         }
 
@@ -98,10 +112,8 @@ object Command {
 
                 val days = (remaining / 86400).toInt()
                 remaining %= 86400
-
                 val hours = (remaining / 3600).toInt()
                 remaining %= 3600
-
                 val minutes = (remaining / 60).toInt()
                 val seconds = (remaining % 60).toInt()
 
