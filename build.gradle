@@ -31,6 +31,8 @@ repositories {
 dependencies {
     // Paper API 26.2（Canvas 26.2 = MC 26.2），向下兼容 Spigot/Paper/Folia
     compileOnly 'io.papermc.paper:paper-api:26.2.build.105-stable'
+    // Log4j2（服务器自带，compileOnly 用于编译 Log4jFilter，不 shade 避免冲突）
+    compileOnly 'org.apache.logging.log4j:log4j-core:2.24.3'
     // ProtocolLib（softdepend，可选）
     compileOnly 'com.comphenix.protocol:ProtocolLib:5.3.0'
     // Lombok

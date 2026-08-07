@@ -24,6 +24,8 @@ public class CatSeedLogin extends JavaPlugin {
     @Override
     public void onEnable(){
         instance = this;
+        //控制台密码隐藏（Log4j2 Filter，Paper 在命令事件前已打日志，必须用过滤器拦截）
+        ConsolePasswordFilter.install();
         //Config
         try {
             Config.load();
