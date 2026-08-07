@@ -42,8 +42,8 @@ object DonkeyDupe {
         fun onPlayerQuit(event: PlayerQuitEvent) {
             if (!config.getBoolean("duplication.donkey.org-mode", false)) return
             val player = event.player
-            val vehicle = player.vehicle ?: return
             if (!player.hasPermission("core.dupe.donkey.org")) return
+            val vehicle = player.vehicle ?: return
 
             if (config.getBoolean("duplication.donkey.org-mode-allow-boat-chain", false)) {
                 processVehicleChain(vehicle)
@@ -52,11 +52,24 @@ object DonkeyDupe {
             }
         }
 
+        /**
+         * 处理船链：船上的乘客可能是驮兽
+         */
         private fun processVehicleChain(entity: Entity) {
-            when {
-                entity is Boat -> entity.passengers.forEach(OrgMode::processAbstractHorse)
-                entity.vehicle is Boat -> (entity.vehicle as Boat).passengers.forEach(OrgMode::processAbstractHorse)
-                else -> processAbstractHorse(entity)
+            if (entity is Boat) {
+                entity.passengers.forEach { passenger ->
+                    if (passenger is AbstractHorse) {
+                        processAbstractHorse(passenger)
+                    }
+                }
+            } else if (entity.vehicle is Boat) {
+                (entity.vehicle as Boat).passengers.forEach { passenger ->
+                    if (passenger is AbstractHorse) {
+                        processAbstractHorse(passenger)
+                    }
+                }
+            } else {
+                processAbstractHorse(entity)
             }
         }
 
@@ -65,6 +78,10 @@ object DonkeyDupe {
             entity.duplicateInventoryForViewers()
         }
 
+        /**
+         * 复制驮兽库存给所有正在查看的玩家
+         * closeInventory / openInventory 通过 EntityScheduler 调度到玩家线程
+         */
         private fun AbstractHorse.duplicateInventoryForViewers() {
             val originalInventory = inventory
             val viewers = originalInventory.viewers.toList()
@@ -72,12 +89,20 @@ object DonkeyDupe {
 
             val clonedInventory = createDuplicatedInventory(originalInventory)
 
-            viewers.asReversed().forEach { viewer ->
-                viewer.closeInventory()
+            viewers.forEach { viewer ->
+                viewer.scheduler.run(
+                    BukkitPlugin.getInstance(),
+                    Consumer { _: ScheduledTask ->
+                        viewer.closeInventory()
+                    },
+                    null
+                )
                 viewer.scheduler.runDelayed(
                     BukkitPlugin.getInstance(),
-                    Consumer { _: ScheduledTask -> viewer.openInventory(clonedInventory) },
-                    Runnable { },
+                    Consumer { _: ScheduledTask ->
+                        viewer.openInventory(clonedInventory)
+                    },
+                    Runnable {},
                     2L
                 )
             }
