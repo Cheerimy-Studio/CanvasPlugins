@@ -31,6 +31,9 @@ repositories {
 dependencies {
     // Paper API 26.2（Canvas 26.2 = MC 26.2），向下兼容 Spigot/Paper/Folia
     compileOnly 'io.papermc.paper:paper-api:26.2.build.105-stable'
+    // Velocity API（Proxy 端插件，compileOnly，同一 jar 双端部署）
+    compileOnly 'com.velocitypowered:velocity-api:3.4.0-SNAPSHOT'
+    annotationProcessor 'com.velocitypowered:velocity-api:3.4.0-SNAPSHOT'
     // Log4j2（服务器自带，compileOnly 用于编译 Log4jFilter，不 shade 避免冲突）
     compileOnly 'org.apache.logging.log4j:log4j-core:2.24.3'
     // ProtocolLib（softdepend，可选）
@@ -62,9 +65,16 @@ shadowJar {
     archiveBaseName = 'CatSeedLogin'
     archiveClassifier = ''
     archiveVersion = project.version
+    // 允许重复条目（plugin.yml + velocity-plugin.json 共存同一 jar）
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     // 注意：不能 relocate org.sqlite —— SQLite.java 用 Class.forName("org.sqlite.JDBC") 字符串加载，
     // relocate 不会改写字符串，会导致 ClassNotFoundException。
     // 不用 minimize —— sqlite-jdbc 通过反射加载，静态分析会误删。
+}
+
+// 让 jar 也接受重复（velocity-plugin.json 可能跟 bungee 资源冲突）
+tasks.named('jar') {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
 
 build.dependsOn(shadowJar)

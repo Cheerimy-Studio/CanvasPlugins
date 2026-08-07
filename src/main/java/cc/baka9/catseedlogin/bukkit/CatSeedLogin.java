@@ -44,6 +44,9 @@ public class CatSeedLogin extends JavaPlugin {
             getLogger().warning("§c加载数据库时出错");
             e.printStackTrace();
         }
+        // 注册 Plugin Message 通道（Velocity 通信）
+        Bukkit.getServer().getMessenger().registerOutgoingPluginChannel(this, VelocityTransfer.CHANNEL);
+
         //Listeners
         getServer().getPluginManager().registerEvents(new Listeners(), this);
 

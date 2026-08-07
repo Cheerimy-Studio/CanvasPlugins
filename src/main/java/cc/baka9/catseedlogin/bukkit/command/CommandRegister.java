@@ -3,6 +3,7 @@ package cc.baka9.catseedlogin.bukkit.command;
 import cc.baka9.catseedlogin.bukkit.CatSeedLogin;
 import cc.baka9.catseedlogin.bukkit.Listeners;
 import cc.baka9.catseedlogin.bukkit.Scheduler;
+import cc.baka9.catseedlogin.bukkit.VelocityTransfer;
 import cc.baka9.catseedlogin.bukkit.Config;
 import cc.baka9.catseedlogin.bukkit.database.Cache;
 import cc.baka9.catseedlogin.bukkit.event.CatSeedPlayerRegisterEvent;
@@ -68,6 +69,8 @@ public class CommandRegister implements CommandExecutor {
                     sender.sendMessage(Config.Language.REGISTER_SUCCESS);
                     player.updateInventory();
                     LoginPlayerHelper.recordCurrentIP(player, lp);
+                    // 通知 Velocity：该玩家已注册并登录，允许切换子服
+                    VelocityTransfer.notifyLoggedIn(player);
                 }
 
 
