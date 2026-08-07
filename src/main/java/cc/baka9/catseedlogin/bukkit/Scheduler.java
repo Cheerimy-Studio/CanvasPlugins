@@ -49,10 +49,13 @@ public final class Scheduler {
     /** 区域线程调度（按实体所在区域） */
     public static <T extends Entity> void runEntity(T entity, Plugin plugin, Consumer<T> task) {
         try {
-            // Folia: entity.getScheduler().run(plugin, task, null)
+            // Paper 26.2: entity.getScheduler().run(plugin, consumer, retried)
+            // consumer 是 Consumer<ScheduledTask>，不是 Consumer<Entity>！
+            // 必须用闭包捕获 entity 引用，wrapper 忽略 ScheduledTask 参数
             Object entityScheduler = entity.getClass().getMethod("getScheduler").invoke(entity);
+            Consumer<Object> wrapper = (ignored) -> task.accept(entity);
             entityScheduler.getClass().getMethod("run", Plugin.class, Consumer.class, Runnable.class)
-                    .invoke(entityScheduler, plugin, task, null);
+                    .invoke(entityScheduler, plugin, wrapper, null);
         } catch (Exception fallback) {
             task.accept(entity);
         }

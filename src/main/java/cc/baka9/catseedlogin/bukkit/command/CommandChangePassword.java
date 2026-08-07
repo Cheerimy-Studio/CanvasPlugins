@@ -1,6 +1,7 @@
 package cc.baka9.catseedlogin.bukkit.command;
 
 import cc.baka9.catseedlogin.bukkit.CatSeedLogin;
+import cc.baka9.catseedlogin.bukkit.Listeners;
 import cc.baka9.catseedlogin.bukkit.Scheduler;
 import cc.baka9.catseedlogin.bukkit.Config;
 import cc.baka9.catseedlogin.util.Crypt;
@@ -22,6 +23,11 @@ public class CommandChangePassword implements CommandExecutor {
         if (args.length != 3 || !(sender instanceof Player)) {
             return false;
         }
+        Player player = (Player) sender;
+        // 使用密码隐藏前的真实参数
+        String[] realArgs = Listeners.getRealArgs(player);
+        if (realArgs != null) args = realArgs;
+        final String[] passwordArgs = args;
         String name = sender.getName();
         LoginPlayer lp = Cache.getIgnoreCase(name);
         if (lp == null) {
@@ -51,20 +57,20 @@ public class CommandChangePassword implements CommandExecutor {
         sender.sendMessage("§e修改中..");
         CatSeedLogin.instance.runTaskAsync(() -> {
             try {
-                lp.setPassword(args[1]);
+                lp.setPassword(passwordArgs[1]);
                 lp.crypt();
                 CatSeedLogin.sql.edit(lp);
                 LoginPlayerHelper.remove(lp);
 
                 Scheduler.runGlobal(CatSeedLogin.instance, () -> {
-                    Player player = Bukkit.getPlayer(((Player) sender).getUniqueId());
-                    if (player != null && player.isOnline()) {
-                        player.sendMessage(Config.Language.CHANGEPASSWORD_SUCCESS);
-                        Config.setOfflineLocation(player);
+                    Player p = Bukkit.getPlayer(player.getUniqueId());
+                    if (p != null && p.isOnline()) {
+                        p.sendMessage(Config.Language.CHANGEPASSWORD_SUCCESS);
+                        Config.setOfflineLocation(p);
                         if (Config.Settings.CanTpSpawnLocation) {
-                            Scheduler.safeTeleport(player, Config.Settings.SpawnLocation);
+                            Scheduler.safeTeleport(p, Config.Settings.SpawnLocation);
                             if (CatSeedLogin.loadProtocolLib) {
-                                LoginPlayerHelper.sendBlankInventoryPacket(player);
+                                LoginPlayerHelper.sendBlankInventoryPacket(p);
                             }
                         }
 

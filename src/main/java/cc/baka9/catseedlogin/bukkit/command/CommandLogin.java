@@ -1,6 +1,7 @@
 package cc.baka9.catseedlogin.bukkit.command;
 
 import cc.baka9.catseedlogin.bukkit.Config;
+import cc.baka9.catseedlogin.bukkit.Listeners;
 import cc.baka9.catseedlogin.bukkit.database.Cache;
 import cc.baka9.catseedlogin.bukkit.event.CatSeedPlayerLoginEvent;
 import cc.baka9.catseedlogin.bukkit.object.LoginPlayer;
@@ -19,6 +20,9 @@ public class CommandLogin implements CommandExecutor {
     public boolean onCommand(CommandSender sender, Command command, String lable, String[] args){
         if (args.length == 0 || !(sender instanceof Player)) return false;
         Player player = (Player) sender;
+        // 使用密码隐藏前的真实参数
+        String[] realArgs = Listeners.getRealArgs(player);
+        if (realArgs != null) args = realArgs;
         String name = player.getName();
         if (LoginPlayerHelper.isLogin(name)) {
             sender.sendMessage(Config.Language.LOGIN_REPEAT);

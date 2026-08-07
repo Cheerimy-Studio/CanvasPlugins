@@ -9,6 +9,7 @@ import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
@@ -17,9 +18,55 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.*;
 
+import java.util.Arrays;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
 
 public class Listeners implements Listener {
+
+    // 涉及密码的命令名（含别名）
+    private static final Set<String> PASSWORD_COMMANDS = Set.of(
+            "login", "l", "register", "reg",
+            "changepassword", "changepw",
+            "resetpassword", "repw"
+    );
+
+    // 存储被替换前的真实参数（玩家名 → 原始 args）
+    private static final ConcurrentHashMap<String, String[]> REAL_ARGS = new ConcurrentHashMap<>();
+
+    /**
+     * 获取玩家命令的真实参数（密码隐藏前）。
+     * 命令处理器调用后应立即清除。
+     */
+    public static String[] getRealArgs(Player player) {
+        return REAL_ARGS.remove(player.getName());
+    }
+
+    /**
+     * 在 LOWEST 优先级拦截含密码的命令，
+     * 将控制台日志中的密码替换为 ***，同时保存真实参数供命令处理器使用。
+     */
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void hidePasswordInConsole(PlayerCommandPreprocessEvent event) {
+        String msg = event.getMessage();
+        String cmd = msg.split(" ")[0].toLowerCase().replaceFirst("/", "");
+        if (!PASSWORD_COMMANDS.contains(cmd)) return;
+
+        String[] parts = msg.split(" ");
+        if (parts.length <= 1) return; // 无参数，不需处理
+
+        // 保存真实参数（不含命令名）
+        String[] realArgs = Arrays.copyOfRange(parts, 1, parts.length);
+        REAL_ARGS.put(event.getPlayer().getName(), realArgs);
+
+        // 替换为 *** 供控制台显示
+        StringBuilder redacted = new StringBuilder(parts[0]);
+        for (int i = 1; i < parts.length; i++) {
+            redacted.append(" ***");
+        }
+        event.setMessage(redacted.toString());
+    }
 
     private boolean playerIsNotMinecraftPlayer(Player p){
         return !p.getClass().getName().matches("org\\.bukkit\\.craftbukkit.*?\\.entity\\.CraftPlayer");

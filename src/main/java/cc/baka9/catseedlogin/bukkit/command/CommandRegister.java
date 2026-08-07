@@ -1,6 +1,7 @@
 package cc.baka9.catseedlogin.bukkit.command;
 
 import cc.baka9.catseedlogin.bukkit.CatSeedLogin;
+import cc.baka9.catseedlogin.bukkit.Listeners;
 import cc.baka9.catseedlogin.bukkit.Scheduler;
 import cc.baka9.catseedlogin.bukkit.Config;
 import cc.baka9.catseedlogin.bukkit.database.Cache;
@@ -22,6 +23,10 @@ public class CommandRegister implements CommandExecutor {
     public boolean onCommand(CommandSender sender, Command command, String lable, String[] args){
         if (args.length != 2) return false;
         Player player = (Player) sender;
+        // 使用密码隐藏前的真实参数
+        String[] realArgs = Listeners.getRealArgs(player);
+        if (realArgs != null) args = realArgs;
+        final String[] passwordArgs = args;
         String name = sender.getName();
         if (LoginPlayerHelper.isLogin(name)) {
             sender.sendMessage(Config.Language.REGISTER_AFTER_LOGIN_ALREADY);
@@ -52,7 +57,7 @@ public class CommandRegister implements CommandExecutor {
                             .replace("{count}", String.valueOf(LoginPlayerListlikeByIp.size()))
                             .replace("{accounts}", String.join(", ", LoginPlayerListlikeByIp.stream().map(LoginPlayer::getName).toArray(String[]::new))));
                 } else {
-                    LoginPlayer lp = new LoginPlayer(name, args[0]);
+                    LoginPlayer lp = new LoginPlayer(name, passwordArgs[0]);
                     lp.crypt();
                     CatSeedLogin.sql.add(lp);
                     LoginPlayerHelper.add(lp);
