@@ -1,0 +1,22 @@
+name: TNT-Optimizer
+version: '2.0.0'
+main: com.tntoptimizer.TNTOptimizer
+api-version: '1.20'
+folia-supported: true
+description: >-
+  Folia 多线程 TNT 爆炸优化 — 异步射线追踪 + 空间聚类 + 跨区域并行写回。
+  基于 Minecraft 26.2 反编译验证的爆炸机制，完全还原原版体验。
+  兼容 CraftCanvasMC/Canvas 及所有依赖 EntityExplodeEvent 的 TNT 类插件。
+author: TNT-Optimizer Team
+website: https://github.com/tntoptimizer
+
+permissions:
+  tntoptimizer.admin:
+    description: 允许重载插件配置
+    default: op
+
+commands:
+  tntoptimizer:
+    description: TNT-Optimizer 主命令
+    usage: /tntoptimizer reload|status|benchmark
+    permission: tntoptimizer.admin

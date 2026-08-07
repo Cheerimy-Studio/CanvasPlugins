@@ -1,0 +1,90 @@
+# ============================================================
+# TNT-Optimizer 配置文件
+# Folia 多线程 TNT 爆炸优化插件
+# ============================================================
+
+settings:
+  # 是否启用优化
+  enabled: true
+
+  # 异步射线追踪线程池大小
+  # 0 = 自动（min(cores, max(4, cores*3/4))），双路 CPU 自动检测总核心数
+  # 正数 = 手动指定（上限 64）
+  async-thread-pool-size: 0
+
+  # 空间聚类设置
+  clustering:
+    # 启用空间聚类（大量 TNT 时自动分组并行）
+    enabled: true
+
+    # 触发聚类的最小 TNT 数量
+    # 低于此值直接逐颗处理，不聚类
+    min-tnt-count: 3
+
+    # 聚类距离倍率
+    # 实际距离 = max(爆炸威力) * 此倍率
+    # 两颗 TNT 在此距离内视为同一簇
+    # 默认 2.5 表示威力 4 的 TNT 在 10 格内会聚类
+    distance-multiplier: 2.5
+
+    # 最大聚类大小（防止单簇 TNT 过多）
+    max-cluster-size: 64
+
+  # 区块快照设置
+  snapshot:
+    # 快照半径（格）
+    # 以 TNT 为中心，此半径内的方块会被快照
+    radius: 8
+
+  # 爆炸设置
+  explosion:
+    # 射线数量模式
+    #   NORMAL  - 标准 1352 条射线（与原版一致）
+    #   REDUCED - 减少到 512 条（性能优先，视觉略有差异）
+    #   ADAPTIVE - 根据 TNT 威力自适应调整
+    ray-mode: ADAPTIVE
+
+    # 自适应射线倍率
+    # 仅在 ray-mode=ADAPTIVE 时生效
+    # 基础射线数 = 威力 * 此倍率
+    adaptive-ray-multiplier: 80
+
+    # 最大射线数（防止计算量过大）
+    max-rays: 1352
+
+    # 兼容性：是否触发 EntityExplodeEvent
+    # TNT 类插件（床战争、TNT 大炮、爆炸保护等）依赖此事件，
+    # 关闭会提升少量性能但可能导致这些插件失效
+    fire-entity-explode-event: true
+
+    # 掉落物模式
+    #   VANILLA - 原版爆炸掉落衰减（每个掉落物约 25% 概率保留，TNT 威力 4）
+    #   FULL    - 100% 掉落（大多数服务器偏好，与原版爆炸不同）
+    drop-mode: VANILLA
+
+    # 跨区域并行写回
+    # 爆炸跨越多个 Region（32×32 区块）时，每个 Region 由各自的区域线程
+    # 并行写回方块破坏，大幅降低单区域线程压力（Folia 安全：不同 Region
+    # 本来就由不同线程拥有，这是合法的多核并行）
+    multi-region-writeback: true
+
+  # 性能监控
+  metrics:
+    enabled: true
+    # 每 N 次爆炸输出一次统计
+    log-interval: 100
+
+  # 调试模式
+  debug: false
+
+# ============================================================
+# 消息配置
+# ============================================================
+messages:
+  prefix: "&8[&cTNT-Optimizer&8]&r"
+  enabled: "&aTNT 爆炸优化已启用"
+  disabled: "&cTNT 爆炸优化已禁用"
+  reloaded: "&a配置已重载"
+  status: "&e状态: &f%status% &e处理: &f%processed% &e平均耗时: &f%avg_time%ms"
+  benchmark-running: "&e正在运行基准测试..."
+  benchmark-done: "&a基准测试完成: 平均 &f%avg_time%ms &e(共 &f%count% &e次)"

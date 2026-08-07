@@ -1,0 +1,5 @@
+Manifest-Version: 1.0
+Implementation-Title: TNT-Optimizer
+Implementation-Version: 2.0.0
+Implementation-Vendor: TNT-Optimizer Team
+
