@@ -493,9 +493,8 @@ public class AsyncExplosionHandler {
                 source, source.getLocation().clone(), blocks, 0.333F, null);
         Bukkit.getPluginManager().callEvent(event);
 
-        // 触发完事件后移除实体
+        // 触发完事件后移除临时实体（非临时实体不删除）
         if (tempSpawned) source.remove();
-        else source.remove();
 
         if (event.isCancelled()) return List.of();
         List<Long> effective = new ArrayList<>();
