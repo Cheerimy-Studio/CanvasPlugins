@@ -86,6 +86,8 @@ public class Config {
         public static int AutoKick;
         // 死亡状态退出游戏是否记录退出位置 (玩家可以通过死亡时退出服务器然后重新进入，再复活，登录返回死亡地点)
         public static boolean DeathStateQuitRecordLocation;
+        // 登录完成后是否继续限制移动（永远冻结）
+        public static boolean AlwaysFreeze;
 
         public static void load(){
             FileConfiguration config = getConfig("settings.yml");
@@ -109,6 +111,7 @@ public class Config {
             AutoKick = config.getInt("AutoKick", 120);
             SpawnLocation = str2Location(config.getString("SpawnLocation"));
             DeathStateQuitRecordLocation = config.getBoolean("DeathStateQuitRecordLocation", resourceConfig.getBoolean("DeathStateQuitRecordLocation"));
+            AlwaysFreeze = config.getBoolean("AlwaysFreeze", resourceConfig.getBoolean("AlwaysFreeze", false));
 
 
         }
@@ -129,6 +132,7 @@ public class Config {
             config.set("SpawnLocation", loc2String(SpawnLocation));
             config.set("CommandWhiteList", CommandWhiteList.stream().map(Pattern::toString).collect(Collectors.toList()));
             config.set("DeathStateQuitRecordLocation", DeathStateQuitRecordLocation);
+            config.set("AlwaysFreeze", AlwaysFreeze);
             try {
                 config.save(new File(CatSeedLogin.instance.getDataFolder(), "settings.yml"));
             } catch (IOException e) {

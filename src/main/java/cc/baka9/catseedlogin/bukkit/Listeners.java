@@ -197,6 +197,21 @@ public class Listeners implements Listener {
     public void onPlayerMove(PlayerMoveEvent event){
         Player player = event.getPlayer();
         if (playerIsNotMinecraftPlayer(player)) return;
+        // AlwaysFreeze: 无论是否登录都限制移动
+        if (Config.Settings.AlwaysFreeze) {
+            Location from = event.getFrom();
+            Location to = event.getTo();
+            if (from.getBlockX() == to.getBlockX() && from.getBlockZ() == to.getBlockZ() && from.getY() - to.getY() >= 0.0D) {
+                return;
+            }
+            if (Config.Settings.CanTpSpawnLocation) {
+                Scheduler.safeTeleport(player, Config.Settings.SpawnLocation);
+            } else {
+                event.setCancelled(true);
+            }
+            return;
+        }
+        // 未登录才限制
         if (LoginPlayerHelper.isLogin(player.getName())) return;
         Location from = event.getFrom();
         Location to = event.getTo();

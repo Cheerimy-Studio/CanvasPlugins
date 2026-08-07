@@ -39,7 +39,8 @@ public class CommandCatSeedLogin implements CommandExecutor {
                 || canTpSpawnLocation(sender, args)
                 || autoKick(sender, args)
                 || setIpRegCountLimit(sender, args)
-                || deathStateQuitRecordLocation(sender, args);
+                || deathStateQuitRecordLocation(sender, args)
+                || alwaysFreeze(sender, args);
     }
 
     private boolean deathStateQuitRecordLocation(CommandSender sender, String[] args){
@@ -47,6 +48,16 @@ public class CommandCatSeedLogin implements CommandExecutor {
             Config.Settings.DeathStateQuitRecordLocation = !Config.Settings.DeathStateQuitRecordLocation;
             Config.Settings.save();
             sender.sendMessage("§e死亡状态退出游戏记录退出位置" + (Config.Settings.DeathStateQuitRecordLocation ? "§a开启" : "§8关闭"));
+            return true;
+        }
+        return false;
+    }
+
+    private boolean alwaysFreeze(CommandSender sender, String[] args){
+        if (args.length > 0 && args[0].equalsIgnoreCase("alwaysFreeze")) {
+            Config.Settings.AlwaysFreeze = !Config.Settings.AlwaysFreeze;
+            Config.Settings.save();
+            sender.sendMessage("§e永远限制移动（登录后也不让动）" + (Config.Settings.AlwaysFreeze ? "§a开启" : "§8关闭"));
             return true;
         }
         return false;

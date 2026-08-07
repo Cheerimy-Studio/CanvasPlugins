@@ -15,3 +15,5 @@ CommandWhiteList:
   - /(?i)worldedit cui
 AutoKick: 120
 DeathStateQuitRecordLocation: true
+# 永远限制移动（即使登录完成也不让动）
+AlwaysFreeze: false
