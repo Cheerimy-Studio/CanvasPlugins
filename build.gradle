@@ -3,7 +3,7 @@ plugins {
 }
 
 group = 'com.tntoptimizer'
-version = '2.0.0'
+version = '3.2.0'
 
 repositories {
     mavenCentral()
@@ -16,15 +16,16 @@ dependencies {
 
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
-    options.release = 21
+    options.release = 25
 }
 
 jar {
+    archiveBaseName = 'TNT-Optimizer'
     manifest {
         attributes(
             'Implementation-Title': 'TNT-Optimizer',
             'Implementation-Version': archiveVersion.get(),
-            'Implementation-Vendor': 'TNT-Optimizer Team'
+            'Implementation-Vendor': 'Canvas Core Team'
         )
     }
 }
