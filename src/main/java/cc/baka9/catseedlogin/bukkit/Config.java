@@ -88,6 +88,12 @@ public class Config {
         public static boolean DeathStateQuitRecordLocation;
         // 登录完成后是否继续限制移动（永远冻结）
         public static boolean AlwaysFreeze;
+        // 踢出英文名离线玩家
+        public static boolean KickEnglishOfflineNames;
+        public static String EnglishNameKickMessage;
+        public static List<String> EnglishNameWhitelist = new ArrayList<>();
+        // 正版玩家免注册
+        public static boolean PremiumAllowNoRegister;
 
         public static void load(){
             FileConfiguration config = getConfig("settings.yml");
@@ -112,6 +118,15 @@ public class Config {
             SpawnLocation = str2Location(config.getString("SpawnLocation"));
             DeathStateQuitRecordLocation = config.getBoolean("DeathStateQuitRecordLocation", resourceConfig.getBoolean("DeathStateQuitRecordLocation"));
             AlwaysFreeze = config.getBoolean("AlwaysFreeze", resourceConfig.getBoolean("AlwaysFreeze", false));
+            KickEnglishOfflineNames = config.getBoolean("KickEnglishOfflineNames", resourceConfig.getBoolean("KickEnglishOfflineNames", false));
+            EnglishNameKickMessage = config.getString("EnglishNameKickMessage", resourceConfig.getString("EnglishNameKickMessage", "离线玩家请使用中文名称 ID 登录。"));
+            List<String> englishNameWhitelist = config.getStringList("EnglishNameWhitelist");
+            if (englishNameWhitelist.isEmpty()) {
+                englishNameWhitelist = resourceConfig.getStringList("EnglishNameWhitelist");
+            }
+            EnglishNameWhitelist.clear();
+            EnglishNameWhitelist.addAll(englishNameWhitelist);
+            PremiumAllowNoRegister = config.getBoolean("PremiumAllowNoRegister", resourceConfig.getBoolean("PremiumAllowNoRegister", true));
 
 
         }
@@ -133,6 +148,10 @@ public class Config {
             config.set("CommandWhiteList", CommandWhiteList.stream().map(Pattern::toString).collect(Collectors.toList()));
             config.set("DeathStateQuitRecordLocation", DeathStateQuitRecordLocation);
             config.set("AlwaysFreeze", AlwaysFreeze);
+            config.set("KickEnglishOfflineNames", KickEnglishOfflineNames);
+            config.set("EnglishNameKickMessage", EnglishNameKickMessage);
+            config.set("EnglishNameWhitelist", EnglishNameWhitelist);
+            config.set("PremiumAllowNoRegister", PremiumAllowNoRegister);
             try {
                 config.save(new File(CatSeedLogin.instance.getDataFolder(), "settings.yml"));
             } catch (IOException e) {

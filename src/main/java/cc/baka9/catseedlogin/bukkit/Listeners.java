@@ -18,10 +18,13 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.*;
 
+import java.security.SecureRandom;
 import java.util.Arrays;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
+import java.nio.charset.StandardCharsets;
 
 public class Listeners implements Listener {
 
@@ -70,6 +73,22 @@ public class Listeners implements Listener {
 
     private boolean playerIsNotMinecraftPlayer(Player p){
         return !p.getClass().getName().matches("org\\.bukkit\\.craftbukkit.*?\\.entity\\.CraftPlayer");
+    }
+
+    /**
+     * 检测用户名是否为纯英文（ASCII 字母、数字、下划线组成）。
+     * 中文用户名返回 false。
+     */
+    private boolean isEnglishName(String name) {
+        return name.matches("^[a-zA-Z0-9_]+$");
+    }
+
+    /**
+     * 检测正版玩家：UUID 不等于离线模式 UUID。
+     */
+    private boolean isPremiumPlayer(Player player) {
+        UUID offlineUUID = UUID.nameUUIDFromBytes(("OfflinePlayer:" + player.getName()).getBytes(StandardCharsets.UTF_8));
+        return !offlineUUID.equals(player.getUniqueId());
     }
 
     @EventHandler
@@ -244,16 +263,72 @@ public class Listeners implements Listener {
     public void onPlayerJoin(PlayerJoinEvent event){
         Player p = event.getPlayer();
         Cache.refresh(p.getName());
+        // 正版玩家自动登录（免注册免输入密码）—— 跳过出生点传送
+        if (Config.Settings.PremiumAllowNoRegister && isPremiumPlayer(p)) {
+            Scheduler.runGlobal(CatSeedLogin.instance, () -> {
+                LoginPlayer lp = Cache.getIgnoreCase(p.getName());
+                if (lp == null) {
+                    // 未注册 → 自动生成随机密码并注册
+                    lp = new LoginPlayer(p.getName(), generateRandomPassword());
+                    lp.crypt();
+                    try {
+                        CatSeedLogin.sql.add(lp);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    LoginPlayerHelper.add(lp);
+                } else if (!LoginPlayerHelper.isLogin(p.getName())) {
+                    // 已注册但未登录 → 自动登录
+                    LoginPlayerHelper.add(lp);
+                }
+                LoginPlayerHelper.recordCurrentIP(p, lp);
+            });
+            return;
+        }
         if (Config.Settings.CanTpSpawnLocation) {
             // Folia: 跨世界传送必须用 teleportAsync（异步），同步 teleport 会阻塞区域线程
             Scheduler.safeTeleport(p, Config.Settings.SpawnLocation);
         }
     }
 
+    private static final SecureRandom SECURE_RANDOM = new SecureRandom();
+    private static final String PASSWORD_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+    private static String generateRandomPassword() {
+        StringBuilder sb = new StringBuilder(16);
+        for (int i = 0; i < 16; i++) {
+            sb.append(PASSWORD_CHARS.charAt(SECURE_RANDOM.nextInt(PASSWORD_CHARS.length())));
+        }
+        return sb.toString();
+    }
+
     //id只能下划线字母数字
     @EventHandler
     public void onPlayerPreLogin(AsyncPlayerPreLoginEvent event){
         String name = event.getName();
+
+        // 英文名离线玩家踢出检测
+        if (Config.Settings.KickEnglishOfflineNames && isEnglishName(name)) {
+            // 白名单内放行
+            if (!Config.Settings.EnglishNameWhitelist.contains(name)) {
+                // 正版玩家放行（UUID 不等于离线 UUID）
+                if (Config.Settings.PremiumAllowNoRegister) {
+                    UUID offlineUUID = UUID.nameUUIDFromBytes(("OfflinePlayer:" + name).getBytes(StandardCharsets.UTF_8));
+                    if (!offlineUUID.equals(event.getUniqueId())) {
+                        // 正版玩家，放行
+                    } else {
+                        event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_OTHER,
+                                Config.Settings.EnglishNameKickMessage);
+                        return;
+                    }
+                } else {
+                    event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_OTHER,
+                            Config.Settings.EnglishNameKickMessage);
+                    return;
+                }
+            }
+        }
+
         if (Config.Settings.LimitChineseID) {
             if (!name.matches("^\\w+$")) {
                 event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_OTHER,

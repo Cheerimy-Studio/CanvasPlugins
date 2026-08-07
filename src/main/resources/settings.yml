@@ -17,3 +17,13 @@ AutoKick: 120
 DeathStateQuitRecordLocation: true
 # 永远限制移动（即使登录完成也不让动）
 AlwaysFreeze: false
+# 踢出英文名离线玩家（离线玩家请使用中文名称登录）
+KickEnglishOfflineNames: true
+# 踢出提示信息
+EnglishNameKickMessage: "离线玩家请使用中文名称 ID 登录。"
+# 英文名白名单（允许使用英文名称登录，但仍需注册）
+EnglishNameWhitelist:
+  - Notch
+  - Steve
+# 正版玩家允许使用英文名（直接免注册登录）
+PremiumAllowNoRegister: true
