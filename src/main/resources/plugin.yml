@@ -1,12 +1,12 @@
 name: TNT-Optimizer
-version: '3.3.0'
+version: '4.0.0'
 main: com.tntoptimizer.TNTOptimizer
 api-version: '1.21'
 folia-supported: true
 description: >-
-  Canvas Core TNT 爆炸优化 — 异步射线追踪 + 空间聚类 + 跨区域并行写回。
-  基于 Minecraft 26.2 反编译验证的爆炸机制，完全还原原版体验。
-  兼容 Canvas/Folia 26.2 及所有依赖 EntityExplodeEvent 的 TNT 类插件。
+  Canvas Core TNT 爆炸优化 �?异步射线追踪 + 空间聚类 + 跨区域并行写回�?
+  基于 Minecraft 26.2 反编译验证的爆炸机制，完全还原原版体验�?
+  兼容 Canvas/Folia 26.2 及所有依�?EntityExplodeEvent �?TNT 类插件�?
 author: Cheerimy
 website: https://github.com/Cheerimy-Studio/CanvasPlugins
 
@@ -17,6 +17,6 @@ permissions:
 
 commands:
   tntoptimizer:
-    description: TNT-Optimizer 主命令
+    description: TNT-Optimizer 主命�?
     usage: /tntoptimizer reload|status|benchmark
     permission: tntoptimizer.admin
