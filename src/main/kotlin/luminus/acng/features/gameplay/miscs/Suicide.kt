@@ -1,4 +1,4 @@
-﻿package luminus.acng.features.gameplay.miscs
+package luminus.acng.features.gameplay.miscs
 
 import luminus.acng.Main.config
 import luminus.acng.msg

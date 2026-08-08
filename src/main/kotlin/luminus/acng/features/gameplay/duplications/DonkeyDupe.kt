@@ -1,4 +1,4 @@
-﻿package luminus.acng.features.gameplay.duplications
+package luminus.acng.features.gameplay.duplications
 
 import luminus.acng.Main.config
 import org.bukkit.Bukkit
