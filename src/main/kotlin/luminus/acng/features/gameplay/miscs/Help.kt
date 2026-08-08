@@ -82,7 +82,7 @@ object Help {
 
     private fun suicideText(): String {
         return if (config.getBoolean("suicide-enable", true)) {
-            "&e/suicide &7(或 &e/514&7, &e/kill&7) — 自杀"
+            "&e/suicide &7(或 &e/514&7) — 自杀"
         } else ""
     }
 
