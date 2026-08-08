@@ -1,6 +1,7 @@
-IpRegisterCountLimit: 2
-IpCountLimit: 2
-LimitChineseID: true
+IpRegisterCountLimit: -1
+IpCountLimit: -1
+# 限制中文ID（false=允许中文名称）
+LimitChineseID: false
 MinLengthID: 2
 MaxLengthID: 15
 BeforeLoginNoDamage: true
@@ -13,12 +14,12 @@ CommandWhiteList:
   - /(?i)resetpassword?(\z| .*)
   - /(?i)repw?(\z| .*)
   - /(?i)worldedit cui
-AutoKick: 120
+AutoKick: -1
 DeathStateQuitRecordLocation: true
 # 永远限制移动（即使登录完成也不让动）
 AlwaysFreeze: false
-# 踢出英文名离线玩家（离线玩家请使用中文名称登录）
-KickEnglishOfflineNames: true
+# 踢出英文名离线玩家（false=不踢人，交给代理端处理）
+KickEnglishOfflineNames: false
 # 踢出提示信息
 EnglishNameKickMessage: "离线玩家请使用中文名称 ID 登录。"
 # 英文名白名单（允许使用英文名称登录，但仍需注册）
@@ -27,3 +28,7 @@ EnglishNameWhitelist:
   - Steve
 # 正版玩家允许使用英文名（直接免注册登录）
 PremiumAllowNoRegister: true
+# 是否在 Velocity/BungeeCord 代理后运行
+# true = 英文名检测由代理端处理（UUID 可靠），后端跳过
+# 代理端 velocity.properties 中 KickEnglishOfflineNames=true 时正版检测 100% 准确
+BehindProxy: true
