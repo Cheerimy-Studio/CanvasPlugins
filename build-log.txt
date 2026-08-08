@@ -1,0 +1,201 @@
+﻿mvn.cmd : WARNING: A terminally deprecated method in sun.misc.Unsafe has been called
+所在位置 行:11 字符: 147
++ ... .0.1:7890"; & "$env:USERPROFILE\apache-maven-3.9.11\bin\mvn.cmd" -B p ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (WARNING: A term...has been called:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+WARNING: sun.misc.Unsafe::staticFieldBase has been called by com.google.inject.internal.aop.HiddenClassDefiner (file:/C
+:/Users/PC/apache-maven-3.9.11/lib/guice-5.1.0-classes.jar)
+WARNING: Please consider reporting this to the maintainers of class com.google.inject.internal.aop.HiddenClassDefiner
+WARNING: sun.misc.Unsafe::staticFieldBase will be removed in a future release
+[INFO] Scanning for projects...
+[INFO] ------------------------------------------------------------------------
+[INFO] Reactor Build Order:
+[INFO] 
+[INFO] NoCheatPlus Parent                                                 [pom]
+[INFO] NCPBuildBase                                                       [jar]
+[INFO] NCPCommons                                                         [jar]
+[INFO] NCPLegacy                                                          [pom]
+[INFO] LegacyBukkitAPI                                                    [jar]
+[INFO] ModernBukkitAPI                                                    [jar]
+[INFO] NCPBukkitAPIAggregated                                             [pom]
+[INFO] NCPCore                                                            [jar]
+[INFO] NCPCompatBukkit                                                    [jar]
+[INFO] NCPCompatProtocolLib                                               [jar]
+[INFO] NCPPlugin                                                          [jar]
+[INFO] NoCheatPlus                                                        [jar]
+[INFO] 
+[INFO] -----------------< fr.neatmonster:nocheatplus-parent >------------------
+[INFO] Building NoCheatPlus Parent 1.1-SNAPSHOT                          [1/12]
+[INFO]   from pom.xml
+[INFO] --------------------------------[ pom ]---------------------------------
+[INFO] 
+[INFO] --------------------< fr.neatmonster:ncpbuildbase >---------------------
+[INFO] Building NCPBuildBase 1.1-SNAPSHOT                                [2/12]
+[INFO]   from NCPBuildBase\pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ ncpbuildbase ---
+[INFO] Copying 1 resource from src\main\resources to target\classes
+[INFO] The encoding used to copy filtered properties files have not been set. This means that the same encoding will be used to copy filtered properties files as when copying other filtered resources. This might not be what you want! Run your build with --debug to see which files might be affected. Read more at https://maven.apache.org/plugins/maven-resources-plugin/examples/filtering-properties-files.html
+[INFO] 
+[INFO] --- compiler:3.8.1:compile (default-compile) @ ncpbuildbase ---
+[INFO] Nothing to compile - all classes are up to date
+[INFO] 
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ ncpbuildbase ---
+[INFO] skip non existing resourceDirectory C:\Users\PC\Downloads\CopyPlugin\NCP\NCPBuildBase\src\test\resources
+[INFO] 
+[INFO] --- compiler:3.8.1:testCompile (default-testCompile) @ ncpbuildbase ---
+[INFO] No sources to compile
+[INFO] 
+[INFO] --- surefire:3.2.5:test (default-test) @ ncpbuildbase ---
+[INFO] Tests are skipped.
+[INFO] 
+[INFO] --- jar:3.4.1:jar (default-jar) @ ncpbuildbase ---
+[INFO] 
+[INFO] ---------------------< fr.neatmonster:ncpcommons >----------------------
+[INFO] Building NCPCommons 1.1-SNAPSHOT                                  [3/12]
+[INFO]   from NCPCommons\pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ ncpcommons ---
+[INFO] skip non existing resourceDirectory C:\Users\PC\Downloads\CopyPlugin\NCP\NCPCommons\src\main\resources
+[INFO] 
+[INFO] --- compiler:3.8.1:compile (default-compile) @ ncpcommons ---
+[INFO] Changes detected - recompiling the module!
+[INFO] Compiling 76 source files to C:\Users\PC\Downloads\CopyPlugin\NCP\NCPCommons\target\classes
+[INFO] /C:/Users/PC/Downloads/CopyPlugin/NCP/NCPCommons/src/main/java/fr/neatmonster/nocheatplus/utilities/ReflectionUtil.java: C:\Users\PC\Downloads\CopyPlugin\NCP\NCPCommons\src\main\java\fr\neatmonster\nocheatplus\utilities\ReflectionUtil.java使用或覆盖了已过时的 API。
+[INFO] /C:/Users/PC/Downloads/CopyPlugin/NCP/NCPCommons/src/main/java/fr/neatmonster/nocheatplus/utilities/ReflectionUtil.java: 有关详细信息, 请使用 -Xlint:deprecation 重新编译。
+[INFO] 
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ ncpcommons ---
+[INFO] skip non existing resourceDirectory C:\Users\PC\Downloads\CopyPlugin\NCP\NCPCommons\src\test\resources
+[INFO] 
+[INFO] --- compiler:3.8.1:testCompile (default-testCompile) @ ncpcommons ---
+[INFO] Changes detected - recompiling the module!
+[INFO] Compiling 9 source files to C:\Users\PC\Downloads\CopyPlugin\NCP\NCPCommons\target\test-classes
+[INFO] 
+[INFO] --- surefire:3.2.5:test (default-test) @ ncpcommons ---
+[INFO] Tests are skipped.
+[INFO] 
+[INFO] --- jar:3.4.1:jar (default-jar) @ ncpcommons ---
+[INFO] Building jar: C:\Users\PC\Downloads\CopyPlugin\NCP\NCPCommons\target\ncpcommons-1.1-SNAPSHOT.jar
+[INFO] 
+[INFO] ----------------------< fr.neatmonster:ncplegacy >----------------------
+[INFO] Building NCPLegacy 1.1-SNAPSHOT                                   [4/12]
+[INFO]   from NCPLegacy\pom.xml
+[INFO] --------------------------------[ pom ]---------------------------------
+[INFO] 
+[INFO] -------------------< fr.neatmonster:ncplegacybukkit >-------------------
+[INFO] Building LegacyBukkitAPI 1.1-SNAPSHOT                             [5/12]
+[INFO]   from NCPLegacy\LegacyBukkitAPI\pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ ncplegacybukkit ---
+[INFO] skip non existing resourceDirectory C:\Users\PC\Downloads\CopyPlugin\NCP\NCPLegacy\LegacyBukkitAPI\src\main\resources
+[INFO] 
+[INFO] --- compiler:3.8.1:compile (default-compile) @ ncplegacybukkit ---
+[INFO] Nothing to compile - all classes are up to date
+[INFO] 
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ ncplegacybukkit ---
+[INFO] skip non existing resourceDirectory C:\Users\PC\Downloads\CopyPlugin\NCP\NCPLegacy\LegacyBukkitAPI\src\test\resources
+[INFO] 
+[INFO] --- compiler:3.8.1:testCompile (default-testCompile) @ ncplegacybukkit ---
+[INFO] No sources to compile
+[INFO] 
+[INFO] --- surefire:3.2.5:test (default-test) @ ncplegacybukkit ---
+[INFO] Tests are skipped.
+[INFO] 
+[INFO] --- jar:3.4.1:jar (default-jar) @ ncplegacybukkit ---
+[INFO] 
+[INFO] -------------------< fr.neatmonster:ncpmodernbukkit >-------------------
+[INFO] Building ModernBukkitAPI 1.1-SNAPSHOT                             [6/12]
+[INFO]   from NCPLegacy\ModernBukkitAPI\pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ ncpmodernbukkit ---
+[INFO] skip non existing resourceDirectory C:\Users\PC\Downloads\CopyPlugin\NCP\NCPLegacy\ModernBukkitAPI\src\main\resources
+[INFO] 
+[INFO] --- compiler:3.8.1:compile (default-compile) @ ncpmodernbukkit ---
+[INFO] Nothing to compile - all classes are up to date
+[INFO] 
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ ncpmodernbukkit ---
+[INFO] skip non existing resourceDirectory C:\Users\PC\Downloads\CopyPlugin\NCP\NCPLegacy\ModernBukkitAPI\src\test\resources
+[INFO] 
+[INFO] --- compiler:3.8.1:testCompile (default-testCompile) @ ncpmodernbukkit ---
+[INFO] No sources to compile
+[INFO] 
+[INFO] --- surefire:3.2.5:test (default-test) @ ncpmodernbukkit ---
+[INFO] Tests are skipped.
+[INFO] 
+[INFO] --- jar:3.4.1:jar (default-jar) @ ncpmodernbukkit ---
+[INFO] 
+[INFO] ---------------< fr.neatmonster:ncpbukkitapiaggregated >----------------
+[INFO] Building NCPBukkitAPIAggregated 1.1-SNAPSHOT                      [7/12]
+[INFO]   from NCPLegacy\NCPBukkitAPIAggregated\pom.xml
+[INFO] --------------------------------[ pom ]---------------------------------
+[INFO] 
+[INFO] -----------------------< fr.neatmonster:ncpcore >-----------------------
+[INFO] Building NCPCore 1.1-SNAPSHOT                                     [8/12]
+[INFO]   from NCPCore\pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ ncpcore ---
+[INFO] skip non existing resourceDirectory C:\Users\PC\Downloads\CopyPlugin\NCP\NCPCore\src\main\resources
+[INFO] 
+[INFO] --- compiler:3.8.1:compile (default-compile) @ ncpcore ---
+[INFO] Changes detected - recompiling the module!
+[INFO] Compiling 488 source files to C:\Users\PC\Downloads\CopyPlugin\NCP\NCPCore\target\classes
+[INFO] -------------------------------------------------------------
+[ERROR] COMPILATION ERROR : 
+[INFO] -------------------------------------------------------------
+[ERROR] /C:/Users/PC/Downloads/CopyPlugin/NCP/NCPCore/src/main/java/fr/neatmonster/nocheatplus/config/DefaultConfig.java:[1,1] 非法字符: '\ufeff'
+[ERROR] /C:/Users/PC/Downloads/CopyPlugin/NCP/NCPCore/src/main/java/fr/neatmonster/nocheatplus/config/DefaultConfig.java:[15,9] 需要class, interface或enum
+[ERROR] /C:/Users/PC/Downloads/CopyPlugin/NCP/NCPCore/src/main/java/fr/neatmonster/nocheatplus/config/DefaultConfig.java:[17,1] 需要class, interface或enum
+[ERROR] /C:/Users/PC/Downloads/CopyPlugin/NCP/NCPCore/src/main/java/fr/neatmonster/nocheatplus/config/DefaultConfig.java:[18,1] 需要class, interface或enum
+[ERROR] /C:/Users/PC/Downloads/CopyPlugin/NCP/NCPCore/src/main/java/fr/neatmonster/nocheatplus/config/DefaultConfig.java:[20,1] 需要class, interface或enum
+[ERROR] /C:/Users/PC/Downloads/CopyPlugin/NCP/NCPCore/src/main/java/fr/neatmonster/nocheatplus/config/DefaultConfig.java:[22,1] 需要class, interface或enum
+[ERROR] /C:/Users/PC/Downloads/CopyPlugin/NCP/NCPCore/src/main/java/fr/neatmonster/nocheatplus/config/DefaultConfig.java:[23,1] 需要class, interface或enum
+[ERROR] /C:/Users/PC/Downloads/CopyPlugin/NCP/NCPCore/src/main/java/fr/neatmonster/nocheatplus/config/DefaultConfig.java:[24,1] 需要class, interface或enum
+[INFO] 8 errors 
+[INFO] -------------------------------------------------------------
+[INFO] ------------------------------------------------------------------------
+[INFO] Reactor Summary:
+[INFO] 
+[INFO] NoCheatPlus Parent 1.1-SNAPSHOT .................... SUCCESS [  0.001 s]
+[INFO] NCPBuildBase 1.1-SNAPSHOT .......................... SUCCESS [  0.956 s]
+[INFO] NCPCommons 1.1-SNAPSHOT ............................ SUCCESS [  1.316 s]
+[INFO] NCPLegacy 1.1-SNAPSHOT ............................. SUCCESS [  0.001 s]
+[INFO] LegacyBukkitAPI 1.1-SNAPSHOT ....................... SUCCESS [  0.071 s]
+[INFO] ModernBukkitAPI 1.1-SNAPSHOT ....................... SUCCESS [  0.072 s]
+[INFO] NCPBukkitAPIAggregated 1.1-SNAPSHOT ................ SUCCESS [  0.000 s]
+[INFO] NCPCore 1.1-SNAPSHOT ............................... FAILURE [  0.611 s]
+[INFO] NCPCompatBukkit 1.1-SNAPSHOT ....................... SKIPPED
+[INFO] NCPCompatProtocolLib 1.1-SNAPSHOT .................. SKIPPED
+[INFO] NCPPlugin 1.1-SNAPSHOT ............................. SKIPPED
+[INFO] NoCheatPlus 3.17.1-SNAPSHOT ........................ SKIPPED
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  3.150 s
+[INFO] Finished at: 2026-08-08T18:12:45+08:00
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-compiler-plugin:3.8.1:compile (default-compile) on project ncpcore: Compilation failure: Compilation failure: 
+[ERROR] /C:/Users/PC/Downloads/CopyPlugin/NCP/NCPCore/src/main/java/fr/neatmonster/nocheatplus/config/DefaultConfig.java:[1,1] 非法字符: '\ufeff'
+[ERROR] /C:/Users/PC/Downloads/CopyPlugin/NCP/NCPCore/src/main/java/fr/neatmonster/nocheatplus/config/DefaultConfig.java:[15,9] 需要class, interface或enum
+[ERROR] /C:/Users/PC/Downloads/CopyPlugin/NCP/NCPCore/src/main/java/fr/neatmonster/nocheatplus/config/DefaultConfig.java:[17,1] 需要class, interface或enum
+[ERROR] /C:/Users/PC/Downloads/CopyPlugin/NCP/NCPCore/src/main/java/fr/neatmonster/nocheatplus/config/DefaultConfig.java:[18,1] 需要class, interface或enum
+[ERROR] /C:/Users/PC/Downloads/CopyPlugin/NCP/NCPCore/src/main/java/fr/neatmonster/nocheatplus/config/DefaultConfig.java:[20,1] 需要class, interface或enum
+[ERROR] /C:/Users/PC/Downloads/CopyPlugin/NCP/NCPCore/src/main/java/fr/neatmonster/nocheatplus/config/DefaultConfig.java:[22,1] 需要class, interface或enum
+[ERROR] /C:/Users/PC/Downloads/CopyPlugin/NCP/NCPCore/src/main/java/fr/neatmonster/nocheatplus/config/DefaultConfig.java:[23,1] 需要class, interface或enum
+[ERROR] /C:/Users/PC/Downloads/CopyPlugin/NCP/NCPCore/src/main/java/fr/neatmonster/nocheatplus/config/DefaultConfig.java:[24,1] 需要class, interface或enum
+[ERROR] -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoFailureException
+[ERROR] 
+[ERROR] After correcting the problems, you can resume the build with the command
+[ERROR]   mvn <args> -rf :ncpcore
