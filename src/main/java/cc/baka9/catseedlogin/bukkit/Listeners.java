@@ -84,11 +84,21 @@ public class Listeners implements Listener {
     }
 
     /**
-     * 检测正版玩家：UUID 不等于离线模式 UUID。
+     * 检测正版玩家：通过 Mojang API 查询正版账号是否存在。
+     * 在 online-mode=false 代理模式下 UUID 全部是离线 UUID，因此必须用 API 查询。
      */
     private boolean isPremiumPlayer(Player player) {
-        UUID offlineUUID = UUID.nameUUIDFromBytes(("OfflinePlayer:" + player.getName()).getBytes(StandardCharsets.UTF_8));
-        return !offlineUUID.equals(player.getUniqueId());
+        try {
+            java.net.URL url = new java.net.URL(
+                "https://api.mojang.com/users/profiles/minecraft/" + player.getName());
+            java.net.HttpURLConnection conn = (java.net.HttpURLConnection) url.openConnection();
+            conn.setConnectTimeout(3000);
+            conn.setReadTimeout(3000);
+            conn.setRequestMethod("GET");
+            return conn.getResponseCode() == 200;
+        } catch (Exception ignored) {
+            return false;
+        }
     }
 
     @EventHandler
