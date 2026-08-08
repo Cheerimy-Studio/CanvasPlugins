@@ -1,4 +1,4 @@
-package luminus.acng.features.gameplay.duplications
+﻿package luminus.acng.features.gameplay.duplications
 
 import luminus.acng.Main.config
 import org.bukkit.Bukkit
@@ -15,7 +15,7 @@ import java.util.function.Consumer
 
 object DonkeyDupe {
     /**
-     * Xin 模式：击杀驮兽时掉落其库存
+     * Xin 妯″紡锛氬嚮鏉€椹吔鏃舵帀钀藉叾搴撳瓨
      */
     object XinMode {
         @SubscribeEvent
@@ -23,7 +23,7 @@ object DonkeyDupe {
             if (!config.getBoolean("duplication.donkey.xin-mode", false)) return
             if (event.entity !is AbstractHorse) return
             val killer = event.entity.killer ?: return
-            if (!killer.hasPermission("core.dupe.donkey.xin")) return
+            if (!killer.hasPermission("2b2tcore.dupe.donkey.xin")) return
 
             val entity = event.entity as AbstractHorse
             entity.inventory.contents.forEach { item ->
@@ -35,14 +35,14 @@ object DonkeyDupe {
     }
 
     /**
-     * Org 模式：骑乘驮兽下线时复制其库存
+     * Org 妯″紡锛氶獞涔橀┊鍏戒笅绾挎椂澶嶅埗鍏跺簱瀛?
      */
     object OrgMode {
         @SubscribeEvent
         fun onPlayerQuit(event: PlayerQuitEvent) {
             if (!config.getBoolean("duplication.donkey.org-mode", false)) return
             val player = event.player
-            if (!player.hasPermission("core.dupe.donkey.org")) return
+            if (!player.hasPermission("2b2tcore.dupe.donkey.org")) return
             val vehicle = player.vehicle ?: return
 
             if (config.getBoolean("duplication.donkey.org-mode-allow-boat-chain", false)) {
@@ -53,7 +53,7 @@ object DonkeyDupe {
         }
 
         /**
-         * 处理船链：船上的乘客可能是驮兽
+         * 澶勭悊鑸归摼锛氳埞涓婄殑涔樺鍙兘鏄┊鍏?
          */
         private fun processVehicleChain(entity: Entity) {
             if (entity is Boat) {
@@ -79,8 +79,8 @@ object DonkeyDupe {
         }
 
         /**
-         * 复制驮兽库存给所有正在查看的玩家
-         * closeInventory / openInventory 通过 EntityScheduler 调度到玩家线程
+         * 澶嶅埗椹吔搴撳瓨缁欐墍鏈夋鍦ㄦ煡鐪嬬殑鐜╁
+         * closeInventory / openInventory 閫氳繃 EntityScheduler 璋冨害鍒扮帺瀹剁嚎绋?
          */
         private fun AbstractHorse.duplicateInventoryForViewers() {
             val originalInventory = inventory
@@ -120,3 +120,4 @@ object DonkeyDupe {
         }
     }
 }
+

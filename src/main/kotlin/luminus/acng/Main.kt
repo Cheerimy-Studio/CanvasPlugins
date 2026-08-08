@@ -50,7 +50,7 @@ object Main : Plugin() {
         info("§aGitHub: §b$GITHUB_REPO")
     }
 
-    @CommandHeader("core", permission = "core.reload", permissionDefault = PermissionDefault.OP)
+    @CommandHeader("core", permission = "2b2tcore.reload", permissionDefault = PermissionDefault.OP)
     object CommandMain {
         @CommandBody
         val info = subCommand {

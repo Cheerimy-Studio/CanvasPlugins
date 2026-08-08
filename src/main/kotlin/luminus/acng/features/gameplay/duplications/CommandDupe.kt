@@ -9,7 +9,7 @@ import taboolib.common.platform.command.PermissionDefault
 import taboolib.common.platform.command.simpleCommand
 
 /**
- * 命令复制：执行 /dupe 复制手持物品（权限：core.dupe.command，默认仅 OP）
+ * 命令复制：执行 /dupe 复制手持物品（权限：2b2tcore.dupe.command，默认仅 OP）
  * simpleCommand 在玩家区域线程执行，库存操作和掉落同步执行，Folia 安全
  */
 object CommandDupe {
@@ -20,7 +20,7 @@ object CommandDupe {
 
         simpleCommand(
             "dupe",
-            permission = "core.dupe.command",
+            permission = "2b2tcore.dupe.command",
             permissionDefault = PermissionDefault.OP
         ) { sender, _ ->
             if (sender !is Player) return@simpleCommand

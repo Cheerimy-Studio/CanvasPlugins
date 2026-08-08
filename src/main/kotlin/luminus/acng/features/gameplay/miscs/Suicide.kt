@@ -1,4 +1,4 @@
-package luminus.acng.features.gameplay.miscs
+﻿package luminus.acng.features.gameplay.miscs
 
 import luminus.acng.Main.config
 import luminus.acng.msg
@@ -10,9 +10,9 @@ import taboolib.common.platform.command.simpleCommand
 import taboolib.platform.BukkitPlugin
 
 /**
- * 自杀命令：/suicide（别名 514）（权限：core.suicide，默认仅 OP）
- * 不再注册 /kill（与原版冲突导致别名 514 失效）
- * 所有玩家（含 OP）统一用 EntityScheduler 设置 health = 0，Folia 线程安全
+ * 鑷潃鍛戒护锛?suicide锛堝埆鍚?514锛夛紙鏉冮檺锛歝ore.suicide锛岄粯璁や粎 OP锛?
+ * 涓嶅啀娉ㄥ唽 /kill锛堜笌鍘熺増鍐茬獊瀵艰嚧鍒悕 514 澶辨晥锛?
+ * 鎵€鏈夌帺瀹讹紙鍚?OP锛夌粺涓€鐢?EntityScheduler 璁剧疆 health = 0锛孎olia 绾跨▼瀹夊叏
  */
 object Suicide {
     @Awake(LifeCycle.ENABLE)
@@ -20,7 +20,7 @@ object Suicide {
         simpleCommand(
             "suicide",
             aliases = arrayListOf("514"),
-            permission = "core.suicide",
+            permission = "2b2tcore.suicide",
             permissionDefault = PermissionDefault.OP
         ) { sender, _ ->
             if (!config.getBoolean("suicide-enable", true)) return@simpleCommand
@@ -33,3 +33,4 @@ object Suicide {
         }
     }
 }
+

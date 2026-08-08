@@ -1,4 +1,4 @@
-package luminus.acng.features.gameplay.duplications
+﻿package luminus.acng.features.gameplay.duplications
 
 import luminus.acng.Main.config
 import org.bukkit.entity.ItemFrame
@@ -7,14 +7,14 @@ import org.bukkit.event.player.PlayerInteractEntityEvent
 import java.util.concurrent.ThreadLocalRandom
 
 /**
- * 物品展示框复制：旋转展示框时有概率掉落其内物品（权限：core.dupe.item-frame）
+ * 鐗╁搧灞曠ず妗嗗鍒讹細鏃嬭浆灞曠ず妗嗘椂鏈夋鐜囨帀钀藉叾鍐呯墿鍝侊紙鏉冮檺锛歝ore.dupe.item-frame锛?
  */
 object ItemFrameDupe {
 
     @SubscribeEvent
     fun onRotate(event: PlayerInteractEntityEvent) {
         if (!config.getBoolean("duplication.item-frame.enable")) return
-        if (!event.player.hasPermission("core.dupe.item-frame")) return
+        if (!event.player.hasPermission("2b2tcore.dupe.item-frame")) return
 
         val entity = event.rightClicked
         if (entity !is ItemFrame) return
@@ -27,3 +27,4 @@ object ItemFrameDupe {
         entity.world.dropItem(entity.location, item.clone())
     }
 }
+

@@ -1,77 +1,85 @@
-# 2B2TCore 配置文件
-# 适用核心：Folia / Canvas（26.2）
-# 所有功能均已在区域线程内同步执行，符合 Folia 线程安全规则
+﻿# 2B2TCore 閰嶇疆鏂囦欢
+# 閫傜敤鏍稿績锛欶olia / Canvas锛?6.2锛?
+# 鎵€鏈夊姛鑳藉潎宸插湪鍖哄煙绾跨▼鍐呭悓姝ユ墽琛岋紝绗﹀悎 Folia 绾跨▼瀹夊叏瑙勫垯
 # GitHub: https://github.com/Cheerimy-Studio/CanvasPlugins
 
-# 配置版本号（请勿手动修改，由插件自动管理）
+# 閰嶇疆鐗堟湰鍙凤紙璇峰嬁鎵嬪姩淇敼锛岀敱鎻掍欢鑷姩绠＄悊锛?
 config-ver: 6
 
-# ===================== 复制功能 =====================
+# ===================== 澶嶅埗鍔熻兘 =====================
 duplication:
-  # 命令复制：通过 /dupe 复制手持物品（权限：core.dupe.command）
+  # 鍛戒护澶嶅埗锛氶€氳繃 /dupe 澶嶅埗鎵嬫寔鐗╁搧锛堟潈闄愶細2b2tcore.dupe.command锛?
   command:
     enable: true
-    multiply-times: 2  # 复制倍数
-    max-amount: 2333   # 单次复制数量上限
+    multiply-times: 2  # 澶嶅埗鍊嶆暟
+    max-amount: 2333   # 鍗曟澶嶅埗鏁伴噺涓婇檺
 
-  # 物品展示框复制：旋转展示框时有概率掉落其内物品（权限：core.dupe.item-frame）
+  # 鐗╁搧灞曠ず妗嗗鍒讹細鏃嬭浆灞曠ず妗嗘椂鏈夋鐜囨帀钀藉叾鍐呯墿鍝侊紙鏉冮檺锛歝ore.dupe.item-frame锛?
   item-frame:
     enable: false
-    possibility: 10  # 触发概率（百分比，0-100）
+    possibility: 10  # 瑙﹀彂姒傜巼锛堢櫨鍒嗘瘮锛?-100锛?
 
-  # 鸡刷复制
+  # 楦″埛澶嶅埗
   chicken:
-    # Xin 模式：将潜影盒存入鸡中，每隔指定分钟数掉落（权限：core.dupe.chicken.xin）
+    # Xin 妯″紡锛氬皢娼滃奖鐩掑瓨鍏ラ浮涓紝姣忛殧鎸囧畾鍒嗛挓鏁版帀钀斤紙鏉冮檺锛歝ore.dupe.chicken.xin锛?
     xin-mode: false
-    xin-mode-interval: 15        # 每隔多少分钟刷新一次
-    xin-mode-max-per-chunk: 3   # 每个区块最多几只有效鸡（超出的显示浓烟，不刷物）
-    # 点击模式：右键鸡时复制手持物品（权限：core.dupe.chicken.click）
+    xin-mode-interval: 15        # 姣忛殧澶氬皯鍒嗛挓鍒锋柊涓€娆?
+    xin-mode-max-per-chunk: 3   # 姣忎釜鍖哄潡鏈€澶氬嚑鍙湁鏁堥浮锛堣秴鍑虹殑鏄剧ず娴撶儫锛屼笉鍒风墿锛?
+    # 鐐瑰嚮妯″紡锛氬彸閿浮鏃跺鍒舵墜鎸佺墿鍝侊紙鏉冮檺锛歝ore.dupe.chicken.click锛?
     click-mode: false
-    click-mode-cooldown: 3  # 冷却时间（秒）
+    click-mode-cooldown: 3  # 鍐峰嵈鏃堕棿锛堢锛?
 
-  # 驴复制
+  # 椹村鍒?
   donkey:
-    # Xin 模式：击杀驮兽时掉落其库存（权限：core.dupe.donkey.xin）
+    # Xin 妯″紡锛氬嚮鏉€椹吔鏃舵帀钀藉叾搴撳瓨锛堟潈闄愶細2b2tcore.dupe.donkey.xin锛?
     xin-mode: false
-    # Org 模式：骑乘驮兽下线时复制其库存（权限：core.dupe.donkey.org）
+    # Org 妯″紡锛氶獞涔橀┊鍏戒笅绾挎椂澶嶅埗鍏跺簱瀛橈紙鏉冮檺锛歝ore.dupe.donkey.org锛?
     org-mode: false
-    # Org 模式下是否允许处理船链上的驮兽
+    # Org 妯″紡涓嬫槸鍚﹀厑璁稿鐞嗚埞閾句笂鐨勯┊鍏?
     org-mode-allow-boat-chain: false
 
-  # 破坏放置复制：累计破坏潜影盒到指定次数时复制（权限：core.dupe.mine-and-place）
+  # 鐮村潖鏀剧疆澶嶅埗锛氱疮璁＄牬鍧忔綔褰辩洅鍒版寚瀹氭鏁版椂澶嶅埗锛堟潈闄愶細2b2tcore.dupe.mine-and-place锛?
   mine-and-place:
     enable: false
-    amount: 10  # 触发复制所需破坏次数
+    amount: 10  # 瑙﹀彂澶嶅埗鎵€闇€鐮村潖娆℃暟
 
-# ===================== 自杀命令 =====================
-# 启用后玩家可使用 /suicide（别名 514、kill）自杀（权限：core.suicide，默认允许）
+# ===================== 鑷潃鍛戒护 =====================
+# 鍚敤鍚庣帺瀹跺彲浣跨敤 /suicide锛堝埆鍚?514銆乲ill锛夎嚜鏉€锛堟潈闄愶細2b2tcore.suicide锛岄粯璁ゅ厑璁革級
 suicide-enable: true
 
-# ===================== 聊天颜色（需安装 PistonChat） =====================
-# 未安装 PistonChat 时本段无效，不会触发其事件类加载
+
+# ===================== 出生点随机传送 =====================
+# 新玩家首次加入时随机传送到世界出生点周围，并获得一定时间无敌
+spawn:
+  enable: true                # 总开关，false 则关闭出生点随机传送
+  radius: 500                 # 随机传送范围（出生点 ± N 格内）
+  invulnerability-seconds: 10  # 新玩家无敌时间（秒，0 则不给）
+
+# ===================== 鑱婂ぉ棰滆壊锛堥渶瀹夎 PistonChat锛?=====================
+# 鏈畨瑁?PistonChat 鏃舵湰娈垫棤鏁堬紝涓嶄細瑙﹀彂鍏朵簨浠剁被鍔犺浇
 chat-color:
-  enable: false  # 总开关
-  # 默认颜色：当玩家不匹配任何权限组时使用，留空表示不修改原颜色
-  # 支持 & 代码（如 &7）、#RRGGBB（如 #AAAAAA）
+  enable: false  # 鎬诲紑鍏?
+  # 榛樿棰滆壊锛氬綋鐜╁涓嶅尮閰嶄换浣曟潈闄愮粍鏃朵娇鐢紝鐣欑┖琛ㄧず涓嶄慨鏀瑰師棰滆壊
+  # 鏀寔 & 浠ｇ爜锛堝 &7锛夈€?RRGGBB锛堝 #AAAAAA锛?
   default-color: "&7"
-  # 权限组：自上而下匹配，首个命中的权限组生效
+  # 鏉冮檺缁勶細鑷笂鑰屼笅鍖归厤锛岄涓懡涓殑鏉冮檺缁勭敓鏁?
   groups:
     vip:
-      permission: "core.chatcolor.vip"
+      permission: "2b2tcore.chatcolor.vip"
       color: "&e"
     op:
-      permission: "core.chatcolor.op"
+      permission: "2b2tcore.chatcolor.op"
       color: "&c"
 
-# ===================== 消息文本 =====================
-# 支持旧版 & 颜色代码
+# ===================== 娑堟伅鏂囨湰 =====================
+# 鏀寔鏃х増 & 棰滆壊浠ｇ爜
 messages:
-  success-dupe: "&e&l成功复制物品！"
-  no-item: "&c你必须手持一个物品才能复制！"
-  suicide: "&7你已自杀。"
-  # /help 命令输出格式（支持 %placeholder% 占位符）
-  # 含功能占位符的行在该功能未启用时整行不输出
-  # 可用功能占位符：%suicide% %dupe-cmd% %item-frame% %chicken% %donkey% %mine-place% %chat-color% %stat%
+  success-dupe: "&e&l鎴愬姛澶嶅埗鐗╁搧锛?
+  no-item: "&c浣犲繀椤绘墜鎸佷竴涓墿鍝佹墠鑳藉鍒讹紒"
+  suicide: "&7浣犲凡鑷潃銆?
+  # /help 鍛戒护杈撳嚭鏍煎紡锛堟敮鎸?%placeholder% 鍗犱綅绗︼級
+  # 鍚姛鑳藉崰浣嶇鐨勮鍦ㄨ鍔熻兘鏈惎鐢ㄦ椂鏁磋涓嶈緭鍑?
+  # 鍙敤鍔熻兘鍗犱綅绗︼細%suicide% %dupe-cmd% %item-frame% %chicken% %donkey% %mine-place% %chat-color% %stat%
   help:
     lines:
       - "&e===== &62B2T &e====="
@@ -82,10 +90,12 @@ messages:
       - "%chicken%"
       - "%donkey%"
       - "%mine-place%"
-      - "&7出生点随机传送 + 10秒无敌"
+      - "&7鍑虹敓鐐归殢鏈轰紶閫?+ 10绉掓棤鏁?
       - "%stat%"
       - " "
-      - "&e管理命令："
-      - "&e/core info &7— 查看插件信息"
-      - "&e/core reload &7— 重载配置文件"
-      - "&e/core clearcache &7— 清空复制缓存"
+      - "&e绠＄悊鍛戒护锛?
+      - "&e/core info &7鈥?鏌ョ湅鎻掍欢淇℃伅"
+      - "&e/core reload &7鈥?閲嶈浇閰嶇疆鏂囦欢"
+      - "&e/core clearcache &7鈥?娓呯┖澶嶅埗缂撳瓨"
+
+

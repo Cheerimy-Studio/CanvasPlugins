@@ -1,5 +1,6 @@
 package luminus.acng.features.gameplay.miscs.stats.player
 
+import luminus.acng.features.gameplay.miscs.stats.player.config
 import luminus.acng.msg
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
@@ -17,7 +18,7 @@ object Command {
 
     @Awake(LifeCycle.ENABLE)
     fun onEnable() {
-        command("stat", permission = "core.stat", permissionDefault = PermissionDefault.OP) {
+        command("stat", permission = "2b2tcore.stat", permissionDefault = PermissionDefault.OP) {
             execute<CommandSender> { sender, _, _ ->
                 if (sender is Player) {
                     // 调度到自身实体线程，Folia 线程安全

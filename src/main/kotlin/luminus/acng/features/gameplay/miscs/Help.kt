@@ -163,9 +163,9 @@ object Help {
             appendLine("&e/core info &7— 查看插件信息")
             appendLine("&e/core reload &7— 重载配置文件")
             appendLine("&e/core clearcache &7— 清空复制缓存")
-            appendLine("&e/dupe &7— 复制手持物品（core.dupe.command）")
-            appendLine("&e/stat &7[玩家] — 查看玩家统计（core.stat）")
-            appendLine("&e/suicide &7— 自杀（core.suicide）")
+            appendLine("&e/dupe &7— 复制手持物品（2b2tcore.dupe.command）")
+            appendLine("&e/stat &7[玩家] — 查看玩家统计（2b2tcore.stat）")
+            appendLine("&e/suicide &7— 自杀（2b2tcore.suicide）")
             appendLine("&7权限可通过 LuckPerms 等插件发放")
         }.trimEnd()
     }

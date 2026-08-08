@@ -1,4 +1,4 @@
-package luminus.acng.features.gameplay.duplications
+﻿package luminus.acng.features.gameplay.duplications
 
 import luminus.acng.Main.config
 import org.bukkit.block.ShulkerBox
@@ -10,7 +10,7 @@ import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
 
 /**
- * 破坏放置复制：累计破坏潜影盒到指定次数时复制一份（权限：core.dupe.mine-and-place）
+ * 鐮村潖鏀剧疆澶嶅埗锛氱疮璁＄牬鍧忔綔褰辩洅鍒版寚瀹氭鏁版椂澶嶅埗涓€浠斤紙鏉冮檺锛歝ore.dupe.mine-and-place锛?
  */
 object MineAndPlaceDupe {
     private val map: ConcurrentHashMap<UUID, Int> = ConcurrentHashMap()
@@ -18,7 +18,7 @@ object MineAndPlaceDupe {
     @SubscribeEvent
     fun onMine(event: BlockBreakEvent) {
         if (!config.getBoolean("duplication.mine-and-place.enable")) return
-        if (!event.player.hasPermission("core.dupe.mine-and-place")) return
+        if (!event.player.hasPermission("2b2tcore.dupe.mine-and-place")) return
         if (!event.block.type.toString().lowercase().contains("shulker")) return
 
         val uuid = event.player.uniqueId
@@ -39,3 +39,4 @@ object MineAndPlaceDupe {
         map.clear()
     }
 }
+
