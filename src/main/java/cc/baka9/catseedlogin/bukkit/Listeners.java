@@ -307,8 +307,8 @@ public class Listeners implements Listener {
     public void onPlayerPreLogin(AsyncPlayerPreLoginEvent event){
         String name = event.getName();
 
-        // 英文名离线玩家踢出检测
-        if (Config.Settings.KickEnglishOfflineNames && isEnglishName(name)) {
+        // 英文名离线玩家踢出检测（仅非代理模式；代理模式下由 Velocity 端的 LoginEvent 处理，UUID 可靠度 100%）
+        if (!Config.Settings.BehindProxy && Config.Settings.KickEnglishOfflineNames && isEnglishName(name)) {
             // 白名单内放行
             if (!Config.Settings.EnglishNameWhitelist.contains(name)) {
                 // 正版玩家放行（UUID 不等于离线 UUID）

@@ -94,6 +94,8 @@ public class Config {
         public static List<String> EnglishNameWhitelist = new ArrayList<>();
         // 正版玩家免注册
         public static boolean PremiumAllowNoRegister;
+        // 是否在代理后运行（Velocity/BungeeCord），true 时后端跳过英文名检测
+        public static boolean BehindProxy;
 
         public static void load(){
             FileConfiguration config = getConfig("settings.yml");
@@ -127,6 +129,7 @@ public class Config {
             EnglishNameWhitelist.clear();
             EnglishNameWhitelist.addAll(englishNameWhitelist);
             PremiumAllowNoRegister = config.getBoolean("PremiumAllowNoRegister", resourceConfig.getBoolean("PremiumAllowNoRegister", true));
+            BehindProxy = config.getBoolean("BehindProxy", resourceConfig.getBoolean("BehindProxy", false));
 
 
         }
@@ -152,6 +155,7 @@ public class Config {
             config.set("EnglishNameKickMessage", EnglishNameKickMessage);
             config.set("EnglishNameWhitelist", EnglishNameWhitelist);
             config.set("PremiumAllowNoRegister", PremiumAllowNoRegister);
+            config.set("BehindProxy", BehindProxy);
             try {
                 config.save(new File(CatSeedLogin.instance.getDataFolder(), "settings.yml"));
             } catch (IOException e) {
