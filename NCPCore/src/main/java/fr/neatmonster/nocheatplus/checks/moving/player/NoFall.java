@@ -190,12 +190,13 @@ public class NoFall extends Check {
         Block block = player.getLocation(useLoc2).subtract(0.0, 1.0, 0.0).getBlock();
         final IPlayerData pData = DataManager.getPlayerData(player);
         
-        // Falling on farmland has a chance of trampling it (wasn't always the case. On legacy versions, just walking on crops would have been enough to trample them :) )
+        // Falling on farmland has a chance of trampling it
+        // Folia: block access from GlobalRegionScheduler may fail cross-region — wrap in try
+        try {
         if (block.getType() == BridgeMaterial.FARMLAND && fallDist > 0.5 && ThreadLocalRandom.current().nextFloat() < fallDist - 0.5) {
             final BlockState newState = block.getState();
             newState.setType(Material.DIRT);
             if (canChangeBlock(player, block, newState, true, true, true)) {
-                // Move up a little bit in order to not get stuck in the block
                 player.setVelocity(new Vector(player.getVelocity().getX() * -1, 0.062501, player.getVelocity().getZ() * -1));
                 block.setType(Material.DIRT);
                 if (pData.isDebugActive(type)) {
@@ -220,6 +221,9 @@ public class NoFall extends Check {
             }
             useLoc2.setWorld(null);
             return fallDist;
+        }
+        } catch (final Exception ex) {
+            // Folia: block outside current scheduler region, skip cosmetic adjustments safely
         }
         // TODO: Might want to clean up NoFall to only track for ground state and override as mention above 
         // (save performance, less code but packet dependent and precise ground state requirement)
