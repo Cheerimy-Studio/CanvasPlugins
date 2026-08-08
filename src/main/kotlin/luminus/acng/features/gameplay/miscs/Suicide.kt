@@ -10,7 +10,7 @@ import taboolib.common.platform.command.simpleCommand
 import taboolib.platform.BukkitPlugin
 
 /**
- * 自杀命令：/suicide（别名 514、kill）（权限：core.suicide，默认允许）
+ * 自杀命令：/suicide（别名 514、kill）（权限：core.suicide，默认仅 OP）
  * 普通玩家使用 EntityScheduler 设置 health = 0，确保 Folia 线程安全
  * OP 走原版 kill 命令以支持选择器参数
  */
@@ -21,7 +21,7 @@ object Suicide {
             "kill",
             aliases = arrayListOf("514", "suicide"),
             permission = "core.suicide",
-            permissionDefault = PermissionDefault.TRUE
+            permissionDefault = PermissionDefault.OP
         ) { sender, args ->
             if (!config.getBoolean("suicide-enable", true)) return@simpleCommand
             if (sender !is Player) return@simpleCommand

@@ -159,10 +159,14 @@ object Help {
             lines.forEach { appendLine(it) }
             appendLine("&7出生点随机传送 + 10秒无敌")
             appendLine(" ")
-            appendLine("&e管理命令：")
+            appendLine("&e管理命令（需要权限）：")
             appendLine("&e/core info &7— 查看插件信息")
             appendLine("&e/core reload &7— 重载配置文件")
             appendLine("&e/core clearcache &7— 清空复制缓存")
+            appendLine("&e/dupe &7— 复制手持物品（core.dupe.command）")
+            appendLine("&e/stat &7[玩家] — 查看玩家统计（core.stat）")
+            appendLine("&e/suicide &7— 自杀（core.suicide）")
+            appendLine("&7权限可通过 LuckPerms 等插件发放")
         }.trimEnd()
     }
 }

@@ -7,6 +7,7 @@ import taboolib.common.LifeCycle
 import taboolib.common.platform.Awake
 import taboolib.common.platform.command.command
 import taboolib.common.platform.command.player
+import taboolib.common.platform.command.PermissionDefault
 import taboolib.common.platform.function.adaptPlayer
 import taboolib.platform.BukkitPlugin
 import java.util.Locale
@@ -16,7 +17,7 @@ object Command {
 
     @Awake(LifeCycle.ENABLE)
     fun onEnable() {
-        command("stat") {
+        command("stat", permission = "core.stat", permissionDefault = PermissionDefault.OP) {
             execute<CommandSender> { sender, _, _ ->
                 if (sender is Player) {
                     // 调度到自身实体线程，Folia 线程安全
