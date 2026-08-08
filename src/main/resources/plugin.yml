@@ -1,6 +1,6 @@
 name: ItemTag
 main: emanondev.itemtag.ItemTag
-version: "3.7.8"
+version: "4.0.0"
 author: emanon
 api-version: 1.13
 depend: [ ItemEdit ]

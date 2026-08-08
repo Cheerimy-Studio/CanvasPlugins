@@ -4,7 +4,7 @@ plugins {
 }
 
 group = 'emanondev.itemtag'
-version = '3.7.8'
+version = '4.0.0'
 
 java {
     sourceCompatibility = JavaVersion.VERSION_21
@@ -29,7 +29,7 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok:1.18.46'
     compileOnly 'org.slf4j:slf4j-api:2.0.17'
 
-    compileOnly 'emanondev.itemedit:ItemEdit:3.7.10'
+    compileOnly 'emanondev.itemedit:ItemEdit:4.0.0'
 
     compileOnly 'com.github.LeonMangler:SuperVanish:6.2.18-3'
     compileOnly 'com.github.MilkBowl:VaultAPI:1.7'
