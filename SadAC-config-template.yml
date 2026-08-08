@@ -1,5 +1,6 @@
 # ===== NCP+SadAC 配置 =====
 # 将此段添加到 plugins/NoCheatPlus/config.yml 末尾
+# 注意：/sad 命令修改的值会自动写回此配置（持久化）
 
 sadac:
   lag:
@@ -10,3 +11,6 @@ sadac:
     redstone-interval-ms: 50
     # 每区块最大经验球+船数量 — 超出部分自动清理
     max-entities-per-chunk: 50
+    # 实体清理扫描半径（区块数，1-10）— 以玩家为中心的正方形半径
+    # 例：3 = 7×7=49 个区块；值越大清理范围越广，性能消耗越高
+    scan-radius: 3

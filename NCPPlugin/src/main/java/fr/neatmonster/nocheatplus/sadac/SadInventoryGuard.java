@@ -1,23 +1,25 @@
 /*
  * SadAC Inventory Guard — 违禁物品黑名单
- * 
+ *
  * 功能:
- * - 从 BanItemConfig.yml 加载违禁物品 ID 列表
- * - 玩家点击背包 / 使用物品时检查并移除违禁物品
+ * - 从 BanItemConfig.yml 加载违禁物品 Material 列表
+ * - 玩家点击背包 / 使用 / 消耗物品时检查并移除违禁物品
+ * - 玩家登录时扫描并清除背包/装备中的违禁物品
  * - 支持运行时添加/移除: /sad banitem add|remove <material>
  *
- * Paper 26.2 / Folia 兼容
+ * Paper 26.2 / Folia 兼容（事件均在区域线程触发）
  */
 
 package fr.neatmonster.nocheatplus.sadac;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
@@ -27,13 +29,14 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.ItemStack;
-
-import fr.neatmonster.nocheatplus.logging.StaticLog;
+import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.plugin.java.JavaPlugin;
 
 /**
  * SadAC 原版违禁物品管理
- * 
+ *
  * 配置文件: plugins/NoCheatPlus/BanItemConfig.yml
  */
 public class SadInventoryGuard implements Listener {
@@ -41,17 +44,22 @@ public class SadInventoryGuard implements Listener {
     private final File configFile;
     private final Set<Material> bannedMaterials = new HashSet<>();
 
-    public SadInventoryGuard() {
-        this.configFile = new File(
-                Bukkit.getPluginManager().getPlugin("NoCheatPlus").getDataFolder(),
-                "BanItemConfig.yml"
-        );
+    public SadInventoryGuard(final JavaPlugin plugin) {
+        this.configFile = new File(plugin.getDataFolder(), "BanItemConfig.yml");
         loadBanList();
     }
 
     /* ================================================================
      * 事件处理
      * ================================================================ */
+
+    // 玩家登录时扫描并清除违禁物品（静默）
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onPlayerJoin(final PlayerJoinEvent event) {
+        if (bannedMaterials.isEmpty()) return;
+        final Player player = event.getPlayer();
+        purgeInventory(player);
+    }
 
     // 点击背包
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
@@ -62,11 +70,6 @@ public class SadInventoryGuard implements Listener {
 
         event.setCancelled(true);
         event.getInventory().setItem(event.getSlot(), null);
-
-        if (event.getWhoClicked() instanceof Player) {
-            StaticLog.logInfo("[NCP+SadAC] 移除 " + event.getWhoClicked().getName()
-                    + " 背包中的违禁物品: " + item.getType());
-        }
     }
 
     // 使用物品
@@ -77,9 +80,6 @@ public class SadInventoryGuard implements Listener {
 
         event.setCancelled(true);
         event.getPlayer().getInventory().remove(item);
-
-        StaticLog.logInfo("[NCP+SadAC] " + event.getPlayer().getName()
-                + " 尝试使用违禁物品: " + item.getType());
     }
 
     // 消耗物品
@@ -116,6 +116,38 @@ public class SadInventoryGuard implements Listener {
         return Collections.unmodifiableSet(bannedMaterials);
     }
 
+    public void reloadConfig() {
+        loadBanList();
+    }
+
+    /* ── 内部工具 ── */
+
+    /** 扫描玩家背包 + 装备栏，静默清除违禁物品 */
+    private void purgeInventory(final Player player) {
+        final PlayerInventory inv = player.getInventory();
+        boolean changed = false;
+
+        for (int i = 0; i < inv.getSize(); i++) {
+            final ItemStack item = inv.getItem(i);
+            if (item != null && bannedMaterials.contains(item.getType())) {
+                inv.setItem(i, null);
+                changed = true;
+            }
+        }
+        for (final ItemStack armor : inv.getArmorContents()) {
+            if (armor != null && bannedMaterials.contains(armor.getType())) {
+                armor.setType(Material.AIR);
+                changed = true;
+            }
+        }
+        final ItemStack offhand = inv.getItemInOffHand();
+        if (offhand != null && bannedMaterials.contains(offhand.getType())) {
+            offhand.setType(Material.AIR);
+            changed = true;
+        }
+        // 忽略 changed：静默运行，不刷日志
+    }
+
     /* ── 持久化 ── */
 
     private void loadBanList() {
@@ -131,14 +163,14 @@ public class SadInventoryGuard implements Listener {
                 final Material mat = Material.valueOf(name.toUpperCase());
                 bannedMaterials.add(mat);
             } catch (final IllegalArgumentException e) {
-                StaticLog.logWarning("[NCP+SadAC] 未知物品: " + name);
+                // 未知物品名静默跳过，避免刷日志
             }
         }
     }
 
     private void saveBanList() {
         final YamlConfiguration yml = new YamlConfiguration();
-        final java.util.List<String> names = new java.util.ArrayList<>();
+        final List<String> names = new ArrayList<>();
         for (final Material mat : bannedMaterials) {
             names.add(mat.name());
         }
@@ -146,7 +178,7 @@ public class SadInventoryGuard implements Listener {
         try {
             yml.save(configFile);
         } catch (final IOException e) {
-            StaticLog.logSevere("[NCP+SadAC] 无法保存违禁物品列表: " + e.getMessage());
+            // 静默：持久化失败不打扰运行
         }
     }
 }

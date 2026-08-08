@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
@@ -20,15 +19,9 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.command.TabCompleter;
-import org.bukkit.entity.Player;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import fr.neatmonster.nocheatplus.compat.SchedulerHelper;
-import fr.neatmonster.nocheatplus.config.ConfigFile;
-import fr.neatmonster.nocheatplus.config.ConfigManager;
 import fr.neatmonster.nocheatplus.logging.StaticLog;
-import fr.neatmonster.nocheatplus.logging.Streams;
 
 /**
  * SadAC 功能集成（Lag 检测 + 违禁物品 + 运行时命令）
@@ -45,13 +38,13 @@ public class SadIntegration {
      */
     public static void enable(final JavaPlugin plugin) {
         // ── 1. 注册 Lag 监听器 ──
-        lagListener = new SadLagListener();
+        lagListener = new SadLagListener(plugin);
         lagListener.reloadConfig();
-        Bukkit.getPluginManager().registerEvents(lagListener, plugin);
+        plugin.getServer().getPluginManager().registerEvents(lagListener, plugin);
 
         // ── 2. 注册违禁物品监听器 ──
-        inventoryGuard = new SadInventoryGuard();
-        Bukkit.getPluginManager().registerEvents(inventoryGuard, plugin);
+        inventoryGuard = new SadInventoryGuard(plugin);
+        plugin.getServer().getPluginManager().registerEvents(inventoryGuard, plugin);
 
         // ── 3. 注册 /sad 命令 ──
         final PluginCommand cmd = plugin.getCommand("sad");
@@ -69,6 +62,7 @@ public class SadIntegration {
      */
     public static void reload() {
         if (lagListener != null) lagListener.reloadConfig();
+        if (inventoryGuard != null) inventoryGuard.reloadConfig();
     }
 
     /* ================================================================
@@ -87,43 +81,71 @@ public class SadIntegration {
                 sender.sendMessage(PREFIX + ChatColor.RED + "你没有权限使用此命令！(需要 nocheatplus.admin.sadac)");
                 return true;
             }
-            if (args.length < 2) {
+            if (args.length < 1) {
                 showUsage(sender);
                 return true;
             }
 
             final String type = args[0].toLowerCase();
-            final String action = args[1].toLowerCase();
 
             switch (type) {
                 case "lag":
-                    return handleLag(sender, action, args);
+                    return handleLag(sender, args);
                 case "banitem":
-                    return handleBanItem(sender, action, args);
+                    return handleBanItem(sender, args);
                 case "reload":
                     SadIntegration.reload();
                     sender.sendMessage(PREFIX + ChatColor.GREEN + "SadAC 配置已重新加载");
                     return true;
+                case "status":
+                    return handleStatus(sender);
                 default:
                     sender.sendMessage(PREFIX + ChatColor.RED + "未知类型: " + type
-                            + "，可用: lag | banitem | reload");
+                            + "，可用: lag | banitem | status | reload");
                     return true;
             }
         }
 
-        private boolean handleLag(final CommandSender sender, final String action, final String[] args) {
+        private boolean handleStatus(final CommandSender sender) {
+            if (lagListener == null) {
+                sender.sendMessage(PREFIX + ChatColor.RED + "模块未初始化");
+                return true;
+            }
+            sender.sendMessage(ChatColor.GRAY + "§6=== §cSadAC 状态 §6===");
+            sender.sendMessage(ChatColor.WHITE + "高频红石 & 实体清理: "
+                    + (lagListener.isEnabled() ? ChatColor.GREEN + "开启" : ChatColor.RED + "关闭"));
+            sender.sendMessage(ChatColor.WHITE + "红石频率阈值: " + ChatColor.YELLOW
+                    + lagListener.getRedstoneIntervalMs() + " ms"
+                    + ChatColor.GRAY + "（值越小越严格）");
+            sender.sendMessage(ChatColor.WHITE + "每区块最大实体数: " + ChatColor.YELLOW
+                    + lagListener.getMaxEntitiesPerChunk());
+            sender.sendMessage(ChatColor.WHITE + "扫描半径: " + ChatColor.YELLOW
+                    + lagListener.getScanRadiusChunks() + "×" + lagListener.getScanRadiusChunks()
+                    + " 区块");
+            sender.sendMessage(ChatColor.WHITE + "已移除红石: " + ChatColor.YELLOW
+                    + lagListener.getRemovedRedstoneCount() + ChatColor.GRAY + " 个");
+            sender.sendMessage(ChatColor.WHITE + "已清理实体: " + ChatColor.YELLOW
+                    + lagListener.getRemovedEntityCount() + ChatColor.GRAY + " 个");
+            if (inventoryGuard != null) {
+                sender.sendMessage(ChatColor.WHITE + "违禁物品: " + ChatColor.YELLOW
+                        + inventoryGuard.getBannedMaterials().size() + ChatColor.GRAY + " 种");
+            }
+            return true;
+        }
+
+        private boolean handleLag(final CommandSender sender, final String[] args) {
             if (lagListener == null) {
                 sender.sendMessage(PREFIX + ChatColor.RED + "Lag 检测模块未初始化");
                 return true;
             }
+            if (args.length < 2) {
+                sender.sendMessage(PREFIX + ChatColor.RED + "用法: /sad lag [on|off|set redstone|entities|scan <value>]");
+                return true;
+            }
+            final String action = args[1].toLowerCase();
             switch (action) {
                 case "on":
                     lagListener.setEnabled(true);
-                    // Folia 安全：用 SchedulerHelper 在主线程重新加载配置
-                    SchedulerHelper.runSyncTask(
-                            Bukkit.getPluginManager().getPlugin("NoCheatPlus"),
-                            (task) -> lagListener.reloadConfig()
-                    );
                     sender.sendMessage(PREFIX + ChatColor.GREEN + "高频红石 & 实体清理已开启");
                     break;
                 case "off":
@@ -133,7 +155,7 @@ public class SadIntegration {
                 case "set":
                     if (args.length < 4) {
                         sender.sendMessage(PREFIX + ChatColor.RED
-                                + "用法: /sad lag set [redstone|entities] <值>");
+                                + "用法: /sad lag set [redstone|entities|scan] <值>");
                         return true;
                     }
                     final String param = args[2].toLowerCase();
@@ -143,32 +165,43 @@ public class SadIntegration {
                             case "redstone":
                                 lagListener.setRedstoneIntervalMs(val);
                                 sender.sendMessage(PREFIX + ChatColor.GREEN
-                                        + "高频红石间隔已设为: " + val + " ms");
+                                        + "高频红石间隔已设为: " + lagListener.getRedstoneIntervalMs() + " ms");
                                 break;
                             case "entities":
                                 lagListener.setMaxEntitiesPerChunk(val);
                                 sender.sendMessage(PREFIX + ChatColor.GREEN
-                                        + "区块最大实体数已设为: " + val);
+                                        + "区块最大实体数已设为: " + lagListener.getMaxEntitiesPerChunk());
+                                break;
+                            case "scan":
+                                lagListener.setScanRadiusChunks(val);
+                                sender.sendMessage(PREFIX + ChatColor.GREEN
+                                        + "扫描半径已设为: " + lagListener.getScanRadiusChunks() + " 区块");
                                 break;
                             default:
                                 sender.sendMessage(PREFIX + ChatColor.RED
-                                        + "未知参数: " + param + "，可用: redstone | entities");
+                                        + "未知参数: " + param + "，可用: redstone | entities | scan");
                         }
                     } catch (NumberFormatException e) {
                         sender.sendMessage(PREFIX + ChatColor.RED + "无效数值: " + args[3]);
                     }
                     break;
                 default:
-                    sender.sendMessage(PREFIX + ChatColor.RED + "用法: /sad lag [on|off|set redstone|entities <value>]");
+                    sender.sendMessage(PREFIX + ChatColor.RED + "用法: /sad lag [on|off|set redstone|entities|scan <value>]");
             }
             return true;
         }
 
-        private boolean handleBanItem(final CommandSender sender, final String action, final String[] args) {
+        private boolean handleBanItem(final CommandSender sender, final String[] args) {
             if (inventoryGuard == null) {
                 sender.sendMessage(PREFIX + ChatColor.RED + "违禁物品模块未初始化");
                 return true;
             }
+            if (args.length < 2) {
+                sender.sendMessage(PREFIX + ChatColor.RED
+                        + "用法: /sad banitem [add|remove|list]");
+                return true;
+            }
+            final String action = args[1].toLowerCase();
             switch (action) {
                 case "add":
                     if (args.length < 3) {
@@ -229,12 +262,14 @@ public class SadIntegration {
 
         private void showUsage(final CommandSender sender) {
             sender.sendMessage(ChatColor.GRAY + "§6=== §cNCP+SadAC §6命令 §6===");
-            sender.sendMessage(ChatColor.WHITE + "/sad lag on|off                 " + ChatColor.GRAY + "开关高频红石 & 实体清理");
-            sender.sendMessage(ChatColor.WHITE + "/sad lag set redstone <ms>     " + ChatColor.GRAY + "设置红石频率阈值(ms)");
-            sender.sendMessage(ChatColor.WHITE + "/sad lag set entities <count>  " + ChatColor.GRAY + "设置每区块最大实体数");
-            sender.sendMessage(ChatColor.WHITE + "/sad banitem add|remove <材质> " + ChatColor.GRAY + "添加/移除违禁物品");
-            sender.sendMessage(ChatColor.WHITE + "/sad banitem list               " + ChatColor.GRAY + "列出违禁物品");
-            sender.sendMessage(ChatColor.WHITE + "/sad reload                     " + ChatColor.GRAY + "重载 SadAC 配置");
+            sender.sendMessage(ChatColor.WHITE + "/sad lag on|off                  " + ChatColor.GRAY + "开关高频红石 & 实体清理");
+            sender.sendMessage(ChatColor.WHITE + "/sad lag set redstone <ms>      " + ChatColor.GRAY + "设置红石频率阈值(ms)");
+            sender.sendMessage(ChatColor.WHITE + "/sad lag set entities <count>   " + ChatColor.GRAY + "设置每区块最大实体数");
+            sender.sendMessage(ChatColor.WHITE + "/sad lag set scan <chunks>      " + ChatColor.GRAY + "设置扫描半径(1-10)");
+            sender.sendMessage(ChatColor.WHITE + "/sad banitem add|remove <材质>  " + ChatColor.GRAY + "添加/移除违禁物品");
+            sender.sendMessage(ChatColor.WHITE + "/sad banitem list                " + ChatColor.GRAY + "列出违禁物品");
+            sender.sendMessage(ChatColor.WHITE + "/sad status                      " + ChatColor.GRAY + "查看模块状态");
+            sender.sendMessage(ChatColor.WHITE + "/sad reload                      " + ChatColor.GRAY + "重载 SadAC 配置");
         }
 
         /* ── Tab 补全 ── */
@@ -243,7 +278,7 @@ public class SadIntegration {
         public List<String> onTabComplete(final CommandSender sender, final Command command,
                                           final String alias, final String[] args) {
             if (args.length == 1) {
-                return filter(Arrays.asList("lag", "banitem", "reload"), args[0]);
+                return filter(Arrays.asList("lag", "banitem", "status", "reload"), args[0]);
             }
             if (args.length == 2) {
                 switch (args[0].toLowerCase()) {
@@ -252,7 +287,7 @@ public class SadIntegration {
                 }
             }
             if (args.length == 3 && args[0].equalsIgnoreCase("lag") && args[1].equalsIgnoreCase("set")) {
-                return filter(Arrays.asList("redstone", "entities"), args[2]);
+                return filter(Arrays.asList("redstone", "entities", "scan"), args[2]);
             }
             if (args.length == 3 && args[0].equalsIgnoreCase("banitem") && args[1].equalsIgnoreCase("add")) {
                 // 提供常见违禁物品建议
