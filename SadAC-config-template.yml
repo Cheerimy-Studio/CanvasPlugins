@@ -1,16 +1,300 @@
-# ===== NCP+SadAC 配置 =====
-# 将此段添加到 plugins/NoCheatPlus/config.yml 末尾
-# 注意：/sad 命令修改的值会自动写回此配置（持久化）
+# ============================================================
+# NoCheatPlus v3.17.1 默认配置 — Folia 26.2 / 只回弹不踢人 / 中文名兼容
+# ============================================================
+# 生成时间: 2026-08-08
+# 修改说明:
+#   - 所有 kick/tempkick/ban 处罚已移除，保留 cancel(回弹)+log
+#   - MOVING_TEMPKICKILLEGAL = false
+#   - 支持中文玩家名称 (不做名称过滤)
+#   - Folia 跨区域线程安全 (NoFall try/catch)
+# ============================================================
 
+logging:
+  active: true
+  debug: false
+  extended:
+    command: true
+  file: ''
+  backup:
+    active: true
+    age: 10
+    amount: 10
+
+string:
+  file: default
+
+actions:
+  # 回弹+记录日志（不踢人）
+  cancel: cancel
+  cancel-low: cancel vl>10 cancel log:medium:0:5:i
+  cancel-medium: cancel vl>30 cancel log:high:0:5:i
+  cancel-strict: cancel vl>50 cancel log:veryhigh:0:5:i
+  cancel-ultra: cancel vl>100 cancel log:extreme:0:5:i
+
+# ============================================================
+# 世界/区域配置
+# ============================================================
+worlds:
+  # 全局默认配置
+  default:
+    # 移动检查 (Folia 安全)
+    moving:
+      active: true
+      checks:
+        survivalfly:
+          active: true
+          # 只回弹不踢人
+          actions: cancel
+          model:
+            # 允许鞘翅飞行
+            elytra: true
+            # 允许创造模式
+            creative: true
+            # 允许 spectator
+            spectator: true
+        creativefly:
+          active: true
+          actions: cancel
+        morepackets:
+          active: true
+          actions: cancel
+        nofall:
+          active: true
+          actions: cancel
+          # Folia 跨区域安全 (try/catch)
+          folia-safe: true
+        tempkickillegal:
+          active: false
+    # 方块交互
+    blockbreak:
+      active: true
+      checks:
+        direction:
+          active: true
+          actions: cancel
+        fastbreak:
+          active: true
+          actions: cancel
+        frequency:
+          active: true
+          actions: cancel
+        noswing:
+          active: true
+          actions: cancel
+        reach:
+          active: true
+          actions: cancel
+        wrongblock:
+          active: true
+          actions: cancel
+    blockinteract:
+      active: true
+      checks:
+        direction:
+          active: true
+          actions: cancel
+        reach:
+          active: true
+          actions: cancel
+        visible:
+          active: true
+          actions: cancel
+    blockplace:
+      active: true
+      checks:
+        against:
+          active: true
+          actions: cancel
+        autosign:
+          active: true
+          actions: cancel
+        direction:
+          active: true
+          actions: cancel
+        fastplace:
+          active: true
+          actions: cancel
+        noswing:
+          active: true
+          actions: cancel
+        reach:
+          active: true
+          actions: cancel
+        speed:
+          active: true
+          actions: cancel
+    # 战斗检查
+    fight:
+      active: true
+      checks:
+        angle:
+          active: true
+          actions: cancel
+        critical:
+          active: true
+          actions: cancel
+        direction:
+          active: true
+          actions: cancel
+        godmode:
+          active: true
+          actions: cancel
+        heal:
+          active: true
+          actions: cancel
+        knockback:
+          active: true
+          actions: cancel
+        noswing:
+          active: true
+          actions: cancel
+        reach:
+          active: true
+          actions: cancel
+        speed:
+          active: true
+          actions: cancel
+    # 物品交互
+    inventory:
+      active: true
+      checks:
+        fastclick:
+          active: true
+          actions: cancel
+        instantbow:
+          active: true
+          actions: cancel
+        instanTEat:
+          active: true
+          actions: cancel
+        items:
+          active: true
+          actions: cancel
+        fastheal:
+          active: true
+          actions: cancel
+    # 聊天
+    chat:
+      active: true
+      checks:
+        captcha:
+          active: false
+        color:
+          active: false
+        commands:
+          active: true
+          actions: cancel
+        logins:
+          active: false
+        relog:
+          active: false
+        text:
+          active: false
+    # 网络
+    net:
+      active: true
+      checks:
+        attackfrequency:
+          active: true
+          actions: cancel
+        flyingfrequency:
+          active: true
+          actions: cancel
+        keepalivefrequency:
+          active: true
+          actions: cancel
+        sounddistance:
+          active: false
+
+# ============================================================
+# 权限节点 (默认仅 OP)
+# ============================================================
+permissions:
+  nocheatplus.admin:
+    description: 'NCP 管理权限'
+    default: op
+    children:
+      nocheatplus.command.notify: true
+      nocheatplus.command.reload: true
+      nocheatplus.command.exempt: true
+      nocheatplus.command.unexempt: true
+      nocheatplus.command.ban: true
+      nocheatplus.command.tempban: true
+      nocheatplus.command.kick: true
+      nocheatplus.command.log: true
+      nocheatplus.admin.sadac: true
+  nocheatplus.checks:
+    description: 'NCP 检查绕过 (给信任玩家)'
+    default: false
+    children:
+      nocheatplus.checks.moving: true
+      nocheatplus.checks.blockbreak: true
+      nocheatplus.checks.blockplace: true
+      nocheatplus.checks.blockinteract: true
+      nocheatplus.checks.fight: true
+      nocheatplus.checks.inventory: true
+      nocheatplus.checks.chat: true
+      nocheatplus.checks.net: true
+
+# ============================================================
+# SadAC 增强模块 (新增)
+# ============================================================
 sadac:
-  lag:
-    # 高频红石 & 实体清理（总开关）
-    enabled: true
-    # 红石更新间隔阈值（毫秒）— 低于此频率视为高频，自动移除红石元件
-    # 值越小越严格：1=最快检测，10000+=几乎不检测
-    redstone-interval-ms: 50
-    # 每区块最大经验球+船数量 — 超出部分自动清理
-    max-entities-per-chunk: 50
-    # 实体清理扫描半径（区块数，1-10）— 以玩家为中心的正方形半径
-    # 例：3 = 7×7=49 个区块；值越大清理范围越广，性能消耗越高
-    scan-radius: 3
+  active: true
+  # 高频红石清理
+  redstone:
+    active: true
+    threshold: 1000  # 每 tick 脉冲数阈值
+    cleanup-interval: 300  # 秒
+  # 实体清理
+  entity:
+    active: true
+    limit: 500  # 每区块实体上限
+    cleanup-interval: 600
+  # 违禁物品扫描
+  itemguard:
+    active: true
+    scan-interval: 30
+    forbidden-items:
+      - BEDROCK
+      - BARRIER
+      - COMMAND_BLOCK
+      - STRUCTURE_BLOCK
+      - JIGSAW
+      - LIGHT
+  # KillAura 补充检测
+  aura:
+    active: true
+    threshold: 15  # 异常角度次数
+    time-window: 5000  # ms
+  # Reach 高精度
+  reach:
+    active: true
+    max-reach: 3.2
+    ping-compensate: true
+  # AutoClicker
+  clicker:
+    active: true
+    max-cps: 20
+    time-window: 1000
+  # Timer
+  timer:
+    active: true
+    threshold: 1.5  # 速度倍率
+
+# ============================================================
+# 兼容性设置
+# ============================================================
+compatibility:
+  # Folia 模式
+  folia: true
+  # 中文玩家名称支持 (不做字符过滤)
+  chinese-names: true
+  # ProtocolLib
+  protocollib: true
+  # 其他插件兼容
+  plugins:
+    - WorldEdit
+    - WorldGuard
+    - Residence
+    - GriefPrevention
