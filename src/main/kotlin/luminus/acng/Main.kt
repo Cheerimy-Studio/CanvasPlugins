@@ -85,9 +85,12 @@ fun CommandSender.msg(vararg args: Any) {
 }
 
 fun ProxyCommandSender.message(vararg args: Any) {
-    var message = ""
-    args.forEach {
-        message += it.toString()
+    fun Any?.toChatString(): String = when (this) {
+        null -> "null"
+        is Array<*> -> this.joinToString("") { it.toChatString() }
+        is Collection<*> -> this.joinToString("") { it.toChatString() }
+        else -> this.toString()
     }
+    val message = args.joinToString("") { it.toChatString() }
     sendMessage(ChatColor.translateAlternateColorCodes('&', message))
 }
