@@ -34,8 +34,15 @@ commands:
                §7§l•§c§o /<command> version§7 - Display information about both the server and the plugin.
                §7§l•§c§o /<command> commands§7 - List all commands, including auxiliary ones.
                §7§l•§c§o /<command> stopwatch (start/stop/distance/return) [distance]§7 - Simple command for measuring time and distances. Useful for testing purposes.
+    sad:
+        description: SadAC 模块控制命令（高频红石/实体清理/违禁物品）
+        permission: nocheatplus.admin.sadac
+        usage: /sad [lag|banitem|reload]
 
 permissions:
+    nocheatplus.admin.sadac:
+        default: op
+        description: 使用 /sad 命令管理 SadAC 模块（高频红石/实体清理/违禁物品）
     # Check silent permissions (no log alerts if present).
     nocheatplus.checks.blockbreak.break.silent:
         default: false

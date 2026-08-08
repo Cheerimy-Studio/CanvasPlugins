@@ -1,0 +1,12 @@
+# ===== NCP+SadAC 配置 =====
+# 将此段添加到 plugins/NoCheatPlus/config.yml 末尾
+
+sadac:
+  lag:
+    # 高频红石 & 实体清理（总开关）
+    enabled: true
+    # 红石更新间隔阈值（毫秒）— 低于此频率视为高频，自动移除红石元件
+    # 值越小越严格：1=最快检测，10000+=几乎不检测
+    redstone-interval-ms: 50
+    # 每区块最大经验球+船数量 — 超出部分自动清理
+    max-entities-per-chunk: 50

@@ -71,6 +71,7 @@ import fr.neatmonster.nocheatplus.command.NoCheatPlusCommand;
 import fr.neatmonster.nocheatplus.command.admin.VersionCommand;
 import fr.neatmonster.nocheatplus.compat.BridgeMisc;
 import fr.neatmonster.nocheatplus.compat.SchedulerHelper;
+import fr.neatmonster.nocheatplus.sadac.SadIntegration;
 import fr.neatmonster.nocheatplus.compat.MCAccess;
 import fr.neatmonster.nocheatplus.compat.blocks.changetracker.BlockChangeListener;
 import fr.neatmonster.nocheatplus.compat.blocks.changetracker.BlockChangeTracker;
@@ -1058,6 +1059,9 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         StaticLog.setStreamID(Streams.STATUS);
         // Tell the server administrator that we finished loading NoCheatPlus now.
         logManager.info(Streams.INIT, "Version " + getDescription().getVersion() + " is enabled.");
+
+        // ── SadAC 模块（高频红石/实体清理/违禁物品） ──
+        SadIntegration.enable(this);
     }
 
     /**
