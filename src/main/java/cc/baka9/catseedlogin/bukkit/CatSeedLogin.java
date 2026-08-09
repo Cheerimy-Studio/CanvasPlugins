@@ -42,8 +42,9 @@ public class CatSeedLogin extends JavaPlugin {
             getLogger().warning("§c加载数据库时出错");
             e.printStackTrace();
         }
-        // 注册 Plugin Message 通道（Velocity 通信 — 登录/注册后通知代理端）
+        // 注册 Plugin Message 通道（Velocity 双向通信）
         Bukkit.getServer().getMessenger().registerOutgoingPluginChannel(this, "catseedlogin:transfer");
+        Bukkit.getServer().getMessenger().registerIncomingPluginChannel(this, "catseedlogin:transfer", new VelocityReceiver());
 
         // 密码隐藏滤器 — 必须在任何命令处理前安装
         ConsolePasswordFilter.install();
