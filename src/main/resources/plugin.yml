@@ -1,7 +1,7 @@
 name: X-Clearlag
-version: 1.8
+version: 2.0.0-paper26.2
 main: com.fabian.xclearlag.XClearlag
-api-version: 1.13
+api-version: '1.21'
 folia-supported: true
 authors: [Fabian]
 website: https://xproyects.qzz.io

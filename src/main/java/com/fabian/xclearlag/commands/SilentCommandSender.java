@@ -49,6 +49,18 @@ public class SilentCommandSender implements org.bukkit.command.ConsoleCommandSen
         return "X-Clearlag";
     }
 
+    // Paper 26.2: CommandSender.name() is now abstract (returns Component-based name)
+    @Override
+    public net.kyori.adventure.text.Component name() {
+        return net.kyori.adventure.text.Component.text("X-Clearlag");
+    }
+
+    // Paper 26.2: CommandSender.spigot() abstract method
+    @Override
+    public org.bukkit.command.CommandSender.Spigot spigot() {
+        return new org.bukkit.command.CommandSender.Spigot();
+    }
+
     @Override
     public boolean isOp() {
         return true; // Always OP to execute cleanup commands
