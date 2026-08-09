@@ -271,9 +271,10 @@ public class Listeners implements Listener {
         String name = event.getName();
 
         // 英文名离线玩家踢出检测（仅非代理模式；代理模式下由 Velocity 端的 LoginEvent 处理，UUID 可靠度 100%）
+        // 英文名白名单始终生效（无论是否代理模式）
+        if (Config.Settings.EnglishNameWhitelist.contains(name)) return;
+
         if (!Config.Settings.BehindProxy && Config.Settings.KickEnglishOfflineNames && name.matches("^[a-zA-Z0-9_]+$")) {
-            // 白名单内放行
-            if (!Config.Settings.EnglishNameWhitelist.contains(name)) {
                 // 正版玩家放行（UUID 不等于离线 UUID）
                 if (Config.Settings.PremiumAllowNoRegister) {
                     UUID offlineUUID = UUID.nameUUIDFromBytes(("OfflinePlayer:" + name).getBytes(StandardCharsets.UTF_8));
