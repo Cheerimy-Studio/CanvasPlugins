@@ -65,11 +65,12 @@ public class VelocityPlugin {
     public void onProxyInitialize(ProxyInitializeEvent event) {
         loadConfig();
         proxy.getChannelRegistrar().register(CHANNEL);
+        // Velocity 4.1.0 自动注册主插件实例，不需要手动 register(this, this)
+        // 只注册 Listeners（非主类需要显式注册）
         proxy.getEventManager().register(this, new Listeners(proxy, logger, loginServerName));
-        logger.info("CatSeedLogin Velocity {} 已加载 (登录服={}, 踢英文离线={})",
+        logger.info("CatSeedLogin Velocity {} 已加载 (登录服={})",
                 getClass().getAnnotation(Plugin.class).version(),
-                loginServerName.isEmpty() ? "(未配置)" : loginServerName,
-                kickEnglishOfflineNames);
+                loginServerName.isEmpty() ? "(未配置)" : loginServerName);
     }
 
     // ========== 正版检测核心 ==========
