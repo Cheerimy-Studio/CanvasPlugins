@@ -16,6 +16,7 @@ import java.nio.file.Files;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 /**
@@ -127,7 +128,8 @@ public class Config {
                 englishNameWhitelist = resourceConfig.getStringList("EnglishNameWhitelist");
             }
             EnglishNameWhitelist.clear();
-            EnglishNameWhitelist.addAll(englishNameWhitelist);
+            // 全部存为小写，检查时用 equalsIgnoreCase
+            englishNameWhitelist.forEach(s -> EnglishNameWhitelist.add(s.toLowerCase(Locale.ROOT)));
             PremiumAllowNoRegister = config.getBoolean("PremiumAllowNoRegister", resourceConfig.getBoolean("PremiumAllowNoRegister", true));
             BehindProxy = config.getBoolean("BehindProxy", resourceConfig.getBoolean("BehindProxy", false));
 
