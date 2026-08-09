@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
  * config.yml 玩家退出服务器的位置
  * emailVerify.yml 邮箱找回密码
  * language.yml 语言，提示
- * settings.yml 设置
+ * config.yml 设置（原 settings.yml 已合并）
  * sql.yml 数据库
  */
 public class Config {
@@ -98,8 +98,8 @@ public class Config {
         public static boolean BehindProxy;
 
         public static void load(){
-            FileConfiguration config = getConfig("settings.yml");
-            FileConfiguration resourceConfig = getResourceConfig("settings.yml");
+            FileConfiguration config = getConfig("config.yml");
+            FileConfiguration resourceConfig = getResourceConfig("config.yml");
 
             IpRegisterCountLimit = config.getInt("IpRegisterCountLimit", resourceConfig.getInt("IpRegisterCountLimit"));
             IpCountLimit = config.getInt("IpCountLimit", resourceConfig.getInt("IpCountLimit"));
@@ -135,7 +135,7 @@ public class Config {
         }
 
         public static void save(){
-            FileConfiguration config = getConfig("settings.yml");
+            FileConfiguration config = getConfig("config.yml");
             config.set("IpRegisterCountLimit", IpRegisterCountLimit);
             config.set("IpCountLimit", IpCountLimit);
             config.set("SpawnWorld", null);
@@ -157,7 +157,7 @@ public class Config {
             config.set("PremiumAllowNoRegister", PremiumAllowNoRegister);
             config.set("BehindProxy", BehindProxy);
             try {
-                config.save(new File(CatSeedLogin.instance.getDataFolder(), "settings.yml"));
+                config.save(new File(CatSeedLogin.instance.getDataFolder(), "config.yml"));
             } catch (IOException e) {
                 e.printStackTrace();
             }

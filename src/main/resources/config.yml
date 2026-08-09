@@ -1,2 +1,46 @@
-# CatSeedLogin Bukkit 配置
+# CatSeedLogin 配置文件
+# 所有设置项从 settings.yml 合并到这里，放弃 settings.yml
+
+# ========== 代理模式 ==========
+# 是否在 Velocity/BungeeCord 代理后运行
+# true = 英文名检测由代理端处理（UUID 可靠），后端跳过
 BehindProxy: true
+
+# ========== 注册/IP 限制 ==========
+IpRegisterCountLimit: -1  # 同IP注册数量限制（-1=不限制）
+IpCountLimit: -1          # 同IP登录数量限制（-1=不限制）
+
+# ========== 用户名限制 ==========
+LimitChineseID: false     # 限制中文ID（false=允许中文名称）
+MinLengthID: 2
+MaxLengthID: 15
+
+# ========== 英文名离线玩家 ==========
+KickEnglishOfflineNames: false        # 踢出英文名离线玩家（false=不踢，代理端处理）
+EnglishNameKickMessage: "离线玩家请使用中文名称 ID 登录。"
+# 英文名白名单：允许使用英文名登录（仍需注册密码）
+EnglishNameWhitelist:
+  - Notch
+  - Steve
+# 正版玩家免注册（直接登录，非正版英文名仍踢出或需注册）
+PremiumAllowNoRegister: true
+
+# ========== 登录前限制 ==========
+BeforeLoginNoDamage: true    # 登录前不受伤害
+# 登录前允许执行的命令白名单（正则表达式，仅登录相关命令）
+CommandWhiteList:
+  - /(?i)l(ogin)?(\z| .*)
+  - /(?i)reg(ister)?(\z| .*)
+  - /(?i)resetpassword?(\z| .*)
+  - /(?i)repw?(\z| .*)
+AutoKick: -1                # 自动踢出未登录玩家秒数（-1=关闭）
+ReenterInterval: 60          # 离开后重新加入间隔（tick）
+
+# ========== 登录后 ==========
+AfterLoginBack: true         # 登录后返回退出位置
+CanTpSpawnLocation: true     # 登录前强制在登录点
+DeathStateQuitRecordLocation: true  # 死亡时退出记录位置
+AlwaysFreeze: false          # 永远冻结（即使登录完成也不让动）
+
+# ========== 出生/传送点（空 = 默认 world 出生点） ==========
+SpawnLocation:
