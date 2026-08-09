@@ -197,6 +197,10 @@ public class SurvivalFly extends Check {
             hFreedom = 0.0;
         }
 
+        // Folia: 跨线程方块查表失败导致 allowedDistance 过小，放宽 2 倍容差
+        if (SchedulerHelper.isFoliaServer()) {
+            hAllowedDistance = Math.max(hAllowedDistance, thisMove.hDistance * 0.5);
+        }
 
         /////////////////////////////////////
         // Vertical move                  ///
