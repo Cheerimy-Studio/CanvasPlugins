@@ -1,43 +1,42 @@
-# 2B2TCore 鐜╁缁熻閰嶇疆鏂囦欢
-# 鏁版嵁閫氳繃 Bukkit PDC 鎸佷箙鍖栵紝瀛樺偍鍦ㄧ帺瀹惰韩涓婏紝鏃犻渶鏁版嵁搴?
+version: '1.0.0'
 
+# ===================== 玩家统计配置 =====================
+# 数据通过 Bukkit PDC 持久化，存储在玩家身上，无需数据库
 player:
-  enable: true  # 鏄惁鍚敤鐜╁缁熻
+  enable: true  # 是否启用玩家统计
 
-# ===================== 缁熻灞曠ず娑堟伅 =====================
-# 浣跨敤 /stat锛堝埆鍚?stats銆乻tatistics銆佺粺璁★級鏌ョ湅
-# 鍗犱綅绗︼細
-#   %name%                    鐜╁鍚?
-#   %kills% %deaths% %kd%     鍑绘潃 / 姝讳骸 / K/D 姣?
-#   %joins% %quits%           鍔犲叆 / 閫€鍑烘鏁?
-#   %online-time-days%        鍦ㄧ嚎澶╂暟
-#   %online-time-hrs%         鍦ㄧ嚎灏忔椂
-#   %online-time-min%         鍦ㄧ嚎鍒嗛挓
-#   %online-time-sec%         鍦ㄧ嚎绉?
-#   %formatted-online-time%   鑷姩鎷兼帴鐨勫湪绾挎椂闀匡紙浠呮樉绀洪潪闆堕」锛?
-#   %has-<鏉冮檺>%              鏉冮檺鍗犱綅绗︼紝鎸?permission-placeholders 閰嶇疆鏇挎崲
+# ===================== 统计展示消息 =====================
+# 使用 /stat（别名 /stats、/statistics、统计）查看
+# %name%                    玩家名
+# %kills% %deaths% %kd%     击杀 / 死亡 / K/D 比
+# %joins% %quits%           加入 / 退出次数
+# %online-time-days%        在线天数
+# %online-time-hrs%         在线小时
+# %online-time-min%         在线分钟
+# %online-time-sec%         在线秒
+# %formatted-online-time%   自动拼接的在线时长（仅显示非零项）
+# %has-<权限>%              权限占位符，按 permission-placeholders 配置替换
 messages:
   player:
-    messages:
+    lines:
       - "&7=========================="
-      - "&6鐜╁: &f%name%"
-      - "&6鍑绘潃: &f%kills%"
-      - "&6姝讳骸: &f%deaths%"
+      - "&6玩家: &f%name%"
+      - "&6击杀: &f%kills%"
+      - "&6死亡: &f%deaths%"
       - "&6K/D: &f%kd%"
-      - "&6鍔犲叆: &f%joins%"
-      - "&6閫€鍑? &f%quits%"
-      - "&6鏉冮檺绀轰緥: &f%has-2b2tcore.example%"
-      - "&6鍦ㄧ嚎鏃堕暱: &f%formatted-online-time%"
+      - "&6加入: &f%joins%"
+      - "&6退出: &f%quits%"
+      - "&6权限示例: &f%has-2b2tcore.example%"
+      - "&6在线时长: &f%formatted-online-time%"
       - "&7=========================="
-    time-day: "澶?
-    time-hour: "鏃?
-    time-minute: "鍒?
-    time-sec: "绉?
-    # 鏉冮檺鍗犱綅绗︼細%has-<鑺傜偣>% 鍛戒腑浠ヤ笅閰嶇疆鏃舵浛鎹?
-    # if-has锛氭嫢鏈夎鏉冮檺鏃舵樉绀虹殑鍐呭
-    # if-not锛氭棤璇ユ潈闄愭椂鏄剧ず鐨勫唴瀹?
+    time-day: "天"
+    time-hour: "时"
+    time-minute: "分"
+    time-sec: "秒"
+    # 权限占位符：%has-<节点>% 命中以下配置时替换
+    # if-has：拥有该权限时显示的内容
+    # if-not：无该权限时显示的内容
     permission-placeholders:
       2b2tcore.example:
-        if-has: "&e&l宸叉巿鏉?
-        if-not: "&c&l鏈巿鏉?
-
+        if-has: "&e&l已授权"
+        if-not: "&c&l未授权"

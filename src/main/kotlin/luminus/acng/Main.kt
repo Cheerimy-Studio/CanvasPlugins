@@ -23,7 +23,7 @@ object Main : Plugin() {
 
     @Config("config.yml")
     lateinit var config: Configuration
-    private const val CONFIG_VERSION = 6
+    private const val CONFIG_VERSION = 7
     private const val GITHUB_REPO = "https://github.com/Cheerimy-Studio/CanvasPlugins"
 
     override fun onEnable() {
