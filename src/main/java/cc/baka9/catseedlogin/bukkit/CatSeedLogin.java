@@ -46,6 +46,7 @@ public class CatSeedLogin extends JavaPlugin {
         }
         // 注册 Plugin Message 通道（Velocity 通信）
         Bukkit.getServer().getMessenger().registerOutgoingPluginChannel(this, VelocityTransfer.CHANNEL);
+        Bukkit.getServer().getMessenger().registerIncomingPluginChannel(this, VelocityTransfer.CHANNEL, new VelocityReceiver());
 
         //Listeners
         getServer().getPluginManager().registerEvents(new Listeners(), this);

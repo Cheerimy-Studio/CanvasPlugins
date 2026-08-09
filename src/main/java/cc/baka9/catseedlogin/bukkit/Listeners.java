@@ -84,13 +84,19 @@ public class Listeners implements Listener {
     }
 
     /**
-     * 检测正版玩家：通过 Mojang API 查询正版账号是否存在。
-     * 在 online-mode=false 代理模式下 UUID 全部是离线 UUID，因此必须用 API 查询。
+     * 检测正版玩家：通过 Mojang API 查询该名字是否有正版账号。
+     * <p>
+     * ⚠️ 重要：在 online-mode=false 代理模式下，此方法只能判断该名字是否为正版账号，
+     * 不能判断当前连接的玩家是否是该正版账号的真正拥有者。
+     * 因此绝不能用于自动登录——冒充者也会通过 API 检查。
+     * <p>
+     * 正确用法：仅用于 KickEnglishOfflineNames（踢出英文名离线玩家）。
+     * 正版玩家仍需注册/登录，靠密码保护账号安全。
      */
-    private boolean isPremiumPlayer(Player player) {
+    private boolean isPremiumName(String name) {
         try {
             java.net.URL url = new java.net.URL(
-                "https://api.mojang.com/users/profiles/minecraft/" + player.getName());
+                "https://api.mojang.com/users/profiles/minecraft/" + name);
             java.net.HttpURLConnection conn = (java.net.HttpURLConnection) url.openConnection();
             conn.setConnectTimeout(3000);
             conn.setReadTimeout(3000);
@@ -273,30 +279,9 @@ public class Listeners implements Listener {
     public void onPlayerJoin(PlayerJoinEvent event){
         Player p = event.getPlayer();
         Cache.refresh(p.getName());
-        // 正版玩家自动登录（免注册免输入密码）—— 跳过出生点传送
-        if (Config.Settings.PremiumAllowNoRegister && isPremiumPlayer(p)) {
-            Scheduler.runGlobal(CatSeedLogin.instance, () -> {
-                LoginPlayer lp = Cache.getIgnoreCase(p.getName());
-                if (lp == null) {
-                    // 未注册 → 自动生成随机密码并注册
-                    lp = new LoginPlayer(p.getName(), generateRandomPassword());
-                    lp.crypt();
-                    try {
-                        CatSeedLogin.sql.add(lp);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                    LoginPlayerHelper.add(lp);
-                } else if (!LoginPlayerHelper.isLogin(p.getName())) {
-                    // 已注册但未登录 → 自动登录
-                    LoginPlayerHelper.add(lp);
-                }
-                LoginPlayerHelper.recordCurrentIP(p, lp);
-            });
-            return;
-        }
+        // 正版免登录由 Velocity 端通过 PluginMessage → VelocityReceiver 触发。
+        // Bukkit 端不主动做正版检测，防止 online-mode=false 时离线玩家冒充正版名免登录。
         if (Config.Settings.CanTpSpawnLocation) {
-            // Folia: 跨世界传送必须用 teleportAsync（异步），同步 teleport 会阻塞区域线程
             Scheduler.safeTeleport(p, Config.Settings.SpawnLocation);
         }
     }
