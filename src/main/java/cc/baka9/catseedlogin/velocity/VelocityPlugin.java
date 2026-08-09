@@ -53,8 +53,8 @@ public class VelocityPlugin {
     private String loginServerName = "login";
     private boolean kickEnglishOfflineNames = true;
 
-    /** 已登录玩家 */
-    private static final Set<String> LOGGED_IN = ConcurrentHashMap.newKeySet();
+    /** 已登录玩家（VelocityPlugin 和 Listeners 共享） */
+    static final Set<String> LOGGED_IN = ConcurrentHashMap.newKeySet();
 
     @Inject
     public VelocityPlugin(ProxyServer proxy, Logger logger, @DataDirectory Path dataDir) {
@@ -146,6 +146,20 @@ public class VelocityPlugin {
     @Subscribe
     public void onDisconnect(DisconnectEvent event) {
         LOGGED_IN.remove(event.getPlayer().getUsername());
+    }
+
+    // ========== Bukkit→Velocity PluginMessage 接收 ==========
+
+    @Subscribe
+    public void onPluginMessage(PluginMessageEvent event) {
+        if (!event.getIdentifier().equals(CHANNEL)) return;
+        if (event.getSource() instanceof com.velocitypowered.api.proxy.ServerConnection server) {
+            Player player = server.getPlayer();
+            if (player != null) {
+                LOGGED_IN.add(player.getUsername());
+                logger.debug("CatSeedLogin: PluginMessage received, marked {} as logged in", player.getUsername());
+            }
+        }
     }
 
     // ========== 工具方法 ==========
