@@ -291,7 +291,6 @@ public class Listeners implements Listener {
                     return;
                 }
             }
-        }
 
         if (Config.Settings.LimitChineseID) {
             if (!name.matches("^\\w+$")) {
