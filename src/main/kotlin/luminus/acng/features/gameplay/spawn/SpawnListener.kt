@@ -41,7 +41,8 @@ object SpawnListener : Listener {
             val x = worldSpawn.blockX + rnd.nextInt(-radius, radius + 1)
             val z = worldSpawn.blockZ + rnd.nextInt(-radius, radius + 1)
             val loc = world.getHighestBlockAt(x, z).location.add(0.5, 1.0, 0.5)
-            player.teleport(loc)
+            // Folia 必须用 teleportAsync，不能用同步 teleport
+            player.teleportAsync(loc)
         }, null)
 
         if (invulnerableSeconds > 0) {
