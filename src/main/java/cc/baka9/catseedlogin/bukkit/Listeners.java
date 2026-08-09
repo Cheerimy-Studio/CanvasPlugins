@@ -18,9 +18,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.*;
 
-import java.security.SecureRandom;
 import java.util.Arrays;
-import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
@@ -73,14 +71,6 @@ public class Listeners implements Listener {
 
     private boolean playerIsNotMinecraftPlayer(Player p){
         return !p.getClass().getName().matches("org\\.bukkit\\.craftbukkit.*?\\.entity\\.CraftPlayer");
-    }
-
-    /**
-     * 检测用户名是否为纯英文（ASCII 字母、数字、下划线组成）。
-     * 中文用户名返回 false。
-     */
-    private boolean isEnglishName(String name) {
-        return name.matches("^[a-zA-Z0-9_]+$");
     }
 
     @EventHandler
@@ -262,16 +252,7 @@ public class Listeners implements Listener {
         }
     }
 
-    private static final SecureRandom SECURE_RANDOM = new SecureRandom();
-    private static final String PASSWORD_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-
-    private static String generateRandomPassword() {
-        StringBuilder sb = new StringBuilder(16);
-        for (int i = 0; i < 16; i++) {
-            sb.append(PASSWORD_CHARS.charAt(SECURE_RANDOM.nextInt(PASSWORD_CHARS.length())));
-        }
-        return sb.toString();
-    }
+    
 
     //id只能下划线字母数字
     @EventHandler
@@ -279,7 +260,7 @@ public class Listeners implements Listener {
         String name = event.getName();
 
         // 英文名离线玩家踢出检测（仅非代理模式；代理模式下由 Velocity 端的 LoginEvent 处理，UUID 可靠度 100%）
-        if (!Config.Settings.BehindProxy && Config.Settings.KickEnglishOfflineNames && isEnglishName(name)) {
+        if (!Config.Settings.BehindProxy && Config.Settings.KickEnglishOfflineNames && name.matches("^[a-zA-Z0-9_]+$")) {
             // 白名单内放行
             if (!Config.Settings.EnglishNameWhitelist.contains(name)) {
                 // 正版玩家放行（UUID 不等于离线 UUID）
