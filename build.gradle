@@ -1,4 +1,4 @@
-plugins {
+﻿plugins {
     id 'java'
     id 'com.gradleup.shadow' version '9.4.2'
 }
@@ -29,20 +29,20 @@ repositories {
 }
 
 dependencies {
-    // Paper API 26.2（Canvas 26.2 = MC 26.2），向下兼容 Spigot/Paper/Folia
+    // Paper API 26.2锛圕anvas 26.2 = MC 26.2锛夛紝鍚戜笅鍏煎 Spigot/Paper/Folia
     compileOnly 'io.papermc.paper:paper-api:26.2.build.105-stable'
-    // Velocity API（Proxy 端插件，compileOnly，同一 jar 双端部署�?
+    // Velocity API锛圥roxy 绔彃浠讹紝compileOnly锛屽悓涓€ jar 鍙岀閮ㄧ讲锛?
     compileOnly 'com.velocitypowered:velocity-api:3.4.0-SNAPSHOT'
     annotationProcessor 'com.velocitypowered:velocity-api:3.4.0-SNAPSHOT'
-    // Log4j2（服务器自带，compileOnly 用于编译 Log4jFilter，不 shade 避免冲突�?
+    // Log4j2锛堟湇鍔″櫒鑷甫锛宑ompileOnly 鐢ㄤ簬缂栬瘧 Log4jFilter锛屼笉 shade 閬垮厤鍐茬獊锛?
     compileOnly 'org.apache.logging.log4j:log4j-core:2.24.3'
-    // ProtocolLib（softdepend，可选）
+    // ProtocolLib锛坰oftdepend锛屽彲閫夛級
     compileOnly 'com.comphenix.protocol:ProtocolLib:5.3.0'
     // Lombok
     compileOnly 'org.projectlombok:lombok:1.18.46'
     annotationProcessor 'org.projectlombok:lombok:1.18.46'
 
-    // 运行时依赖（shade �?jar�?
+    // 杩愯鏃朵緷璧栵紙shade 杩?jar锛?
     implementation 'org.xerial:sqlite-jdbc:3.21.0.1'
     implementation 'com.sun.mail:jakarta.mail:1.6.7'
     compileOnly 'mysql:mysql-connector-java:8.0.28'
@@ -55,8 +55,7 @@ tasks.withType(JavaCompile) {
 sourceSets {
     main {
         java {
-            // BungeeCord 端源码保留但排除编译（Paper 端不需要，避免 Bungee API 依赖�?
-            exclude 'cc/baka9/catseedlogin/bungee/**'
+            // BungeeCord 绔簮鐮佷繚鐣欎絾鎺掗櫎缂栬瘧锛圥aper 绔笉闇€瑕侊紝閬垮厤 Bungee API 渚濊禆锛?
         }
     }
 }
@@ -65,14 +64,14 @@ shadowJar {
     archiveBaseName = 'CatSeedLogin'
     archiveClassifier = ''
     archiveVersion = project.version
-    // 允许重复条目（plugin.yml + velocity-plugin.json 共存同一 jar�?
+    // 鍏佽閲嶅鏉＄洰锛坧lugin.yml + velocity-plugin.json 鍏卞瓨鍚屼竴 jar锛?
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-    // 注意：不�?relocate org.sqlite —�?SQLite.java �?Class.forName("org.sqlite.JDBC") 字符串加载，
-    // relocate 不会改写字符串，会导�?ClassNotFoundException�?
-    // 不用 minimize —�?sqlite-jdbc 通过反射加载，静态分析会误删�?
+    // 娉ㄦ剰锛氫笉鑳?relocate org.sqlite 鈥斺€?SQLite.java 鐢?Class.forName("org.sqlite.JDBC") 瀛楃涓插姞杞斤紝
+    // relocate 涓嶄細鏀瑰啓瀛楃涓诧紝浼氬鑷?ClassNotFoundException銆?
+    // 涓嶇敤 minimize 鈥斺€?sqlite-jdbc 閫氳繃鍙嶅皠鍔犺浇锛岄潤鎬佸垎鏋愪細璇垹銆?
 }
 
-// �?jar 也接受重复（velocity-plugin.json 可能�?bungee 资源冲突�?
+// 璁?jar 涔熸帴鍙楅噸澶嶏紙velocity-plugin.json 鍙兘璺?bungee 璧勬簮鍐茬獊锛?
 tasks.named('jar') {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
