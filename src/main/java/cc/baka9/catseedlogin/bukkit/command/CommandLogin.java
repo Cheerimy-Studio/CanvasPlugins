@@ -44,7 +44,13 @@ public class CommandLogin implements CommandExecutor {
             // 通知 Velocity：该玩家已登录，允许切换子服
             VelocityTransfer.notifyLoggedIn(player);
             if (Config.Settings.AfterLoginBack && Config.Settings.CanTpSpawnLocation) {
-                Config.getOfflineLocation(player).ifPresent(player::teleport);
+                Config.getOfflineLocation(player).ifPresent(loc -> {
+                    try { player.teleportAsync(loc); } catch (NoSuchMethodError e) { player.teleport(loc); }
+                });
+            }
+            // 登录后自动命令（如 /server main）
+            for (String cmd : Config.Settings.AfterLoginCommands) {
+                player.performCommand(cmd);
             }
         } else {
             sender.sendMessage(Config.Language.LOGIN_FAIL);

@@ -74,6 +74,10 @@ public class VelocityReceiver implements PluginMessageListener {
         LoginPlayerHelper.recordCurrentIP(player, lp);
         VelocityTransfer.notifyLoggedIn(player);
         CatSeedLogin.instance.getLogger().info("CatSeedLogin: " + name + " 正版自动登录成功");
+        // 正版自动登录后也执行 AfterLoginCommands
+        for (String cmd : Config.Settings.AfterLoginCommands) {
+            player.performCommand(cmd);
+        }
     }
 
     private static String generatePassword() {

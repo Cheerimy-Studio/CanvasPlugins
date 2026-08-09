@@ -71,6 +71,10 @@ public class CommandRegister implements CommandExecutor {
                     LoginPlayerHelper.recordCurrentIP(player, lp);
                     // 通知 Velocity：该玩家已注册并登录，允许切换子服
                     VelocityTransfer.notifyLoggedIn(player);
+                    // 注册后自动命令（如 /server main）
+                    for (String cmd : Config.Settings.AfterLoginCommands) {
+                        player.performCommand(cmd);
+                    }
                 }
 
 

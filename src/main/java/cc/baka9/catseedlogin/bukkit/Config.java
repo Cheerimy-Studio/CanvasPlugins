@@ -97,6 +97,8 @@ public class Config {
         public static boolean PremiumAllowNoRegister;
         // 是否在代理后运行（Velocity/BungeeCord），true 时后端跳过英文名检测
         public static boolean BehindProxy;
+        // 登录/注册后自动执行的命令（如 /server main）
+        public static List<String> AfterLoginCommands = new ArrayList<>();
 
         public static void load(){
             FileConfiguration config = getConfig("config.yml");
@@ -132,7 +134,12 @@ public class Config {
             englishNameWhitelist.forEach(s -> EnglishNameWhitelist.add(s.toLowerCase(Locale.ROOT)));
             PremiumAllowNoRegister = config.getBoolean("PremiumAllowNoRegister", resourceConfig.getBoolean("PremiumAllowNoRegister", true));
             BehindProxy = config.getBoolean("BehindProxy", resourceConfig.getBoolean("BehindProxy", false));
-
+            List<String> afterLoginCommands = config.getStringList("AfterLoginCommands");
+            if (afterLoginCommands.isEmpty()) {
+                afterLoginCommands = resourceConfig.getStringList("AfterLoginCommands");
+            }
+            AfterLoginCommands.clear();
+            AfterLoginCommands.addAll(afterLoginCommands);
 
         }
 
@@ -158,6 +165,7 @@ public class Config {
             config.set("EnglishNameWhitelist", EnglishNameWhitelist);
             config.set("PremiumAllowNoRegister", PremiumAllowNoRegister);
             config.set("BehindProxy", BehindProxy);
+            config.set("AfterLoginCommands", AfterLoginCommands);
             try {
                 config.save(new File(CatSeedLogin.instance.getDataFolder(), "config.yml"));
             } catch (IOException e) {
@@ -299,20 +307,30 @@ public class Config {
 
     // 字符串转成位置
     private static Location str2Location(String str){
-        Location loc;
+        Location loc = null;
         try {
-            String[] locStrs = str.split(":");
-            World world = Bukkit.getWorld(locStrs[0]);
-            double x = Double.parseDouble(locStrs[1]);
-            double y = Double.parseDouble(locStrs[2]);
-            double z = Double.parseDouble(locStrs[3]);
-            float yaw = Float.parseFloat(locStrs[4]);
-            float pitch = Float.parseFloat(locStrs[5]);
-            loc = new Location(world, x, y, z, yaw, pitch);
+            if (str != null && !str.isEmpty()) {
+                String[] locStrs = str.split(":");
+                World world = Bukkit.getWorld(locStrs[0]);
+                double x = Double.parseDouble(locStrs[1]);
+                double y = Double.parseDouble(locStrs[2]);
+                double z = Double.parseDouble(locStrs[3]);
+                float yaw = Float.parseFloat(locStrs[4]);
+                float pitch = Float.parseFloat(locStrs[5]);
+                loc = new Location(world, x, y, z, yaw, pitch);
+            }
         } catch (Exception ignored) {
-            loc = getDefaultWorld().getSpawnLocation();
+            // 解析失败，退回到默认出生点
         }
-        fixLocation(loc);
+        if (loc == null || loc.getWorld() == null) {
+            World defaultWorld = getDefaultWorld();
+            if (defaultWorld != null) {
+                loc = defaultWorld.getSpawnLocation();
+            }
+        }
+        if (loc != null) {
+            fixLocation(loc);
+        }
         return loc;
 
     }

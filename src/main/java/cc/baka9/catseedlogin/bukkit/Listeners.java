@@ -248,19 +248,17 @@ public class Listeners implements Listener {
         Cache.refresh(p.getName());
         // 正版免登录由 Velocity 端通过 PluginMessage → VelocityReceiver 触发。
         // Bukkit 端不主动做正版检测，防止 online-mode=false 时离线玩家冒充正版名免登录。
-        if (Config.Settings.CanTpSpawnLocation) {
+        if (Config.Settings.CanTpSpawnLocation && Config.Settings.SpawnLocation != null) {
             Scheduler.safeTeleport(p, Config.Settings.SpawnLocation);
         }
-        // 延迟发送登录/注册提示（给 VelocityReceiver 一点时间处理正版自动登录）
-        Scheduler.runGlobalLater(CatSeedLogin.instance, () -> {
-            if (!LoginPlayerHelper.isLogin(p.getName())) {
-                if (!LoginPlayerHelper.isRegister(p.getName())) {
-                    p.sendMessage(Config.Language.REGISTER_REQUEST);
-                } else {
-                    p.sendMessage(Config.Language.LOGIN_REQUEST);
-                }
+        // 立即发送登录/注册提示（正版玩家会被 VelocityReceiver.autoLogin 覆盖）
+        if (!LoginPlayerHelper.isLogin(p.getName())) {
+            if (!LoginPlayerHelper.isRegister(p.getName())) {
+                p.sendMessage(Config.Language.REGISTER_REQUEST);
+            } else {
+                p.sendMessage(Config.Language.LOGIN_REQUEST);
             }
-        }, 40L); // 2 秒后
+        }
     }
 
     
@@ -271,7 +269,7 @@ public class Listeners implements Listener {
         String name = event.getName();
 
         // 英文名离线玩家踢出检测（仅非代理模式；代理模式下由 Velocity 端的 LoginEvent 处理，UUID 可靠度 100%）
-        // 英文名白名单始终生效（不区分大小写）
+        // 英文名白名单始终生效（不区分大小写）—— 允许这些离线英文名注册登录
         if (Config.Settings.EnglishNameWhitelist.stream().anyMatch(w -> w.equalsIgnoreCase(name))) return;
 
         if (!Config.Settings.BehindProxy && Config.Settings.KickEnglishOfflineNames && name.matches("^[a-zA-Z0-9_]+$")) {

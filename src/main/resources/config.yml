@@ -41,6 +41,8 @@ AfterLoginBack: true         # 登录后返回退出位置
 CanTpSpawnLocation: true     # 登录前强制在登录点
 DeathStateQuitRecordLocation: true  # 死亡时退出记录位置
 AlwaysFreeze: false          # 永远冻结（即使登录完成也不让动）
+# 登录/注册后自动执行的命令（以玩家身份，用控制台可设 /server main）
+AfterLoginCommands: []
 
 # ========== 出生/传送点（空 = 默认 world 出生点） ==========
 SpawnLocation:
