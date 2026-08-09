@@ -27,7 +27,7 @@ object Suicide {
             if (sender !is Player) return@simpleCommand
 
             sender.scheduler.run(BukkitPlugin.getInstance(), { _ ->
-                sender.health = 0.0
+                sender.damage(99999.0)
             }, null)
             config.getString("messages.suicide", "")?.takeIf { it.isNotEmpty() }?.let { sender.msg(it) }
         }

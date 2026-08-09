@@ -1,24 +1,12 @@
 version: '1.0.0'
 
-# ===================== 玩家统计配置 =====================
-# 数据通过 Bukkit PDC 持久化，存储在玩家身上，无需数据库
 player:
-  enable: true  # 是否启用玩家统计
+  enable: true
 
-# ===================== 统计展示消息 =====================
-# 使用 /stat（别名 /stats、/statistics、统计）查看
-# %name%                    玩家名
-# %kills% %deaths% %kd%     击杀 / 死亡 / K/D 比
-# %joins% %quits%           加入 / 退出次数
-# %online-time-days%        在线天数
-# %online-time-hrs%         在线小时
-# %online-time-min%         在线分钟
-# %online-time-sec%         在线秒
-# %formatted-online-time%   自动拼接的在线时长（仅显示非零项）
-# %has-<权限>%              权限占位符，按 permission-placeholders 配置替换
+# /stat 展示消息 — 注意 key 名称必须与 Command.kt 中的 config.getStringList("messages.player.messages") 一致
 messages:
   player:
-    lines:
+    messages:
       - "&7=========================="
       - "&6玩家: &f%name%"
       - "&6击杀: &f%kills%"
@@ -26,16 +14,12 @@ messages:
       - "&6K/D: &f%kd%"
       - "&6加入: &f%joins%"
       - "&6退出: &f%quits%"
-      - "&6权限示例: &f%has-2b2tcore.example%"
       - "&6在线时长: &f%formatted-online-time%"
       - "&7=========================="
     time-day: "天"
     time-hour: "时"
     time-minute: "分"
-    time-sec: "秒"
-    # 权限占位符：%has-<节点>% 命中以下配置时替换
-    # if-has：拥有该权限时显示的内容
-    # if-not：无该权限时显示的内容
+    time-second: "秒"
     permission-placeholders:
       2b2tcore.example:
         if-has: "&e&l已授权"

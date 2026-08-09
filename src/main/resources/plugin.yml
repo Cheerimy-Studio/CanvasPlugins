@@ -14,6 +14,11 @@ permissions:
   2b2tcore.suicide:
     description: 使用 /suicide /514 自杀
     default: op
+commands:
+  suicide:
+    description: 自杀
+    usage: /<command>
+    aliases: [514]
   2b2tcore.stat:
     description: 查看玩家统计 /stat
     default: op
