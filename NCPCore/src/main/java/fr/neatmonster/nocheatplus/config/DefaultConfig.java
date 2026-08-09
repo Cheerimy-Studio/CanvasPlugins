@@ -461,7 +461,7 @@ public class DefaultConfig extends ConfigFile {
  set(ConfPaths.MOVING_MOREPACKETS_BURST_DIRECT, 10, 154); // Maximum burst events within 500ms (Max packets allowed: 15*10=150 within 500ms)
  set(ConfPaths.MOVING_MOREPACKETS_BURST_EPM, 95, 154); // Maximum burst events per minute
  set(ConfPaths.MOVING_MOREPACKETS_SETBACKAGE, 110, 154); // Quite harsh. 
- set(ConfPaths.MOVING_MOREPACKETS_ACTIONS, "cancel vl>2 cancel log:morepackets:10:9:i vl>100 cancel log:morepackets:0:2:ifc", 154);
+ set(ConfPaths.MOVING_MOREPACKETS_ACTIONS, "cancel vl>10 cancel log:morepackets:10:9:i vl>500 cancel log:morepackets:0:2:ifc", 154); // Folia容忍
  // NoFall
  set(ConfPaths.MOVING_NOFALL_CHECK, "default", 154);
  set(ConfPaths.MOVING_NOFALL_DEALDAMAGE, true, 154);
@@ -470,10 +470,10 @@ public class DefaultConfig extends ConfigFile {
  set(ConfPaths.MOVING_NOFALL_RESETONTP, false, 154);
  set(ConfPaths.MOVING_NOFALL_RESETONVEHICLE, true, 154);
  set(ConfPaths.MOVING_NOFALL_ANTICRITICALS, true, 154);
- set(ConfPaths.MOVING_NOFALL_ACTIONS, "cancel vl>2 cancel log:nofall:0:5:if", 154); //vl>6 cancel log:nofall:0:1:if", 154);
+ set(ConfPaths.MOVING_NOFALL_ACTIONS, "cancel vl>10 cancel log:nofall:0:5:if", 154); // Folia容忍
  // Passable
  set(ConfPaths.MOVING_PASSABLE_CHECK, "default", 154);
- set(ConfPaths.MOVING_PASSABLE_ACTIONS, "cancel vl>15 cancel log:passable:7:9:i vl>100 cancel log:passable:1:4:if", 154);
+ set(ConfPaths.MOVING_PASSABLE_ACTIONS, "cancel vl>50 cancel log:passable:7:9:i vl>300 cancel log:passable:1:4:if", 154); // Folia容忍
  set(ConfPaths.MOVING_PASSABLE_UNTRACKED_TELEPORT_ACTIVE, true, 154);
  set(ConfPaths.MOVING_PASSABLE_UNTRACKED_CMD_ACTIVE, true, 154);
  set(ConfPaths.MOVING_PASSABLE_UNTRACKED_CMD_TRYTELEPORT, true, 154);
@@ -486,25 +486,27 @@ public class DefaultConfig extends ConfigFile {
  // SurvivalFly - ViolationFrequencyHook
  set(ConfPaths.MOVING_SURVIVALFLY_VLFREQUENCY_ACTIVE, true, 154);
  set(ConfPaths.MOVING_SURVIVALFLY_VLFREQUENCY_DEBUG, false, 154);
- set(ConfPaths.MOVING_SURVIVALFLY_VLFREQUENCY_MAXTHRESHOLDVL, 35, 154);
- set(ConfPaths.MOVING_SURVIVALFLY_VLFREQUENCY_NOADDITIONVL, 5, 154);
- set(ConfPaths.MOVING_SURVIVALFLY_VLFREQUENCY_AMOUNTTOADD, 5, 154);
- set(ConfPaths.MOVING_SURVIVALFLY_VLFREQUENCY_LASTVIOLATEDMOVECOUNT, 10, 154);
+ // Folia: 大幅提高VL容忍度，跨线程水平速度信封经常返回0
+ set(ConfPaths.MOVING_SURVIVALFLY_VLFREQUENCY_MAXTHRESHOLDVL, 200, 154);
+ set(ConfPaths.MOVING_SURVIVALFLY_VLFREQUENCY_NOADDITIONVL, 50, 154);
+ set(ConfPaths.MOVING_SURVIVALFLY_VLFREQUENCY_AMOUNTTOADD, 1, 154);
+ set(ConfPaths.MOVING_SURVIVALFLY_VLFREQUENCY_LASTVIOLATEDMOVECOUNT, 20, 154);
  // More leniency features
- set(ConfPaths.MOVING_SURVIVALFLY_LENIENCY_FREEZECOUNT, 40, 1144);
+ set(ConfPaths.MOVING_SURVIVALFLY_LENIENCY_FREEZECOUNT, 120, 1144);
  set(ConfPaths.MOVING_SURVIVALFLY_LENIENCY_FREEZEINAIR, true, 1143);
- set(ConfPaths.MOVING_SURVIVALFLY_SETBACKPOLICY_FALLDAMAGE, true, 154);
+ set(ConfPaths.MOVING_SURVIVALFLY_SETBACKPOLICY_FALLDAMAGE, false, 154);
+ // Folia: 只cancel回弹不踢人，阈值大幅提高以容忍跨线程检测误差
  set(ConfPaths.MOVING_SURVIVALFLY_ACTIONS, "cancel log:flyfile:6:15:f"
- + "vl>100 cancel log:survivalfly:10:11:i log:flyfile:6:15:f"
- + "vl>700 cancel log:survivalfly:8:5:i log:flyfile:1:3:f"
- + "vl>2100 cancel log:survivalflyhighvl:0:4:icf", 154); 
- // SurvivalFly - Hover Subcheck
- set(ConfPaths.MOVING_SURVIVALFLY_HOVER_CHECK, true, 154); // Not a check type yet.
- set(ConfPaths.MOVING_SURVIVALFLY_HOVER_STEP, 5, 154);
- set(ConfPaths.MOVING_SURVIVALFLY_HOVER_TICKS, 85, 154);
- set(ConfPaths.MOVING_SURVIVALFLY_HOVER_LOGINTICKS, 60, 154);
- set(ConfPaths.MOVING_SURVIVALFLY_HOVER_FALLDAMAGE, true, 154);
- set(ConfPaths.MOVING_SURVIVALFLY_HOVER_SFVIOLATION, 200, 154); 
+ + "vl>500 cancel log:survivalfly:10:11:i log:flyfile:6:15:f"
+ + "vl>3000 cancel log:survivalfly:8:5:i log:flyfile:1:3:f"
+ + "vl>10000 cancel log:survivalflyhighvl:0:4:icf", 154); 
+ // SurvivalFly - Hover Subcheck (Folia: 高容忍)
+ set(ConfPaths.MOVING_SURVIVALFLY_HOVER_CHECK, true, 154);
+ set(ConfPaths.MOVING_SURVIVALFLY_HOVER_STEP, 40, 154);
+ set(ConfPaths.MOVING_SURVIVALFLY_HOVER_TICKS, 200, 154);
+ set(ConfPaths.MOVING_SURVIVALFLY_HOVER_LOGINTICKS, 200, 154);
+ set(ConfPaths.MOVING_SURVIVALFLY_HOVER_FALLDAMAGE, false, 154);
+ set(ConfPaths.MOVING_SURVIVALFLY_HOVER_SFVIOLATION, 500, 154); 
  // Moving Trace - Lag compensator
  set(ConfPaths.MOVING_TRACE_MAXAGE, 30, 154);
  set(ConfPaths.MOVING_TRACE_MAXSIZE, 30, 154);
@@ -535,7 +537,7 @@ public class DefaultConfig extends ConfigFile {
  set(ConfPaths.MOVING_VEHICLE_ENVELOPE_ACTIVE, "default", 154);
  set(ConfPaths.MOVING_VEHICLE_ENVELOPE_HSPEEDCAP + ".default", 0.9, 154);
  set(ConfPaths.MOVING_VEHICLE_ENVELOPE_HSPEEDCAP + ".pig", 0.3, 154);
- set(ConfPaths.MOVING_VEHICLE_ENVELOPE_ACTIONS, "cancel vl>50 cancel log:vehicleenvelope:10:6:if vl>300 cancel log:vehicleenvelope:0:10:if", 154);
+ set(ConfPaths.MOVING_VEHICLE_ENVELOPE_ACTIONS, "cancel vl>100 cancel log:vehicleenvelope:10:6:if vl>500 cancel log:vehicleenvelope:0:10:if", 154); // Folia容忍
  // Messages
  set(ConfPaths.MOVING_MESSAGE_ILLEGALPLAYERMOVE, "Illegal move.", 154);
  set(ConfPaths.MOVING_MESSAGE_ILLEGALVEHICLEMOVE, "Illegal vehicle move.", 154);
@@ -563,7 +565,7 @@ public class DefaultConfig extends ConfigFile {
  set(ConfPaths.NET_KEEPALIVEFREQUENCY_ACTIONS, "cancel vl>10 cancel log:keepalive:2:6:i vl>60 cancel log:keepalive:0:10:icf", 154);
  // Moving
  set(ConfPaths.NET_MOVING_ACTIVE, "default", 154);
- set(ConfPaths.NET_MOVING_ACTIONS, "cancel vl>17 cancel log:moving:10:15:i", 154);
+ set(ConfPaths.NET_MOVING_ACTIONS, "cancel vl>50 cancel log:moving:10:15:i", 154); // Folia容忍
  // PacketFrequency (pre 1.9).
  set(ConfPaths.NET_PACKETFREQUENCY_ACTIVE, "default", 154);
  set(ConfPaths.NET_PACKETFREQUENCY_PPS, 300, 154); // Old limit: 200, legit 1.8 clients seem to be able to reach such value more often than not...
