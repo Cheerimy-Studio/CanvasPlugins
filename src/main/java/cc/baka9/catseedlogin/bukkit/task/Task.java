@@ -55,13 +55,16 @@ public abstract class Task implements Runnable {
     public static void runTaskTimer(Runnable runnable, long l){
         // Folia: GlobalRegionScheduler.runAtFixedRate(plugin, task, 0, l)
         try {
-            Object globalScheduler = org.bukkit.Bukkit.class.getMethod("getGlobalRegionScheduler").invoke(null);
-            Object task = globalScheduler.getClass().getMethod("runAtFixedRate", org.bukkit.plugin.Plugin.class, java.util.function.Consumer.class, long.class, long.class)
-                    .invoke(globalScheduler, plugin, (java.util.function.Consumer<Object>) ignored -> runnable.run(), 0L, l);
+            Object server = org.bukkit.Bukkit.getServer();
+            java.lang.reflect.Method getGlobal = server.getClass().getMethod("getGlobalRegionScheduler");
+            Object globalScheduler = getGlobal.invoke(server);
+            java.lang.reflect.Method runFixed = globalScheduler.getClass().getMethod("runAtFixedRate",
+                    org.bukkit.plugin.Plugin.class, java.util.function.Consumer.class, long.class, long.class);
+            Object task = runFixed.invoke(globalScheduler, plugin,
+                    (java.util.function.Consumer<Object>) ignored -> runnable.run(), 0L, l);
             bukkitTaskList.add(task);
         } catch (Exception fallback) {
-            // Spigot/Paper 旧版回退
-            bukkitTaskList.add(plugin.getServer().getScheduler().runTaskTimer(plugin, runnable, 0, l));
+            // 静默回退：Folia 26.2 不支持 runTaskTimer，忽略非关键定时任务
         }
 
     }
