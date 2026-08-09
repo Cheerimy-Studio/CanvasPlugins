@@ -1,0 +1,46 @@
+name: 2B2TCore
+main: luminus.acng.taboolib.platform.BukkitPlugin
+version: 2.0.0
+authors:
+  - 'NaN'
+api-version: "1.21"
+folia-supported: true
+description: 2B2TCore - Anarchy server core plugin for Folia / Canvas
+
+permissions:
+  2b2tcore.reload:
+    description: 重载插件配置
+    default: op
+  2b2tcore.suicide:
+    description: 使用 /suicide /514 自杀
+    default: op
+  2b2tcore.stat:
+    description: 查看玩家统计 /stat
+    default: op
+  2b2tcore.dupe.command:
+    description: 使用 /dupe 复制手持物品
+    default: op
+  2b2tcore.dupe.chicken.xin:
+    description: 鸡复制 Xin 模式
+    default: op
+  2b2tcore.dupe.chicken.click:
+    description: 鸡复制点击模式
+    default: op
+  2b2tcore.dupe.donkey.xin:
+    description: 驴复制 Xin 模式
+    default: op
+  2b2tcore.dupe.donkey.org:
+    description: 驴复制 Org 模式
+    default: op
+  2b2tcore.dupe.item-frame:
+    description: 物品展示框复制
+    default: op
+  2b2tcore.dupe.mine-and-place:
+    description: 破坏放置复制
+    default: op
+  2b2tcore.chatcolor.vip:
+    description: VIP 聊天颜色
+    default: op
+  2b2tcore.chatcolor.op:
+    description: OP 聊天颜色
+    default: op
