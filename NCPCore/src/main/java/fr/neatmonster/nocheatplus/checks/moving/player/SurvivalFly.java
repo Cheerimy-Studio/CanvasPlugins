@@ -1128,8 +1128,8 @@ public class SurvivalFly extends Check {
             }
         }
         
-        // Block speed (Folia: 0.6f 保底防正常行走回弹)
-        float blockSpeed = Math.max(0.6f, data.nextBlockSpeedMultiplier);
+        // Block speed (Folia: 1.0 保底 — 跨线程方块查表不可靠，用 1.0 跳过)
+        float blockSpeed = 1.0f;
         thisMove.xAllowedDistance *= (double) blockSpeed;
         thisMove.zAllowedDistance *= (double) blockSpeed;
         // Friction next, with special case for riptide at the start of the movement tick (when the riptide move is "unified" and not split into two updates; friction of the next move is used here)
@@ -1141,8 +1141,10 @@ public class SurvivalFly extends Check {
                 newFriction = true;
             }
         }
-        thisMove.xAllowedDistance *= (double) (newFriction ? data.nextInertia : data.lastInertia);
-        thisMove.zAllowedDistance *= (double) (newFriction ? data.nextInertia : data.lastInertia);
+        // Folia: 摩擦力跨线程查表不可靠，用 0.91 默认值
+        double inertia = newFriction ? Math.max(0.91, data.nextInertia) : Math.max(0.91, data.lastInertia);
+        thisMove.xAllowedDistance *= inertia;
+        thisMove.zAllowedDistance *= inertia;
         // Apply entity-pushing speed
         // From Entity.java.push()
         // The entity's location is in the past.

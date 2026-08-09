@@ -112,8 +112,8 @@ public class Magic {
     ///////////////////////////////////////////
     // *----------Misc.----------*
     public static final double PAPER_DIST = 0.01;
-    /** The margin of error tolerated by predictions */
-    public static final double PREDICTION_EPSILON = 0.0001;
+    /** The margin of error tolerated by predictions (Folia: 放宽至 0.01 防跨线程方块查表误差导致回弹) */
+    public static final double PREDICTION_EPSILON = 0.01;
     /** Minimum match tolerance for sneak-edge corner recovery (post-collide vs packet). */
     public static final double EDGE_SNEAK_CORNER_MATCH_TOLERANCE_MIN = 0.02;
     /** Maximum match tolerance for sneak-edge corner recovery (swift sneak / speed potions). */
