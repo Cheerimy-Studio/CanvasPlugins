@@ -1128,9 +1128,10 @@ public class SurvivalFly extends Check {
             }
         }
         
-        // Block speed
-        thisMove.xAllowedDistance *= (double) data.nextBlockSpeedMultiplier;
-        thisMove.zAllowedDistance *= (double) data.nextBlockSpeedMultiplier;
+        // Block speed (Folia: clamp floor to prevent 0 from cross-thread lookup failures)
+        float blockSpeed = Math.max(0.5f, data.nextBlockSpeedMultiplier);
+        thisMove.xAllowedDistance *= (double) blockSpeed;
+        thisMove.zAllowedDistance *= (double) blockSpeed;
         // Friction next, with special case for riptide at the start of the movement tick (when the riptide move is "unified" and not split into two updates; friction of the next move is used here)
         boolean newFriction = false;
         if (lastMove.tridentRelease.decide() && lastMove.toIsValid) {

@@ -433,7 +433,7 @@ public class MovingData extends ACheckData implements IDataOnRemoveSubCheckData,
     public void adjustMediumProperties(final Player player, final PlayerLocation from) {
         nextFrictionHorizontal = BlockProperties.getHorizontalFrictionFactor(player, from);
         nextStuckInBlockHorizontal = BlockProperties.getStuckInBlockHorizontalFactor(player, from);
-        nextBlockSpeedMultiplier = MathUtil.lerp(attributeAccess.getHandle().getMovementEfficiency(player), BlockProperties.getBlockSpeedFactor(player, from), 1.0f);
+        nextBlockSpeedMultiplier = Math.max(0.5f, MathUtil.lerp(attributeAccess.getHandle().getMovementEfficiency(player), BlockProperties.getBlockSpeedFactor(player, from), 1.0f)); // Folia: 防止跨线程返回0导致hdist=0
         nextFrictionVertical = BlockProperties.getVerticalFrictionFactor(player, from);
         nextStuckInBlockVertical = BlockProperties.getStuckInBlockVerticalFactor(player, from);
     }

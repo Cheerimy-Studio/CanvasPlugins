@@ -546,8 +546,10 @@ public class HiddenMotionReconstructor {
             }
         }
 
-        baseX *= (double) data.nextBlockSpeedMultiplier;
-        baseZ *= (double) data.nextBlockSpeedMultiplier;
+        // Folia: clamp floor to prevent cross-thread lookup failures returning 0
+        float blockSpeedA = Math.max(0.5f, data.nextBlockSpeedMultiplier);
+        baseX *= (double) blockSpeedA;
+        baseZ *= (double) blockSpeedA;
         
         baseX *= (double) data.lastInertia;
         baseZ *= (double) data.lastInertia;
@@ -727,8 +729,10 @@ public class HiddenMotionReconstructor {
                     baseZ = 0.0;
                 }
             }
-            baseX *= (double) data.nextBlockSpeedMultiplier;
-            baseZ *= (double) data.nextBlockSpeedMultiplier;
+            // Folia: clamp floor to prevent cross-thread lookup failures returning 0
+            float blockSpeedB = Math.max(0.5f, data.nextBlockSpeedMultiplier);
+            baseX *= (double) blockSpeedB;
+            baseZ *= (double) blockSpeedB;
             
             baseX *= (double) data.lastInertia;
             baseZ *= (double) data.lastInertia;
