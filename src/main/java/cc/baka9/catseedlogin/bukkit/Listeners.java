@@ -251,6 +251,16 @@ public class Listeners implements Listener {
         if (Config.Settings.CanTpSpawnLocation) {
             Scheduler.safeTeleport(p, Config.Settings.SpawnLocation);
         }
+        // 延迟发送登录/注册提示（给 VelocityReceiver 一点时间处理正版自动登录）
+        Scheduler.runGlobalLater(CatSeedLogin.instance, () -> {
+            if (!LoginPlayerHelper.isLogin(p.getName())) {
+                if (!LoginPlayerHelper.isRegister(p.getName())) {
+                    p.sendMessage(Config.Language.REGISTER_REQUEST);
+                } else {
+                    p.sendMessage(Config.Language.LOGIN_REQUEST);
+                }
+            }
+        }, 40L); // 2 秒后
     }
 
     
