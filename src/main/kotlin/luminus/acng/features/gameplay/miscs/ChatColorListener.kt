@@ -23,7 +23,8 @@ object ChatColorListener : Listener {
         val color = resolveColor(sender) ?: return
         event.format = Component.text(sender.name).color(color)
             .append(Component.text(" >> "))
-            .append(Component.text(event.message))
+        // 注意：PistonChat 显示 format + message，所以 format 只放"名称 >> "，
+        // 消息内容由 PistonChat 自动附加，否则会出现 "名称 >> 消息 消息" 重复
     }
 
     private fun resolveColor(player: Player): TextColor? {
