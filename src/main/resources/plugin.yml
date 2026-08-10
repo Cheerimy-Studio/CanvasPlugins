@@ -13,7 +13,7 @@ permissions:
     default: op
   2b2tcore.suicide:
     description: 使用 /suicide /514 自杀
-    default: op
+    default: true
 commands:
   suicide:
     description: 自杀
