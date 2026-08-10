@@ -21,7 +21,7 @@ object Suicide {
             "suicide",
             aliases = arrayListOf("514"),
             permission = "2b2tcore.suicide",
-            permissionDefault = PermissionDefault.OP
+            permissionDefault = PermissionDefault.TRUE
         ) { sender, _ ->
             if (!config.getBoolean("suicide-enable", true)) return@simpleCommand
             if (sender !is Player) return@simpleCommand

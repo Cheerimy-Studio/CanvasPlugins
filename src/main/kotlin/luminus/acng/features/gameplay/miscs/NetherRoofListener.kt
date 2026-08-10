@@ -117,7 +117,7 @@ object NetherRoofListener : Listener {
         val world = center.world ?: return
         val chunkRadius = config.getInt("nether-roof.cleanup-radius-chunks", 1).coerceAtLeast(0).coerceAtMost(2)
         val minY = 129
-        val maxY = world.maxHeight.coerceAtMost(256)
+        val maxY = minOf(world.maxHeight, 255)
 
         val centerChunk = world.getChunkAt(center)
         val chunks = mutableListOf<Chunk>()
