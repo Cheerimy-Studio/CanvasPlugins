@@ -22,6 +22,8 @@ object ChatColorListener : Listener {
         val sender = event.sender
         val color = resolveColor(sender) ?: return
         event.format = Component.text(sender.name).color(color)
+            .append(Component.text(" >> "))
+            .append(Component.text(event.message))
     }
 
     private fun resolveColor(player: Player): TextColor? {
