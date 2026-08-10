@@ -14,18 +14,18 @@ duplication:
     multiply-times: 2  # 复制倍数
     max-amount: 2333   # 单次复制数量上限
 
-  # 物品展示框复制：旋转展示框时有概率掉落其内物品（权限：core.dupe.item-frame）
+  # 物品展示框复制：旋转展示框时有概率掉落其内物品（权限：2b2tcore.dupe.item-frame）
   item-frame:
     enable: false
     possibility: 10  # 触发概率（百分比，0-100）
 
   # 鸡刷复制
   chicken:
-    # Xin 模式：将潜影盒存入鸡中，每隔指定分钟数掉落（权限：core.dupe.chicken.xin）
+    # Xin 模式：将潜影盒存入鸡中，每隔指定分钟数掉落（权限：2b2tcore.dupe.chicken.xin）
     xin-mode: false
     xin-mode-interval: 15        # 每隔多少分钟刷新一次
     xin-mode-max-per-chunk: 3   # 每个区块最多几只有效鸡（超出的显示浓烟，不刷物）
-    # 点击模式：右键鸡时复制手持物品（权限：core.dupe.chicken.click）
+    # 点击模式：右键鸡时复制手持物品（权限：2b2tcore.dupe.chicken.click）
     click-mode: false
     click-mode-cooldown: 3  # 冷却时间（秒）
 
@@ -33,7 +33,7 @@ duplication:
   donkey:
     # Xin 模式：击杀驴兽时掉落其库存（权限：2b2tcore.dupe.donkey.xin）
     xin-mode: false
-    # Org 模式：骑乘驴兽下线时复制其库存（权限：core.dupe.donkey.org）
+    # Org 模式：骑乘驴兽下线时复制其库存（权限：2b2tcore.dupe.donkey.org）
     org-mode: false
     # Org 模式下是否允许处理船链上的驴兽
     org-mode-allow-boat-chain: false
@@ -53,6 +53,14 @@ spawn:
   enable: true                # 总开关，false 则关闭出生点随机传送
   radius: 500                 # 随机传送范围（出生点 ± N 格内）
   invulnerability-seconds: 10  # 新玩家无敌时间（秒，0 则不给）
+
+# ===================== 地狱顶层（Y > 128）限制器 =====================
+# 无权限 `2b2tcore.runmax` 的玩家在地狱超过 128 层会被强制传回下方安全处，
+# 并清理周围已加载区块 Y > 128 的方块和实体。
+# 有权限的玩家上升到 256 层以上时也会被强制传送回下方安全处。
+nether-roof:
+  enable: false               # 总开关
+  cleanup-radius-chunks: 1  # 清理半径（区块数，0 表示仅当前区块，最大 2）
 
 # ===================== 聊天颜色（需安装 PistonChat）=====================
 # 未安装 PistonChat 时本段无效，不会触发其事件类加载

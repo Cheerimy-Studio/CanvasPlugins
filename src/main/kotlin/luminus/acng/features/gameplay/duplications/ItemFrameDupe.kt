@@ -22,9 +22,9 @@ object ItemFrameDupe {
         val item = entity.item
         if (item.type.isAir) return
 
-        if (ThreadLocalRandom.current().nextInt(100) >= config.getInt("duplication.item-frame.possibility", 10)) return
-
-        entity.world.dropItem(entity.location, item.clone())
+        if (ThreadLocalRandom.current().nextInt(100) < config.getInt("duplication.item-frame.possibility", 10)) {
+            entity.world.dropItem(entity.location, item.clone())
+        }
     }
 }
 

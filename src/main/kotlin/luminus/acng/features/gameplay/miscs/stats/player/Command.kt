@@ -48,6 +48,7 @@ object Command {
         val data = player.getPlayerData()
 
         val permissionPlaceholders = config.getConfigurationSection("messages.player.permission-placeholders")
+        val permissionStatus = buildPermissionStatus(player)
         var processedMessages = ""
         Listeners.OnlineTime.saveCurrentSession(adaptPlayer(player))
         val formattedOnlineTime = data.onlineTime.format(
@@ -73,6 +74,7 @@ object Command {
                 .replace("%online-time-min%", data.onlineTime.minutes.toString())
                 .replace("%online-time-sec%", data.onlineTime.seconds.toString())
                 .replace("%formatted-online-time%", formattedOnlineTime)
+                .replace("%permissions%", permissionStatus)
 
 
             permissionPlaceholders?.let { section ->
@@ -97,6 +99,16 @@ object Command {
             }
         }
         return processedMessages.trimEnd()
+    }
+
+    /** 构造权限状态行，供 /stat 消息使用（一行显示） */
+    private fun buildPermissionStatus(player: Player): String {
+        val tick = "&a✔"
+        val cross = "&c✘"
+        val runMax = if (player.hasPermission("2b2tcore.runmax")) tick else cross
+        val dupe = if (player.hasPermission("2b2tcore.dupe.command")) tick else cross
+        val greenName = if (player.hasPermission("2b2tcore.chatcolor.vip")) tick else cross
+        return "&7权限：&7🏃 $runMax &7📦 $dupe&7🟢 $greenName"
     }
 
     data class PlayerData(val kills: Int, val deaths: Int, val kd: Double, val joins: Int, val quits: Int, val onlineTime: DateTime)

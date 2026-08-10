@@ -142,31 +142,18 @@ object Help {
         } else ""
     }
 
+    private fun runMaxText(): String {
+        return if (config.getBoolean("nether-roof.enable", false)) {
+            "&e地狱顶层限制 &7— 超过 128 层自动传送（权限：2b2tcore.runmax）"
+        } else ""
+    }
+
     private fun buildDefaultHelp(): String {
         return buildString {
-            appendLine("&e===== &62B2T &e=====")
-            appendLine(" ")
-            val lines = listOf(
-                suicideText(),
-                dupeCmdText(),
-                itemFrameText(),
-                chickenText(),
-                donkeyText(),
-                minePlaceText(),
-                chatColorText(),
-                statText()
-            ).filter { it.isNotEmpty() }
-            lines.forEach { appendLine(it) }
-            appendLine("&7出生点随机传送 + 10秒无敌")
-            appendLine(" ")
-            appendLine("&e管理命令（需要权限）：")
-            appendLine("&e/core info &7— 查看插件信息")
-            appendLine("&e/core reload &7— 重载配置文件")
-            appendLine("&e/core clearcache &7— 清空复制缓存")
-            appendLine("&e/dupe &7— 复制手持物品（2b2tcore.dupe.command）")
-            appendLine("&e/stat &7[玩家] — 查看玩家统计（2b2tcore.stat）")
-            appendLine("&e/suicide &7— 自杀（2b2tcore.suicide）")
-            appendLine("&7权限可通过 LuckPerms 等插件发放")
+            appendLine("&7=====&62B2T 帮助菜单&7=====")
+            appendLine("&e/stat &7[玩家] — 查看玩家统计")
+            appendLine("&e/suicide &7或 &e/514 &7— 自杀")
+            appendLine("&e/dupe &7— 复制手持物品")
         }.trimEnd()
     }
 }

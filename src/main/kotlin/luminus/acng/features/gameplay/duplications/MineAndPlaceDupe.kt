@@ -25,12 +25,13 @@ object MineAndPlaceDupe {
         val current = map.compute(uuid) { _, v -> (v ?: 0) + 1 } ?: return
 
         if (current >= config.getInt("duplication.mine-and-place.amount", 10)) {
-            val shulkerBox = event.block.state as ShulkerBox
-            val shulkerItem = ItemStack(event.block.type)
+            val block = event.block
+            val shulkerBox = block.state as ShulkerBox
+            val shulkerItem = ItemStack(block.type)
             val blockStateMeta = shulkerItem.itemMeta as BlockStateMeta
             blockStateMeta.blockState = shulkerBox
             shulkerItem.setItemMeta(blockStateMeta)
-            shulkerBox.world.dropItem(shulkerBox.location, shulkerItem)
+            block.world.dropItem(block.location, shulkerItem)
             map.remove(uuid)
         }
     }

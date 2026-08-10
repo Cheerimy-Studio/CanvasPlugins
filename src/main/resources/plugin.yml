@@ -49,3 +49,6 @@ commands:
   2b2tcore.chatcolor.op:
     description: OP 聊天颜色
     default: op
+  2b2tcore.runmax:
+    description: 允许在地狱 128 层以上活动
+    default: op
