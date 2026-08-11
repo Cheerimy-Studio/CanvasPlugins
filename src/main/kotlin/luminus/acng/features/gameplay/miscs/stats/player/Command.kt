@@ -108,7 +108,7 @@ object Command {
         val runMax = if (player.hasPermission("2b2tcore.runmax")) tick else cross
         val dupe = if (player.hasPermission("2b2tcore.dupe.command")) tick else cross
         val greenName = if (player.hasPermission("2b2tcore.chatcolor.vip")) tick else cross
-        return "&7权限：&7🏃 $runMax &7📦 $dupe&7🟢 $greenName"
+        return "&7权限：&7🏃 $runMax &7📦 $dupe &7🟢 $greenName"
     }
 
     data class PlayerData(val kills: Int, val deaths: Int, val kd: Double, val joins: Int, val quits: Int, val onlineTime: DateTime)
