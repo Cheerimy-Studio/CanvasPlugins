@@ -48,7 +48,22 @@ permissions:
     description: 允许在地狱 128 层以上活动
     default: op
 
+# 所有命令均注册到 plugin.yml，确保覆盖原版命令（如 /help）并可靠注册。
+# 权限检查在代码内完成（Taboolib command() / hasPermission），此处不声明
+# permission 字段避免双重检查导致报错信息不一致。
 commands:
+  help:
+    description: 查看 2B2T 帮助菜单
+    usage: /<command>
+  stat:
+    description: 查看玩家统计
+    usage: /<command> [玩家]
+  dupe:
+    description: 复制手持物品
+    usage: /<command>
+  core:
+    description: 插件管理命令
+    usage: /<command> <info|reload|clearcache>
   suicide:
     description: 自杀
     usage: /<command>
