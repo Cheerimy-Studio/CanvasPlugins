@@ -9,16 +9,11 @@ description: 2B2TCore - Anarchy server core plugin for Folia / Canvas
 
 permissions:
   2b2tcore.reload:
-    description: 重载插件配置
+    description: 重载插件配置 /core
     default: op
   2b2tcore.suicide:
     description: 使用 /suicide /514 自杀
     default: true
-commands:
-  suicide:
-    description: 自杀
-    usage: /<command>
-    aliases: [514]
   2b2tcore.stat:
     description: 查看玩家统计 /stat
     default: op
@@ -44,11 +39,17 @@ commands:
     description: 破坏放置复制
     default: op
   2b2tcore.chatcolor.vip:
-    description: VIP 聊天颜色
+    description: VIP 聊天颜色（黄色）
     default: op
   2b2tcore.chatcolor.op:
-    description: OP 聊天颜色
+    description: OP 聊天颜色（红色）
     default: op
   2b2tcore.runmax:
     description: 允许在地狱 128 层以上活动
     default: op
+
+commands:
+  suicide:
+    description: 自杀
+    usage: /<command>
+    aliases: [514]

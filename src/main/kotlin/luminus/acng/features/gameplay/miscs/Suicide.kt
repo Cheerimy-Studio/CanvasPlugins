@@ -32,6 +32,7 @@ object Suicide {
         cmd.setExecutor { sender, _, _, _ ->
             if (!config.getBoolean("suicide-enable", true)) return@setExecutor true
             if (sender !is Player) return@setExecutor true
+            if (!sender.hasPermission("2b2tcore.suicide")) return@setExecutor true
 
             // 执行自杀（Folia 下命令在 entity region 线程执行，setHealth 安全）
             killPlayer(sender, plugin)

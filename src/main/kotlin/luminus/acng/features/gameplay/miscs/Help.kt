@@ -6,7 +6,6 @@ import org.bukkit.command.CommandSender
 import taboolib.common.LifeCycle
 import taboolib.common.platform.Awake
 import taboolib.common.platform.command.command
-import taboolib.common.platform.command.PermissionDefault
 
 /**
  * 帮助命令：/help
@@ -55,7 +54,8 @@ object Help {
             "%donkey%" to donkeyText(),
             "%mine-place%" to minePlaceText(),
             "%chat-color%" to chatColorText(),
-            "%stat%" to statText()
+            "%stat%" to statText(),
+            "%nether-roof%" to netherRoofText()
         )
 
         // 如果行中包含任何未启用的功能占位符，整行不显示
@@ -142,7 +142,7 @@ object Help {
         } else ""
     }
 
-    private fun runMaxText(): String {
+    private fun netherRoofText(): String {
         return if (config.getBoolean("nether-roof.enable", false)) {
             "&e地狱顶层限制 &7— 超过 128 层自动传送（权限：2b2tcore.runmax）"
         } else ""
@@ -154,6 +154,7 @@ object Help {
             appendLine("&e/stat &7[玩家] — 查看玩家统计")
             appendLine("&e/suicide &7或 &e/514 &7— 自杀")
             appendLine("&e/dupe &7— 复制手持物品")
+            appendLine("&e/core info &7— 查看插件信息")
         }.trimEnd()
     }
 }
