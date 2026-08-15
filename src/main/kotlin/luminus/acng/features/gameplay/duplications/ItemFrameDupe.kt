@@ -21,9 +21,12 @@ object ItemFrameDupe {
 
         val item = entity.item
         if (item.type.isAir) return
+        // 复制品不可被二次复制
+        if (Replica.checkCanDupe(event.player, item)) return
 
         if (ThreadLocalRandom.current().nextInt(100) < config.getInt("duplication.item-frame.possibility", 10)) {
-            entity.world.dropItem(entity.location, item.clone())
+            // 掉落物默认打上复制品词条；拥有 2b2tcore.dupe.original 权限的玩家得到原版
+            entity.world.dropItem(entity.location, Replica.output(event.player, item.clone()))
         }
     }
 }

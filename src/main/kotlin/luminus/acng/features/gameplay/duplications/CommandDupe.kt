@@ -30,13 +30,16 @@ object CommandDupe {
                 config.getString("messages.no-item", "You must hold an item to dupe!")?.let { sender.msg(it) }
                 return@simpleCommand
             }
+            // 复制品不可被二次复制
+            if (Replica.checkCanDupe(sender, item)) return@simpleCommand
 
             val multiplyTimes = config.getInt("duplication.command.multiply-times", 2)
             val maxAmount = config.getInt("duplication.command.max-amount", 2333)
             val amount = minOf(item.amount * multiplyTimes, maxAmount)
             if (amount <= 0) return@simpleCommand
 
-            val newItem = item.clone()
+            // 输出物品：默认打上复制品词条，拥有 2b2tcore.dupe.original 权限的玩家得到原版
+            val newItem = Replica.output(sender, item.clone())
             newItem.amount = amount
 
             sender.inventory.addItem(newItem).forEach { (_, itemStack) ->

@@ -5,6 +5,7 @@ import org.bukkit.Bukkit
 import org.bukkit.entity.AbstractHorse
 import org.bukkit.entity.Boat
 import org.bukkit.entity.Entity
+import org.bukkit.entity.Player
 import io.papermc.paper.threadedregions.scheduler.ScheduledTask
 import org.bukkit.event.entity.EntityDeathEvent
 import org.bukkit.event.player.PlayerQuitEvent
@@ -28,7 +29,10 @@ object DonkeyDupe {
             val entity = event.entity as AbstractHorse
             entity.inventory.contents.forEach { item ->
                 if (item != null && !item.type.isAir) {
-                    entity.world.dropItemNaturally(entity.location, item)
+                    // 复制品（或内含复制品的容器）不可被二次复制
+                    if (Replica.containsReplica(item)) return@forEach
+                    // 掉落物默认打上复制品词条；拥有 2b2tcore.dupe.original 权限的击杀者得到原版
+                    entity.world.dropItemNaturally(entity.location, Replica.output(killer, item.clone()))
                 }
             }
         }
@@ -46,48 +50,48 @@ object DonkeyDupe {
             val vehicle = player.vehicle ?: return
 
             if (config.getBoolean("duplication.donkey.org-mode-allow-boat-chain", false)) {
-                processVehicleChain(vehicle)
+                processVehicleChain(vehicle, player)
             } else {
-                processAbstractHorse(vehicle)
+                processAbstractHorse(vehicle, player)
             }
         }
 
         /**
          * 澶勭悊鑸归摼锛氳埞涓婄殑涔樺鍙兘鏄┊鍏?
          */
-        private fun processVehicleChain(entity: Entity) {
+        private fun processVehicleChain(entity: Entity, player: Player) {
             if (entity is Boat) {
                 entity.passengers.forEach { passenger ->
                     if (passenger is AbstractHorse) {
-                        processAbstractHorse(passenger)
+                        processAbstractHorse(passenger, player)
                     }
                 }
             } else if (entity.vehicle is Boat) {
                 (entity.vehicle as Boat).passengers.forEach { passenger ->
                     if (passenger is AbstractHorse) {
-                        processAbstractHorse(passenger)
+                        processAbstractHorse(passenger, player)
                     }
                 }
             } else {
-                processAbstractHorse(entity)
+                processAbstractHorse(entity, player)
             }
         }
 
-        private fun processAbstractHorse(entity: Entity) {
-            if (entity !is AbstractHorse) return
-            entity.duplicateInventoryForViewers()
+        private fun processAbstractHorse(entity: Entity, player: Player) {
+            val horse = entity as? AbstractHorse ?: return
+            horse.duplicateInventoryForViewers(player)
         }
 
         /**
          * 澶嶅埗椹吔搴撳瓨缁欐墍鏈夋鍦ㄦ煡鐪嬬殑鐜╁
          * closeInventory / openInventory 閫氳繃 EntityScheduler 璋冨害鍒扮帺瀹剁嚎绋?
          */
-        private fun AbstractHorse.duplicateInventoryForViewers() {
+        private fun AbstractHorse.duplicateInventoryForViewers(player: Player) {
             val originalInventory = inventory
             val viewers = originalInventory.viewers.toList()
             if (viewers.isEmpty()) return
 
-            val clonedInventory = createDuplicatedInventory(originalInventory)
+            val clonedInventory = createDuplicatedInventory(originalInventory, player)
 
             viewers.forEach { viewer ->
                 viewer.scheduler.run(
@@ -108,13 +112,14 @@ object DonkeyDupe {
             }
         }
 
-        private fun createDuplicatedInventory(source: Inventory): Inventory {
+        private fun createDuplicatedInventory(source: Inventory, duper: Player): Inventory {
             val cloned = Bukkit.createInventory(null, source.type, "Duplicated Inventory")
             source.contents
                 .withIndex()
-                .filter { (_, item) -> item != null }
+                .filter { (_, item) -> item != null && !Replica.containsReplica(item) }
                 .forEach { (slot, item) ->
-                    cloned.setItem(slot, item!!.clone())
+                    // 复制品（或内含复制品的容器）不复制；输出默认带复制品词条，原版权限玩家得原版
+                    cloned.setItem(slot, Replica.output(duper, item!!.clone()))
                 }
             return cloned
         }

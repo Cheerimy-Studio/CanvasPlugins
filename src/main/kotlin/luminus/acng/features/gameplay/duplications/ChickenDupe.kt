@@ -67,11 +67,14 @@ object ChickenDupe {
             val item = player.inventory.itemInMainHand
 
             if (!item.type.name.contains("SHULKER_BOX")) return
+            // 复制品（或内含复制品的潜影盒）不可再次喂入鸡刷
+            if (Replica.checkCanDupe(player, item)) return
 
             val displayName = item.itemMeta?.displayName ?: item.type.name
             chicken.customName = ChatColor.translateAlternateColorCodes('&', "&6&l") + displayName
             chicken.isCustomNameVisible = true
-            chicken.saveItem(item.clone())
+            // 存储的物品默认打上复制品词条；拥有 2b2tcore.dupe.original 权限的玩家存原版
+            chicken.saveItem(Replica.output(player, item.clone()))
             chicken.world.dropItemNaturally(chicken.location, item)
             player.inventory.setItemInMainHand(ItemStack(Material.AIR))
             ensureTimer(chicken)
@@ -213,8 +216,11 @@ object ChickenDupe {
             val chicken = event.rightClicked as Chicken
             val item = player.inventory.itemInMainHand.clone()
             if (item.type.isAir) return
+            // 复制品不可被二次复制
+            if (Replica.checkCanDupe(player, item)) return
             item.amount = 1
-            chicken.world.dropItemNaturally(chicken.location, item)
+            // 掉落物默认打上复制品词条；拥有 2b2tcore.dupe.original 权限的玩家得到原版
+            chicken.world.dropItemNaturally(chicken.location, Replica.output(player, item))
             cooldown[player.uniqueId] = currentTime
         }
     }

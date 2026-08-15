@@ -4,7 +4,7 @@
 # GitHub: https://github.com/Cheerimy-Studio/CanvasPlugins
 
 # 配置版本号（请勿手动修改，由插件自动管理）
-config-ver: 7
+config-ver: 8
 
 # ===================== 复制功能 =====================
 duplication:
@@ -42,6 +42,12 @@ duplication:
   mine-and-place:
     enable: false
     amount: 10  # 触发复制所需破坏次数
+
+  # 复制品标记：所有复制产生的物品都会带有「复制品」词条（lore + PDC 标记）
+  # 复制品不可被二次复制；拥有权限 2b2tcore.dupe.original 的玩家复制出的物品为原版（不带词条）
+  replica:
+    enable: true
+    lore: "&7复制品"  # 复制品词条文本（支持 & 颜色代码）
 
 # ===================== 自杀命令 =====================
 # 启用后玩家可使用 /suicide（别名 /514）自杀（权限：2b2tcore.suicide）
@@ -83,6 +89,7 @@ chat-color:
 messages:
   success-dupe: "&e&l成功复制物品！"
   no-item: "&c你必须手持一个物品才能复制！"
+  deny-redupe: "&c复制品无法再次复制！"
   suicide: "&7你已自杀。"
   # /help 命令输出格式（支持 %placeholder% 占位符）
   # 含功能占位符的行在该功能未启用时整行不输出
