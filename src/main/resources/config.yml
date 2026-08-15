@@ -4,7 +4,7 @@
 # GitHub: https://github.com/Cheerimy-Studio/CanvasPlugins
 
 # 配置版本号（请勿手动修改，由插件自动管理）
-config-ver: 8
+config-ver: 9
 
 # ===================== 复制功能 =====================
 duplication:
@@ -45,9 +45,11 @@ duplication:
 
   # 复制品标记：所有复制产生的物品都会带有「复制品」词条（lore + PDC 标记）
   # 复制品不可被二次复制；拥有权限 2b2tcore.dupe.original 的玩家复制出的物品为原版（不带词条）
+  # 复制品同时带 ItemTag 禁止交互特性（不可交易/合成/附魔/铁砧/磨石/锻造/死亡消失），潜影盒内部物品递归打标
   replica:
     enable: true
     lore: "&7复制品"  # 复制品词条文本（支持 & 颜色代码）
+    itemtag-flags: true  # 是否写入 ItemTag 禁止交互 flag（需安装 ItemTag 插件）
 
 # ===================== 自杀命令 =====================
 # 启用后玩家可使用 /suicide（别名 /514）自杀（权限：2b2tcore.suicide）

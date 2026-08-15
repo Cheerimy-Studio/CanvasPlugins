@@ -1,10 +1,11 @@
 name: 2B2TCore
 main: luminus.acng.taboolib.platform.BukkitPlugin
-version: 2.1.0
+version: 2.2.0
 authors:
   - 'NaN'
 api-version: "1.21"
 folia-supported: true
+softdepend: [ItemTag]
 description: 2B2TCore - Anarchy server core plugin for Folia / Canvas
 
 permissions:
