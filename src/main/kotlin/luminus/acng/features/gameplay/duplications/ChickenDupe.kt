@@ -1,6 +1,8 @@
 package luminus.acng.features.gameplay.duplications
 
 import luminus.acng.Main.config
+import luminus.acng.features.gameplay.teleport.TeleportStone
+import luminus.acng.msg
 import io.papermc.paper.threadedregions.scheduler.ScheduledTask
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
@@ -260,6 +262,11 @@ object ChickenDupe {
             val chicken = event.rightClicked as Chicken
             val item = player.inventory.itemInMainHand.clone()
             if (item.type.isAir) return
+            // 传送石只能通过展示框复制
+            if (TeleportStone.isStone(item)) {
+                player.msg("&c传送石只能通过展示框复制！")
+                return
+            }
             // 复制品不可被二次复制
             if (Replica.checkCanDupe(player, item)) return
             item.amount = 1

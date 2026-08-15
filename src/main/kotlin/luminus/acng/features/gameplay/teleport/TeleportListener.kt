@@ -13,7 +13,8 @@ import org.bukkit.inventory.CraftingInventory
  *
  * - 传送碎片：所有材料（龙蛋 + 8 种块）不可为复制品
  * - 传送核心：9 个传送碎片（带复制品词条，但允许作为材料，不拦截）
- * - 传送石：传送核心允许，其余 8 种材料不可为复制品
+ * - 传送石：传送核心允许，其余 8 种材料不可为复制品；
+ *   合成成功后替换为带新随机唯一 ID 的传送石本体
  */
 object TeleportListener : Listener {
 
@@ -34,12 +35,15 @@ object TeleportListener : Listener {
             TeleportItems.isCore(result) -> {
                 // 9 个传送碎片：带复制品词条但允许作为合成材料
             }
-            TeleportItems.isStone(result) -> {
+            TeleportStone.isStone(result) -> {
                 if (matrix.any {
                         it != null && !it.type.isAir && !TeleportItems.isCore(it) && Replica.containsReplica(it)
                     }) {
                     event.isCancelled = true
                     player.msg("&c合成传送石的材料不能是复制品！")
+                } else {
+                    // 替换为带新随机唯一 ID 的传送石本体
+                    inventory.result = TeleportStone.createBody()
                 }
             }
         }

@@ -2,9 +2,11 @@ package luminus.acng
 
 import luminus.acng.features.gameplay.duplications.ChickenDupe
 import luminus.acng.features.gameplay.duplications.MineAndPlaceDupe
+import luminus.acng.features.gameplay.teleport.TeleportStone
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.command.CommandSender
+import org.bukkit.entity.Player
 import taboolib.common.platform.Plugin
 import taboolib.common.platform.ProxyCommandSender
 import taboolib.common.platform.command.CommandBody
@@ -23,7 +25,7 @@ object Main : Plugin() {
 
     @Config("config.yml")
     lateinit var config: Configuration
-    private const val CONFIG_VERSION = 12
+    private const val CONFIG_VERSION = 13
     private const val GITHUB_REPO = "https://github.com/Cheerimy-Studio/CanvasPlugins"
 
     override fun onEnable() {
@@ -94,6 +96,18 @@ object Main : Plugin() {
                 ChickenDupe.XinMode.reload()
                 MineAndPlaceDupe.clear()
                 sender.msg("&e已清空缓存")
+            }
+        }
+
+        @CommandBody
+        val createtpstone = subCommand {
+            execute<Player> { sender, _, _ ->
+                val stone = TeleportStone.createBody()
+                val id = TeleportStone.getId(stone) ?: "未知"
+                sender.inventory.addItem(stone).forEach { (_, item) ->
+                    sender.world.dropItemNaturally(sender.location, item)
+                }
+                sender.msg("&a已生成传送石（ID: ${id.take(8)}）")
             }
         }
     }
