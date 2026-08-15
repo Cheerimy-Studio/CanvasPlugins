@@ -10,14 +10,18 @@ import org.bukkit.block.TileState
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.BlockStateMeta
+import org.bukkit.inventory.meta.BundleMeta
 import org.bukkit.inventory.meta.ItemMeta
 import org.bukkit.persistence.PersistentDataType
+import java.util.UUID
+import java.util.concurrent.ConcurrentHashMap
 
 /**
  * 复制品标记工具：
  * - 所有复制插件复制出的物品都会被打上「复制品」词条（可见 lore + PDC 标记）
  * - 复制品同时带上 ItemTag 的禁止交互 flag（不可交易/合成/附魔/铁砧/磨石/锻造/死亡消失）
- * - 潜影盒内部物品会递归打上同样的「复制品」词条与禁止交互特性
+ * - 潜影盒内部物品递归打上同样的「复制品」词条与禁止交互特性
+ * - 收纳袋（Bundle）内部物品同样递归打标；潜影盒内物品里的收纳袋也会被打标
  * - 复制品（或内含复制品的容器）不可被二次复制
  * - 拥有 2b2tcore.dupe.original 权限的玩家复制出的物品为原版（不带词条与 flag）
  *
@@ -91,6 +95,14 @@ object Replica {
                 }
             }
         }
+        // 收纳袋（Bundle）内部物品
+        if (meta is BundleMeta) {
+            meta.items.forEach { content ->
+                if (!content.type.isAir && containsReplica(content, depth + 1)) {
+                    return true
+                }
+            }
+        }
         return false
     }
 
@@ -138,6 +150,13 @@ object Replica {
                 meta.blockState = state
             }
         }
+        // 收纳袋（Bundle）内部物品递归打标
+        if (depth < MAX_NESTING && meta is BundleMeta) {
+            val items = meta.items
+            if (items.isNotEmpty()) {
+                meta.setItems(items.map { mark(it, depth + 1) })
+            }
+        }
 
         item.itemMeta = meta
         return item
@@ -181,8 +200,18 @@ object Replica {
         return true
     }
 
-    /** 发送复制品拦截提示 */
+    /** 玩家 UUID -> 上次收到拦截提示的时间（毫秒），用于提示冷却 */
+    private val denyCooldowns = ConcurrentHashMap<UUID, Long>()
+
+    private fun denyCooldownMillis(): Long =
+        config.getLong("duplication.replica.deny-cooldown-seconds", 60) * 1000
+
+    /** 发送复制品拦截提示（每名玩家间隔 deny-cooldown-seconds 秒内最多提醒一次） */
     fun deny(player: Player?) {
-        player?.msg(config.getString("messages.deny-redupe", "&c复制品无法再次复制！") ?: "&c复制品无法再次复制！")
+        if (player == null) return
+        val now = System.currentTimeMillis()
+        val last = denyCooldowns.put(player.uniqueId, now)
+        if (last != null && now - last < denyCooldownMillis()) return
+        player.msg(config.getString("messages.deny-redupe", "&c复制品无法再次复制！") ?: "&c复制品无法再次复制！")
     }
 }
