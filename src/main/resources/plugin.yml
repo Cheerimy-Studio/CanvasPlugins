@@ -1,6 +1,6 @@
 name: 2B2TCore
 main: luminus.acng.taboolib.platform.BukkitPlugin
-version: 2.3.0
+version: 2.3.1
 authors:
   - 'NaN'
 api-version: "1.21"

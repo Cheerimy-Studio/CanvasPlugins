@@ -23,20 +23,32 @@ object Main : Plugin() {
 
     @Config("config.yml")
     lateinit var config: Configuration
-    private const val CONFIG_VERSION = 10
+    private const val CONFIG_VERSION = 11
     private const val GITHUB_REPO = "https://github.com/Cheerimy-Studio/CanvasPlugins"
 
     override fun onEnable() {
         // 启动耗时计时
         val start = System.currentTimeMillis()
 
-        if (config.getInt("config-ver", CONFIG_VERSION) != CONFIG_VERSION) {
-            BukkitPlugin.getInstance().saveResource("config.yml", true)
+        val fileConfigVer = config.getInt("config-ver", 0)
+        if (fileConfigVer != CONFIG_VERSION) {
+            // 不覆盖用户配置文件！只更新版本号，新增配置项使用代码默认值
+            warning("[2B2TCore] 配置版本不匹配（当前: $fileConfigVer, 需要: $CONFIG_VERSION）")
+            warning("[2B2TCore] 已保留用户自定义配置，新增项将使用默认值")
+            warning("[2B2TCore] 如需完整默认配置，请备份后删除 config.yml 再重启")
+            config.set("config-ver", CONFIG_VERSION)
+            try {
+                config.saveToFile()
+            } catch (e: NoSuchMethodException) {
+                // TabooLib 版本不兼容时静默处理，版本号仅在内存中更新
+            } catch (e: Exception) {
+                warning("[2B2TCore] 配置版本号写入失败: ${e.message}")
+            }
         }
 
         // PistonChat 聊天颜色集成在 PistonChatHook 中通过 @Awake 与 PluginEnableEvent 动态挂载
 
-        // Cheerimy-Studio 正版检测
+        // Cheerimy-Studio 正版检测（仅提示，不阻止运行）
         val cheerimy = Bukkit.getPluginManager().getPlugin("Cheerimy-Studio")
         if (cheerimy == null || !cheerimy.isEnabled) {
             warning("[2B2TCore] Cheerimy-Studio integrity check failed.")
@@ -65,6 +77,11 @@ object Main : Plugin() {
             execute<CommandSender> { sender, _, _ ->
                 config.reload()
                 luminus.acng.features.gameplay.miscs.stats.player.config.reload()
+                // reload 后重新尝试挂载 PistonChat 聊天颜色
+                luminus.acng.features.gameplay.miscs.PistonChatHook.tryRegister()
+                // reload 后确保 Listener 已注册（首次启动时 enable=false 则未注册）
+                luminus.acng.features.gameplay.spawn.SpawnListener.register()
+                luminus.acng.features.gameplay.miscs.NetherRoofListener.register()
                 sender.msg("&e已重载配置文件")
             }
         }

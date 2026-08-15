@@ -37,10 +37,14 @@ object NetherRoofListener : Listener {
     private const val CLEANUP_HEIGHT = 128.0
     private const val FORCE_TELEPORT_HEIGHT = 256.0
 
+    private var registered = false
+
     @Awake(LifeCycle.ENABLE)
     fun register() {
         if (!config.getBoolean("nether-roof.enable", false)) return
+        if (registered) return
         BukkitPlugin.getInstance().server.pluginManager.registerEvents(this, BukkitPlugin.getInstance())
+        registered = true
     }
 
     @EventHandler

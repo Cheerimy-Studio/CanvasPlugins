@@ -22,10 +22,14 @@ import java.util.concurrent.ThreadLocalRandom
  */
 object SpawnListener : Listener {
 
+    private var registered = false
+
     @Awake(LifeCycle.ENABLE)
     fun register() {
         if (!config.getBoolean("spawn.enable", true)) return
+        if (registered) return
         BukkitPlugin.getInstance().server.pluginManager.registerEvents(this, BukkitPlugin.getInstance())
+        registered = true
     }
 
     /** 首次加入游戏：随机传送 + 无敌 */
@@ -53,25 +57,29 @@ object SpawnListener : Listener {
         val player = event.player
 
         // 重生后延迟到玩家实体线程执行传送 + 无敌
-        // EntityScheduler 在下一 tick 执行，此时玩家已完成重生放置
         player.scheduler.run(BukkitPlugin.getInstance(), { _ ->
-            randomTeleport(player)
+            doRandomTeleport(player)
             grantInvulnerability(player)
         }, null)
     }
 
-    /** 随机传送到世界出生点周围 */
+    /** 随机传送到世界出生点周围（调度到玩家实体线程） */
     private fun randomTeleport(player: Player) {
-        val radius = config.getInt("spawn.radius", 500)
         player.scheduler.run(BukkitPlugin.getInstance(), { _ ->
-            val world = player.world
-            val worldSpawn = world.spawnLocation
-            val rnd = ThreadLocalRandom.current()
-            val x = worldSpawn.blockX + rnd.nextInt(-radius, radius + 1)
-            val z = worldSpawn.blockZ + rnd.nextInt(-radius, radius + 1)
-            val loc = world.getHighestBlockAt(x, z).location.add(0.5, 1.0, 0.5)
-            player.teleportAsync(loc)
+            doRandomTeleport(player)
         }, null)
+    }
+
+    /** 实际执行随机传送（必须在玩家区域线程调用） */
+    private fun doRandomTeleport(player: Player) {
+        val radius = config.getInt("spawn.radius", 500)
+        val world = player.world
+        val worldSpawn = world.spawnLocation
+        val rnd = ThreadLocalRandom.current()
+        val x = worldSpawn.blockX + rnd.nextInt(-radius, radius + 1)
+        val z = worldSpawn.blockZ + rnd.nextInt(-radius, radius + 1)
+        val loc = world.getHighestBlockAt(x, z).location.add(0.5, 1.0, 0.5)
+        player.teleportAsync(loc)
     }
 
     /** 授予无敌时间 */
