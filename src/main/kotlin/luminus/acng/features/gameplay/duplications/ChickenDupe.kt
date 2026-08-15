@@ -16,6 +16,8 @@ import org.bukkit.event.world.EntitiesLoadEvent
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.persistence.PersistentDataType
+import taboolib.common.LifeCycle
+import taboolib.common.platform.Awake
 import taboolib.common.platform.event.SubscribeEvent
 import taboolib.platform.BukkitPlugin
 import java.util.UUID
@@ -40,6 +42,19 @@ object ChickenDupe {
         private val maxPerChunk get() = config.getInt("duplication.chicken.xin-mode-max-per-chunk", 3)
 
         private val itemKey = NamespacedKey("anarchycore-nextgen", "stored_item")
+
+        /**
+         * 插件启动时延迟扫描所有已加载区块中的鸡。
+         * 解决常驻区块（出生点等）EntitiesLoadEvent 不触发的问题。
+         */
+        @Awake(LifeCycle.ENABLE)
+        fun onEnable() {
+            if (!config.getBoolean("duplication.chicken.xin-mode")) return
+            // 延迟 3 秒，确保所有区块加载完毕
+            Bukkit.getGlobalRegionScheduler().runDelayed(BukkitPlugin.getInstance(), Consumer { _ ->
+                scanLoadedChickens()
+            }, 60L)
+        }
 
         @SubscribeEvent
         fun onEntitiesLoad(event: EntitiesLoadEvent) {
@@ -180,6 +195,35 @@ object ChickenDupe {
             visualTimers.values.forEach { it.cancel() }
             visualTimers.clear()
             chickenActiveMap.clear()
+            // 清空后重新扫描已加载的鸡，恢复火焰效果
+            if (config.getBoolean("duplication.chicken.xin-mode")) {
+                Bukkit.getGlobalRegionScheduler().runDelayed(BukkitPlugin.getInstance(), Consumer { _ ->
+                    scanLoadedChickens()
+                }, 20L)
+            }
+        }
+
+        /**
+         * 扫描所有已加载区块中的鸡，为存有物品的鸡恢复定时器。
+         * 每个区块在各自的区域线程上执行，保证 Folia 线程安全。
+         */
+        private fun scanLoadedChickens() {
+            for (world in Bukkit.getWorlds()) {
+                for (chunk in world.loadedChunks) {
+                    val cx = chunk.x
+                    val cz = chunk.z
+                    Bukkit.getRegionScheduler().execute(BukkitPlugin.getInstance(), world, cx, cz) {
+                        if (!world.isChunkLoaded(cx, cz)) return@execute
+                        val c = world.getChunkAt(cx, cz)
+                        c.entities.filterIsInstance<Chicken>().forEach { chicken ->
+                            if (chicken.loadItem() != null) {
+                                ensureTimer(chicken)
+                            }
+                        }
+                        refreshChunkActiveStates(c)
+                    }
+                }
+            }
         }
 
         private fun Chicken.saveItem(item: ItemStack) {

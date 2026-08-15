@@ -77,18 +77,18 @@ nether-roof:
 # ===================== 聊天颜色（需安装 PistonChat）=====================
 # 未安装 PistonChat 时本段无效，不会触发其事件类加载
 chat-color:
-  enable: false  # 总开关
+  enable: true  # 总开关（默认开启）
   # 默认颜色：当玩家不匹配任何权限组时使用，留空表示不修改原颜色
   # 支持 & 代码（如 &7）、RRGGBB（如 #AAAAAA）
   default-color: "&7"
   # 权限组：自上而下匹配，首个命中的权限组生效
   groups:
+    op:
+      permission: "2b2tcore.chatcolor.op"
+      color: "&6"  # OP 金色
     vip:
       permission: "2b2tcore.chatcolor.vip"
       color: "&e"
-    op:
-      permission: "2b2tcore.chatcolor.op"
-      color: "&c"
 
 # ===================== 消息文本 =====================
 # 支持旧版 & 颜色代码
