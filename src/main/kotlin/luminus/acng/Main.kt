@@ -23,7 +23,7 @@ object Main : Plugin() {
 
     @Config("config.yml")
     lateinit var config: Configuration
-    private const val CONFIG_VERSION = 11
+    private const val CONFIG_VERSION = 12
     private const val GITHUB_REPO = "https://github.com/Cheerimy-Studio/CanvasPlugins"
 
     override fun onEnable() {
@@ -82,6 +82,8 @@ object Main : Plugin() {
                 // reload 后确保 Listener 已注册（首次启动时 enable=false 则未注册）
                 luminus.acng.features.gameplay.spawn.SpawnListener.register()
                 luminus.acng.features.gameplay.miscs.NetherRoofListener.register()
+                // reload 后确保传送石配方/监听器已注册
+                luminus.acng.features.gameplay.teleport.TeleportRecipes.register()
                 sender.msg("&e已重载配置文件")
             }
         }
