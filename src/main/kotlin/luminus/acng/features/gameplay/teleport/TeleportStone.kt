@@ -108,7 +108,10 @@ object TeleportStone {
         val id = getId(item) ?: return false
         if (!isReplica(item)) return false
         val holder = Bukkit.getOnlinePlayers().firstOrNull { p ->
-            p.inventory.contents.any { it != null && isBody(it) && getId(it) == id }
+            // 搜索主背包 + 副手 + 装备栏，确保本体在任何格都能找到
+            p.inventory.contents.any { it != null && isBody(it) && getId(it) == id } ||
+            p.inventory.itemInOffHand.let { it != null && isBody(it) && getId(it) == id } ||
+            p.inventory.armorContents.any { it != null && isBody(it) && getId(it) == id }
         }
         if (holder == null) {
             player.msg("&c持有传送石本体的玩家不在线，无法传送！")

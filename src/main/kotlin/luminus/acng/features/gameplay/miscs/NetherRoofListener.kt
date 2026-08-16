@@ -22,19 +22,19 @@ import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
 
 /**
- * 地狱顶层（Y > 128）限制器。
+ * 地狱顶层（Y >= 128）限制器。
  *
- * - 开启后，无权限 `2b2tcore.runmax` 的玩家在地狱 Y >= 128 时会被传送到 Y <= 128 的最近安全位置，
+ * - 无权限 `2b2tcore.runmax` 的玩家在地狱 Y >= 128 时会被传送到 Y <= 128 的最近安全位置，
  *   并清理玩家所在区块 Y >= 128 的方块与非玩家实体（不产生掉落物）。
- * - 无权限玩家在地狱 Y >= 128 放置方块会被直接取消（禁止在上层搭建）。
- * - 有权限的玩家在 Y > 128 时若继续上升到 Y >= 256，会被自动传送到下方最近安全处（不清理方块）。
+ * - 任何玩家（含 OP）在地狱 Y >= 128 放置方块会被直接取消（禁止在上层搭建）。
+ * - 有权限的玩家在 Y >= 128 时若继续上升到 Y >= 256，会被自动传送到下方最近安全处（不清理方块）。
  *
  * 性能：cleanupAbove 有每玩家 5 秒冷却，避免 PlayerMoveEvent 频繁触发时重复清理。
  *
  * Folia 线程安全：
- * - 所有方块/实体操作均通过 RegionScheduler 调度到对应 chunk 的所在区域执行；
+ * - 方块/实体操作通过 RegionScheduler 调度到对应 chunk 所在区域执行；
  * - teleport 优先使用 teleportAsync；
- * - 清理前检查 isChunkLoaded，避免强制加载未加载区块。
+ * - isChunkLoaded 检查在区域回调内进行，避免跨区域预检查。
  */
 object NetherRoofListener : Listener {
 

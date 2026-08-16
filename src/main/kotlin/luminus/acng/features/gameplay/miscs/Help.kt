@@ -87,7 +87,7 @@ object Help {
     }
 
     private fun dupeCmdText(): String {
-        return if (config.getBoolean("duplication.command.enable", true)) {
+        return if (config.getBoolean("duplication.command.enable", false)) {
             "&e/dupe &7— 复制手持物品"
         } else ""
     }
