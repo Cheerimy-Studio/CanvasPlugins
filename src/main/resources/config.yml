@@ -4,7 +4,7 @@
 # GitHub: https://github.com/Cheerimy-Studio/CanvasPlugins
 
 # 配置版本号（请勿手动修改，由插件自动管理）
-config-ver: 13
+config-ver: 14
 
 # ===================== 复制功能 =====================
 duplication:
