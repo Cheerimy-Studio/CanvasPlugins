@@ -24,9 +24,9 @@ object TeleportStoneListener : Listener {
         val player = event.player
         if (TeleportStone.consume(player, item)) {
             // 传送成功，消耗 1 个复制品
+            val hand = event.hand
             item.amount -= 1
-            val hand = event.hand ?: return
-            if (item.amount <= 0) {
+            if (item.amount <= 0 && hand != null) {
                 player.inventory.setItem(hand, null)
             }
             event.isCancelled = true

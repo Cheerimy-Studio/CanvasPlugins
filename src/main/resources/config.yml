@@ -115,7 +115,7 @@ messages:
   suicide: "&7你已自杀。"
   # /help 命令输出格式（支持 %placeholder% 占位符）
   # 含功能占位符的行在该功能未启用时整行不输出
-  # 可用功能占位符：%suicide% %dupe-cmd% %item-frame% %chicken% %donkey% %mine-place% %chat-color% %stat%
+  # 可用功能占位符：%suicide% %dupe-cmd% %item-frame% %chicken% %donkey% %mine-place% %chat-color% %stat% %nether-roof%
   help:
     lines:
       - "&e===== &62B2T &e====="

@@ -29,6 +29,8 @@ import java.util.concurrent.ConcurrentHashMap
  * - 无权限玩家在地狱 Y > 128 放置方块会被直接取消（禁止在上层搭建）。
  * - 有权限的玩家在 Y > 128 时若继续上升到 Y >= 256，会被自动传送到下方最近安全处（不清理方块）。
  *
+ * 性能：cleanupAbove 有每玩家 5 秒冷却，避免 PlayerMoveEvent 频繁触发时重复清理。
+ *
  * Folia 线程安全：
  * - 所有方块/实体操作均通过 RegionScheduler 调度到对应 chunk 的所在区域执行；
  * - teleport 优先使用 teleportAsync；
@@ -43,6 +45,7 @@ object NetherRoofListener : Listener {
 
     private var registered = false
     private val messageCooldown = ConcurrentHashMap<UUID, Long>()
+    private val cleanupCooldown = ConcurrentHashMap<UUID, Long>()
 
     @Awake(LifeCycle.ENABLE)
     fun register() {
@@ -70,7 +73,13 @@ object NetherRoofListener : Listener {
 
         // 无权限：超过 128 强制传送到下方安全处并清理周围
         if (y > CLEANUP_HEIGHT) {
-            cleanupAbove(player, to)
+            // 清理有冷却，避免每次 PlayerMoveEvent 都执行百万级方块遍历
+            val now = System.currentTimeMillis()
+            val lastCleanup = cleanupCooldown[player.uniqueId]
+            if (lastCleanup == null || now - lastCleanup >= 5000) {
+                cleanupCooldown[player.uniqueId] = now
+                cleanupAbove(player, to)
+            }
             teleportToSafeBelow(player, to)
         }
     }
