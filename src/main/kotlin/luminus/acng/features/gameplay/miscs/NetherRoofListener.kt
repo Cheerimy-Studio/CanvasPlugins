@@ -18,6 +18,8 @@ import taboolib.common.LifeCycle
 import taboolib.common.platform.Awake
 import taboolib.common.platform.function.info
 import taboolib.platform.BukkitPlugin
+import java.util.UUID
+import java.util.concurrent.ConcurrentHashMap
 
 /**
  * 地狱顶层（Y > 128）限制器。
@@ -40,6 +42,7 @@ object NetherRoofListener : Listener {
     private const val FORCE_TELEPORT_HEIGHT = 256.0
 
     private var registered = false
+    private val messageCooldown = ConcurrentHashMap<UUID, Long>()
 
     @Awake(LifeCycle.ENABLE)
     fun register() {
@@ -72,15 +75,24 @@ object NetherRoofListener : Listener {
         }
     }
 
-    /** 无权限玩家禁止在地狱上层（Y > 128）搭建方块 */
+    /** 任何玩家（含 OP）均禁止在地狱上层（Y > 128）搭建方块 */
     @EventHandler
     fun onBlockPlace(event: BlockPlaceEvent) {
         if (!config.getBoolean("nether-roof.enable", false)) return
-        val player = event.player
-        if (player.hasPermission(PERMISSION)) return
         if (!isNether(event.block.world)) return
         if (event.block.y > CLEANUP_HEIGHT) {
             event.isCancelled = true
+            sendDenyMessage(event.player)
+        }
+    }
+
+    /** 发送禁止搭建提示，并受配置文件冷却控制（同一玩家间隔内最多一次） */
+    private fun sendDenyMessage(player: Player) {
+        val now = System.currentTimeMillis()
+        val cooldownMs = config.getInt("nether-roof.message-cooldown-seconds", 60).coerceAtLeast(0) * 1000L
+        val last = messageCooldown[player.uniqueId]
+        if (last == null || now - last >= cooldownMs) {
+            messageCooldown[player.uniqueId] = now
             player.msg("&c地狱上层禁止搭建方块！")
         }
     }

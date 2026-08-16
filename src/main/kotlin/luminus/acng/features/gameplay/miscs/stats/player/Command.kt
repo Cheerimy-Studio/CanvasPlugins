@@ -1,13 +1,15 @@
 package luminus.acng.features.gameplay.miscs.stats.player
 
+import luminus.acng.features.gameplay.miscs.stats.player.Listeners
 import luminus.acng.features.gameplay.miscs.stats.player.config
+import luminus.acng.features.gameplay.miscs.stats.player.getPlayerData
 import luminus.acng.msg
+import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 import taboolib.common.LifeCycle
 import taboolib.common.platform.Awake
 import taboolib.common.platform.command.command
-import taboolib.common.platform.command.player
 import taboolib.common.platform.command.PermissionDefault
 import taboolib.common.platform.function.adaptPlayer
 import taboolib.platform.BukkitPlugin
@@ -19,22 +21,27 @@ object Command {
     @Awake(LifeCycle.ENABLE)
     fun onEnable() {
         command("stat", permission = "2b2tcore.stat", permissionDefault = PermissionDefault.OP) {
+            // 无参数：查看自己
             execute<CommandSender> { sender, _, _ ->
                 if (sender is Player) {
-                    // 调度到自身实体线程，Folia 线程安全
                     sender.scheduler.run(BukkitPlugin.getInstance(), { _ ->
                         sender.msg(buildStatisticsMessage(sender))
                     }, null)
                 }
             }
-            player {
+            // /stat <玩家名>：查看指定玩家（需在线）
+            dynamic {
+                suggestion<CommandSender> { sender, context ->
+                    Bukkit.getOnlinePlayers().map { it.name }
+                }
                 execute<CommandSender> { sender, context, _ ->
-                    // 所有玩家都可以查看其他玩家的统计
-                    val target = context.player().castSafely<Player>() ?: run {
-                        sender.msg("&c无法找到该玩家")
+                    val targetName = context.argumentOrNull(0)
+                    if (targetName.isNullOrBlank()) {
+                        sender.msg("&c用法：/stat <玩家名>")
                         return@execute
                     }
-                    // Folia：目标玩家可能在别的区域线程，统计构建必须调度到目标玩家的实体线程
+                    val target = Bukkit.getPlayerExact(targetName)
+                        ?: return@execute sender.msg("&c玩家 $targetName 不在线")
                     target.scheduler.run(BukkitPlugin.getInstance(), { _ ->
                         sender.msg(buildStatisticsMessage(target))
                     }, null)

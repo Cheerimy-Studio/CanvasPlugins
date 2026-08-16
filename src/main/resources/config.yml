@@ -79,12 +79,15 @@ spawn:
   respawn-random: true        # 死亡重生时无床/锚则随机重生
 
 # ===================== 地狱顶层（Y > 128）限制器 =====================
-# 无权限 `2b2tcore.runmax` 的玩家在地狱超过 128 层会被强制传回下方安全处，
-# 并清理周围已加载区块 Y > 128 的方块和实体，且禁止在上层搭建方块。
-# 有权限的玩家上升到 256 层以上时也会被强制传送回下方安全处。
+# 任何玩家在地狱超过 128 层会被强制传回下方安全处，
+# 并清理周围已加载区块 Y > 128 的方块和实体，且禁止在上层搭建方块（含 OP）。
 nether-roof:
-  enable: true                # 总开关
-  cleanup-radius-chunks: 2    # 清理半径（区块数，0 表示仅当前区块，最大 2）
+  # 总开关
+  enable: true
+  # 清理半径（区块数，0 表示仅当前区块，最大 2）
+  cleanup-radius-chunks: 2
+  # 禁止搭建提示冷却（秒，同一玩家间隔内最多提示一次）
+  message-cooldown-seconds: 60
 
 # ===================== 聊天颜色（需安装 PistonChat）=====================
 # 未安装 PistonChat 时本段无效，不会触发其事件类加载
@@ -111,7 +114,7 @@ messages:
   suicide: "&7你已自杀。"
   # /help 命令输出格式（支持 %placeholder% 占位符）
   # 含功能占位符的行在该功能未启用时整行不输出
-  # 可用功能占位符：%suicide% %dupe-cmd% %item-frame% %chicken% %donkey% %mine-place% %chat-color% %stat% %nether-roof%
+  # 可用功能占位符：%suicide% %dupe-cmd% %item-frame% %chicken% %donkey% %mine-place% %chat-color% %stat%
   help:
     lines:
       - "&e===== &62B2T &e====="
@@ -122,5 +125,4 @@ messages:
       - "%chicken%"
       - "%donkey%"
       - "%mine-place%"
-      - "%nether-roof%"
       - "%stat%"
