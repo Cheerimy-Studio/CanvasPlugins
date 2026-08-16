@@ -137,7 +137,7 @@ object Help {
     }
 
     private fun statText(): String {
-        return if (config.getBoolean("player.enable", true)) {
+        return if (luminus.acng.features.gameplay.miscs.stats.player.config.getBoolean("player.enable", true)) {
             "&e/stat &7[玩家] — 查看玩家统计"
         } else ""
     }

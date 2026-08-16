@@ -28,13 +28,13 @@ import java.util.function.Consumer
 
 object ChickenDupe {
 
-    /** 楦＄殑 UUID -> 鏄惁涓烘湁鏁堬紙鍙埛鐗╋級鐘舵€?*/
+    /** 鸡的 UUID -> 是否为有效（可刷物）状态 */
     private val chickenActiveMap = ConcurrentHashMap<UUID, Boolean>()
 
     /**
-     * Xin 妯″紡锛氭瘡鍙瓨鏈夌墿鍝佺殑楦″湪鑷韩鍖哄煙绾跨▼锛圗ntityScheduler锛変笂鍛ㄦ湡妫€娴嬶紝
-     * 姣忛殧 interval-minutes 鍒嗛挓鎺夎惤鐗╁搧銆?
-     * 姣忎釜鍖哄潡鏈€澶?max-per-chunk 鍙湁鏁堥浮锛岃秴鍑虹殑鏄剧ず娴撶儫鏁堟灉锛堜笉鍒风墿锛夈€?
+     * Xin 模式：每只存有物品的鸡在自身区域线程（EntityScheduler）上周期检测，
+     * 每隔 interval-minutes 分钟掉落物品。
+     * 每个区块最多 max-per-chunk 只有效鸡，超出的显示浓烟效果（不刷物）。
      */
     object XinMode {
         private val timers = ConcurrentHashMap<UUID, ScheduledTask>()
@@ -95,7 +95,7 @@ object ChickenDupe {
             chicken.world.dropItemNaturally(chicken.location, item)
             player.inventory.setItemInMainHand(ItemStack(Material.AIR))
             ensureTimer(chicken)
-            // 鍒锋柊鍖哄潡鐘舵€侀渶瑕佸湪楦℃墍鍦ㄥ尯鍩熺嚎绋嬫墽琛岋紙鐜╁鍖哄煙鍙兘涓庨浮涓嶅悓锛?
+            // 刷新区块状态需要在鸡所在区域线程执行（玩家区域可能与鸡不同）
             Bukkit.getRegionScheduler().execute(BukkitPlugin.getInstance(), chicken.location) {
                 refreshChunkActiveStates(chicken.chunk)
             }
@@ -116,7 +116,7 @@ object ChickenDupe {
         }
 
         /**
-         * 缁戝畾鐨勯浮鍏嶇柅鐏劙浼ゅ锛堟湁鏁堥浮鐫€鐏紝瓒呴檺楦℃祿鐑燂紝閮戒笉鍙椾激锛?
+         * 绑定的鸡免疫火焰伤害（有效鸡着火，超限鸡浓烟，都不受伤）
          */
         @SubscribeEvent
         fun onChickenDamage(event: EntityDamageEvent) {
@@ -136,7 +136,7 @@ object ChickenDupe {
 
             val intervalTicks = intervalMinutes * 60L * 20L
 
-            // 鎺夌墿瀹氭椂鍣細鍦ㄩ浮鐨勫尯鍩熺嚎绋嬩笂鍛ㄦ湡鎬ф帀钀界墿鍝?
+            // 掉物定时器：在鸡的区域线程上周期性掉落物品
             val dropTask = chicken.scheduler.runAtFixedRate(
                 BukkitPlugin.getInstance(),
                 Consumer { _: ScheduledTask ->
@@ -153,17 +153,17 @@ object ChickenDupe {
             ) ?: return
             timers[chicken.uniqueId] = dropTask
 
-            // 瑙嗚鏁堟灉瀹氭椂鍣細姣?绉掑埛鏂扮伀鐒?娴撶儫绮掑瓙
+            // 视觉效果定时器：每 2 秒刷新火焰/浓烟粒子
             val visualTask = chicken.scheduler.runAtFixedRate(
                 BukkitPlugin.getInstance(),
                 Consumer { _: ScheduledTask ->
                     val loc = chicken.location
                     if (chickenActiveMap[chicken.uniqueId] == true) {
-                        // 鏈夋晥楦★細鐫€鐏?+ 鐏劙绮掑瓙
+                        // 有效鸡：着火 + 火焰粒子
                         chicken.fireTicks = 200
                         chicken.world.spawnParticle(Particle.FLAME, loc, 5, 0.2, 0.2, 0.2, 0.01)
                     } else {
-                        // 瓒呴檺楦★細娴撶儫绮掑瓙锛堜笉鍒风墿锛?
+                        // 超限鸡：浓烟粒子（不刷物）
                         chicken.world.spawnParticle(Particle.LARGE_SMOKE, loc, 3, 0.2, 0.2, 0.2, 0.01)
                     }
                 },
@@ -176,9 +176,9 @@ object ChickenDupe {
         }
 
         /**
-         * 鍒锋柊鍖哄潡鍐呮墍鏈夌粦瀹氶浮鐨勬椿璺冪姸鎬?
-         * 鍓?maxPerChunk 鍙负鏈夋晥锛堢潃鐏級锛屽叾浣欎负鏃犳晥锛堟祿鐑燂級
-         * 浠呰缃姸鎬佹爣璁帮紝瑙嗚鏁堟灉鐢卞畾鏃跺櫒澶勭悊
+         * 刷新区块内所有绑定鸡的活跃状态
+         * 前 maxPerChunk 只为有效（着火），其余为无效（浓烟）
+         * 仅设置状态标记，视觉效果由定时器处理
          */
         private fun refreshChunkActiveStates(chunk: Chunk?) {
             if (chunk == null) return
@@ -276,4 +276,3 @@ object ChickenDupe {
         }
     }
 }
-

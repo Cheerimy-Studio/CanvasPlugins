@@ -233,8 +233,9 @@ object Replica {
     fun deny(player: Player?) {
         if (player == null) return
         val now = System.currentTimeMillis()
-        val last = denyCooldowns.put(player.uniqueId, now)
+        val last = denyCooldowns[player.uniqueId]
         if (last != null && now - last < denyCooldownMillis()) return
+        denyCooldowns[player.uniqueId] = now
         player.msg(config.getString("messages.deny-redupe", "&c复制品无法再次复制！") ?: "&c复制品无法再次复制！")
     }
 }

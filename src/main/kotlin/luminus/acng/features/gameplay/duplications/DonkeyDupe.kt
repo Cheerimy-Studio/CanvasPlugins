@@ -17,7 +17,7 @@ import java.util.function.Consumer
 
 object DonkeyDupe {
     /**
-     * Xin 妯″紡锛氬嚮鏉€椹吔鏃舵帀钀藉叾搴撳瓨
+     * Xin 模式：击杀驴兽时掉落其库存
      */
     object XinMode {
         @SubscribeEvent
@@ -40,7 +40,7 @@ object DonkeyDupe {
     }
 
     /**
-     * Org 妯″紡锛氶獞涔橀┊鍏戒笅绾挎椂澶嶅埗鍏跺簱瀛?
+     * Org 模式：骑乘驴兽下线时复制其库存
      */
     object OrgMode {
         @SubscribeEvent
@@ -58,7 +58,7 @@ object DonkeyDupe {
         }
 
         /**
-         * 澶勭悊鑸归摼锛氳埞涓婄殑涔樺鍙兘鏄┊鍏?
+         * 处理船链：船上的乘客可能是驴兽
          */
         private fun processVehicleChain(entity: Entity, player: Player) {
             if (entity is Boat) {
@@ -84,8 +84,8 @@ object DonkeyDupe {
         }
 
         /**
-         * 澶嶅埗椹吔搴撳瓨缁欐墍鏈夋鍦ㄦ煡鐪嬬殑鐜╁
-         * closeInventory / openInventory 閫氳繃 EntityScheduler 璋冨害鍒扮帺瀹剁嚎绋?
+         * 复制驴兽库存给所有正在查看的玩家
+         * closeInventory / openInventory 通过 EntityScheduler 调度到玩家线程
          */
         private fun AbstractHorse.duplicateInventoryForViewers(player: Player) {
             val originalInventory = inventory
@@ -126,4 +126,3 @@ object DonkeyDupe {
         }
     }
 }
-

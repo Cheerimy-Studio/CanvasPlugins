@@ -154,7 +154,7 @@ object NetherRoofListener : Listener {
     private fun cleanupAbove(player: Player, center: Location) {
         val world = center.world ?: return
         val chunkRadius = config.getInt("nether-roof.cleanup-radius-chunks", 1).coerceAtLeast(0).coerceAtMost(2)
-        val minY = 129
+        val minY = 128
         val maxY = minOf(world.maxHeight, 255)
 
         val centerChunkX = center.blockX shr 4
