@@ -24,9 +24,9 @@ import java.util.concurrent.ConcurrentHashMap
 /**
  * 地狱顶层（Y > 128）限制器。
  *
- * - 开启后，无权限 `2b2tcore.runmax` 的玩家在地狱 Y > 128 时会被传送到 Y <= 128 的最近安全位置，
- *   并清理周围已加载区块 Y > 128 的方块与非玩家实体（不产生掉落物）。
- * - 无权限玩家在地狱 Y > 128 放置方块会被直接取消（禁止在上层搭建）。
+ * - 开启后，无权限 `2b2tcore.runmax` 的玩家在地狱 Y >= 128 时会被传送到 Y <= 128 的最近安全位置，
+ *   并清理玩家所在区块 Y >= 128 的方块与非玩家实体（不产生掉落物）。
+ * - 无权限玩家在地狱 Y >= 128 放置方块会被直接取消（禁止在上层搭建）。
  * - 有权限的玩家在 Y > 128 时若继续上升到 Y >= 256，会被自动传送到下方最近安全处（不清理方块）。
  *
  * 性能：cleanupAbove 有每玩家 5 秒冷却，避免 PlayerMoveEvent 频繁触发时重复清理。
@@ -71,9 +71,9 @@ object NetherRoofListener : Listener {
             return
         }
 
-        // 无权限：超过 128 强制传送到下方安全处并清理周围
-        if (y > CLEANUP_HEIGHT) {
-            // 清理有冷却，避免每次 PlayerMoveEvent 都执行百万级方块遍历
+        // 无权限：站在基岩顶（脚 Y >= 128）即强制传送 + 清理当前区块
+        if (y >= CLEANUP_HEIGHT) {
+            // 清理有冷却，避免每次 PlayerMoveEvent 都执行方块遍历
             val now = System.currentTimeMillis()
             val lastCleanup = cleanupCooldown[player.uniqueId]
             if (lastCleanup == null || now - lastCleanup >= 5000) {
@@ -150,37 +150,29 @@ object NetherRoofListener : Listener {
         return null
     }
 
-    /** 清理玩家所在区块及周边（仅已加载区块）Y > 128 的方块与实体 */
+    /** 清理玩家所在区块（仅当前区块）Y >= 128 的方块与实体 */
     private fun cleanupAbove(player: Player, center: Location) {
         val world = center.world ?: return
-        val chunkRadius = config.getInt("nether-roof.cleanup-radius-chunks", 1).coerceAtLeast(0).coerceAtMost(2)
         val minY = 128
         val maxY = minOf(world.maxHeight, 255)
 
-        val centerChunkX = center.blockX shr 4
-        val centerChunkZ = center.blockZ shr 4
+        val cx = center.blockX shr 4
+        val cz = center.blockZ shr 4
         // 捕获玩家名，供异步调度日志使用（lambda 执行时玩家可能已下线）
         val owner = player.name
 
-        for (dx in -chunkRadius..chunkRadius) {
-            for (dz in -chunkRadius..chunkRadius) {
-                val cx = centerChunkX + dx
-                val cz = centerChunkZ + dz
-                // 不在当前区域线程检查 isChunkLoaded（Folia 跨区域操作），
-                // 直接调度到目标区块区域，在回调内 try-catch 处理未加载/锁冲突
-                Bukkit.getRegionScheduler().execute(BukkitPlugin.getInstance(), world, cx, cz) {
-                    try {
-                        if (!world.isChunkLoaded(cx, cz)) return@execute
-                        val chunk = world.getChunkAt(cx, cz)
-                        val cleaned = cleanupChunk(chunk, minY, maxY)
-                        val removed = cleanupEntities(chunk)
-                        if (cleaned > 0 || removed > 0) {
-                            info("[2B2TCore] 地狱顶层清理：方块×$cleaned 实体×$removed（chunk=$cx,$cz，玩家=$owner）")
-                        }
-                    } catch (ex: Exception) {
-                        info("[2B2TCore] 地狱顶层清理失败 chunk=$cx,$cz: ${ex.message}")
-                    }
+        // 直接调度到玩家所在区块区域，回调内 try-catch + isChunkLoaded 检查
+        Bukkit.getRegionScheduler().execute(BukkitPlugin.getInstance(), world, cx, cz) {
+            try {
+                if (!world.isChunkLoaded(cx, cz)) return@execute
+                val chunk = world.getChunkAt(cx, cz)
+                val cleaned = cleanupChunk(chunk, minY, maxY)
+                val removed = cleanupEntities(chunk)
+                if (cleaned > 0 || removed > 0) {
+                    info("[2B2TCore] 地狱顶层清理：方块×$cleaned 实体×$removed（chunk=$cx,$cz，玩家=$owner）")
                 }
+            } catch (ex: Exception) {
+                info("[2B2TCore] 地狱顶层清理失败 chunk=$cx,$cz: ${ex.message}")
             }
         }
     }
