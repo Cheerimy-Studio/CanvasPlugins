@@ -166,10 +166,11 @@ object NetherRoofListener : Listener {
             for (dz in -chunkRadius..chunkRadius) {
                 val cx = centerChunkX + dx
                 val cz = centerChunkZ + dz
-                if (!world.isChunkLoaded(cx, cz)) continue
-                // 调度到该 chunk 所在区域执行，避免 Folia 跨区域访问异常
+                // 不在当前区域线程检查 isChunkLoaded（Folia 跨区域操作），
+                // 直接调度到目标区块区域，在回调内 try-catch 处理未加载/锁冲突
                 Bukkit.getRegionScheduler().execute(BukkitPlugin.getInstance(), world, cx, cz) {
                     try {
+                        if (!world.isChunkLoaded(cx, cz)) return@execute
                         val chunk = world.getChunkAt(cx, cz)
                         val cleaned = cleanupChunk(chunk, minY, maxY)
                         val removed = cleanupEntities(chunk)

@@ -23,8 +23,11 @@ import java.util.concurrent.ThreadLocalRandom
  * - 两者均授予配置的无敌时间
  *
  * Folia 线程安全：
- * - 方块读取（getHighestBlockAt / getRelative）必须调度到目标区块所在区域线程，
- *   否则跨区域访问抛异常导致随机传送全部失败、fallback 到世界出生点（00 附近）。
+ * - onRespawn 事件在玩家死亡位置的区域线程触发，绝不能在该线程读取远处区块
+ *   的方块（getHighestBlockYAt 跨区域会抛异常），否则随机传送全部失败、fallback
+ *   到世界出生点（00 附近）。
+ * - 正确做法：onRespawn 只做纯数学随机坐标设置 respawnLocation（不读任何方块），
+ *   精确的安全落点修正由重生后调度到目标区块的 RegionScheduler 完成。
  * - 所有传送使用 teleportAsync。
  */
 object SpawnListener : Listener {
@@ -54,10 +57,13 @@ object SpawnListener : Listener {
      * 死亡重生：未设置床/锚重生点时重生到出生点周围随机位置 + 无敌。
      * isBedSpawn 为 true 表示玩家有有效床或重生锚，不干预。
      *
-     * Folia 关键：onRespawn 在玩家死亡位置的区域线程触发，直接读取出生点附近
-     * 区块的方块会跨区域抛异常 → 全部尝试失败 → fallback 世界出生点（00 附近）。
-     * 因此这里只做纯数学随机坐标设置 respawnLocation（先让玩家出现在随机范围），
-     * 精确的安全落点修正由重生后的区域调度任务完成。
+     * Folia 关键：onRespawn 在玩家死亡位置的区域线程触发，绝对不能在此读取
+     * 出生点附近区块的方块（getHighestBlockYAt 跨区域抛异常 → catch 兜底
+     * spawn.y → 玩家仍在出生点高度，后续调度也因区块未加载失败）。
+     *
+     * 修复：onRespawn 只做纯数学随机坐标设置 respawnLocation（y 用世界最高
+     * 建筑高度上限 +10 作为安全高空值，先让玩家出现在随机范围的高空），
+     * 精确落点由重生后调度到目标区块的 RegionScheduler 完成（高空→安全落点）。
      * 世界取 event.respawnLocation.world（玩家实际重生世界），兼容下界/末地死亡。
      */
     @EventHandler
@@ -73,19 +79,30 @@ object SpawnListener : Listener {
         val rnd = ThreadLocalRandom.current()
         val x = spawn.blockX + rnd.nextInt(-radius, radius + 1)
         val z = spawn.blockZ + rnd.nextInt(-radius, radius + 1)
-        // 尝试获取该坐标地形高度（可能跨区域抛异常，失败用出生点高度兜底）
-        val y = try {
-            (world.getHighestBlockYAt(x, z) + 1).toDouble()
-        } catch (_: Exception) {
-            spawn.y
-        }
-        event.respawnLocation = Location(world, x + 0.5, y, z + 0.5)
+        // 高空安全值：世界最高建筑高度 + 10，确保不会卡在方块里
+        val safeHighY = (world.maxHeight - 10).coerceAtLeast(100).toDouble()
 
-        // 重生后：安全修正（区域线程）+ 无敌（玩家实体线程）
-        player.scheduler.run(BukkitPlugin.getInstance(), { _ ->
-            teleportToSafeRandom(player, x, z)
-            grantInvulnerability(player)
-        }, null)
+        // 只设置随机坐标，不读取任何方块（避免 Folia 跨区域异常）
+        event.respawnLocation = Location(world, x + 0.5, safeHighY, z + 0.5)
+
+        // 重生后：延迟 1 秒调度到目标区块区域线程做安全落点修正 + 无敌
+        val cx = x shr 4
+        val cz = z shr 4
+        Bukkit.getGlobalRegionScheduler().runDelayed(BukkitPlugin.getInstance(), { _ ->
+            Bukkit.getRegionScheduler().execute(BukkitPlugin.getInstance(), world, cx, cz) {
+                try {
+                    val loc = findSafeLocation(world, x, z)
+                    if (loc != null) {
+                        player.teleportAsync(loc)
+                    }
+                    // 安全落点找不到时不做额外处理，玩家已在随机范围高空（可自行降落）
+                } catch (_: Exception) {
+                    // 区域锁冲突等异常，忽略
+                }
+                // 无敌在区域线程设置也安全（isInvulnerable 是实体属性）
+                grantInvulnerability(player)
+            }
+        }, 20L) // 延迟 1 秒等区块加载
     }
 
     /** 随机传送到世界出生点周围（调度到玩家实体线程） */
@@ -135,22 +152,6 @@ object SpawnListener : Listener {
         tryRandomChunk()
     }
 
-    /** 传送到指定坐标附近的安全点（内部调度到目标区块区域线程） */
-    private fun teleportToSafeRandom(player: Player, x: Int, z: Int) {
-        val world = player.world
-        val cx = x shr 4
-        val cz = z shr 4
-        Bukkit.getRegionScheduler().execute(BukkitPlugin.getInstance(), world, cx, cz) {
-            val loc = findSafeLocation(world, x, z)
-            if (loc != null) {
-                player.teleportAsync(loc)
-            } else {
-                // 目标点不安全（如岩浆/水），重新随机传送
-                doRandomTeleport(player)
-            }
-        }
-    }
-
     /** 寻找安全落脚点：实心方块上方两格空气，且不是危险方块（须在目标区域线程调用） */
     private fun findSafeLocation(world: World, x: Int, z: Int): Location? {
         try {
@@ -163,7 +164,6 @@ object SpawnListener : Listener {
             if (highest.getRelative(0, 2, 0).type != Material.AIR) return null
             return Location(world, x + 0.5, highest.y + 1.0, z + 0.5)
         } catch (_: Exception) {
-            // 区域锁冲突等异常，安全跳过
             return null
         }
     }
@@ -175,7 +175,6 @@ object SpawnListener : Listener {
             player.noDamageTicks = invulnerableSeconds * 20
             try {
                 player.isInvulnerable = true
-                // 在玩家实体调度器上延迟取消无敌，避免跨线程访问
                 player.scheduler.runDelayed(
                     BukkitPlugin.getInstance(),
                     { player.isInvulnerable = false },
