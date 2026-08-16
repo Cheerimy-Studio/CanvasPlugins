@@ -140,7 +140,7 @@ object Command {
         // 自杀权限组（单一权限，默认 true 所以通常所有人都有）
         val suicideStatus = evaluatePermissionGroup(player, listOf("2b2tcore.suicide"), tick, question, cross)
 
-        return "&7权限：&7[复制 $dupeStatus] [跑顶 $runmaxStatus] [聊天 $chatColorStatus] [自杀 $suicideStatus]"
+        return "&7权限：[复制 ${dupeStatus}&7] [跑顶 ${runmaxStatus}&7] [聊天 ${chatColorStatus}&7] [自杀 ${suicideStatus}&7]"
     }
 
     /**
