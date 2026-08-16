@@ -1,6 +1,7 @@
 package luminus.acng.features.gameplay.miscs
 
 import luminus.acng.Main.config
+import luminus.acng.msg
 import org.bukkit.Bukkit
 import org.bukkit.Chunk
 import org.bukkit.Location
@@ -11,22 +12,23 @@ import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
+import org.bukkit.event.block.BlockPlaceEvent
 import org.bukkit.event.player.PlayerMoveEvent
 import taboolib.common.LifeCycle
 import taboolib.common.platform.Awake
 import taboolib.common.platform.function.info
 import taboolib.platform.BukkitPlugin
-import java.util.concurrent.ThreadLocalRandom
 
 /**
  * 地狱顶层（Y > 128）限制器。
  *
  * - 开启后，无权限 `2b2tcore.runmax` 的玩家在地狱 Y > 128 时会被传送到 Y <= 128 的最近安全位置，
  *   并清理周围已加载区块 Y > 128 的方块与非玩家实体（不产生掉落物）。
+ * - 无权限玩家在地狱 Y > 128 放置方块会被直接取消（禁止在上层搭建）。
  * - 有权限的玩家在 Y > 128 时若继续上升到 Y >= 256，会被自动传送到下方最近安全处（不清理方块）。
  *
  * Folia 线程安全：
- * - 所有方块/实体操作均调度到对应 chunk 的 RegionScheduler 执行；
+ * - 所有方块/实体操作均通过 RegionScheduler 调度到对应 chunk 的所在区域执行；
  * - teleport 优先使用 teleportAsync；
  * - 清理前检查 isChunkLoaded，避免强制加载未加载区块。
  */
@@ -51,7 +53,6 @@ object NetherRoofListener : Listener {
     fun onPlayerMove(event: PlayerMoveEvent) {
         if (!config.getBoolean("nether-roof.enable", false)) return
         val to = event.to
-        if (to == null) return
         if (!isNether(to.world)) return
         val player = event.player
         val y = to.y
@@ -68,6 +69,19 @@ object NetherRoofListener : Listener {
         if (y > CLEANUP_HEIGHT) {
             cleanupAbove(player, to)
             teleportToSafeBelow(player, to)
+        }
+    }
+
+    /** 无权限玩家禁止在地狱上层（Y > 128）搭建方块 */
+    @EventHandler
+    fun onBlockPlace(event: BlockPlaceEvent) {
+        if (!config.getBoolean("nether-roof.enable", false)) return
+        val player = event.player
+        if (player.hasPermission(PERMISSION)) return
+        if (!isNether(event.block.world)) return
+        if (event.block.y > CLEANUP_HEIGHT) {
+            event.isCancelled = true
+            player.msg("&c地狱上层禁止搭建方块！")
         }
     }
 
@@ -124,58 +138,28 @@ object NetherRoofListener : Listener {
 
         val centerChunkX = center.blockX shr 4
         val centerChunkZ = center.blockZ shr 4
+        // 捕获玩家名，供异步调度日志使用（lambda 执行时玩家可能已下线）
+        val owner = player.name
 
-        val chunkPositions = mutableListOf<Pair<Int, Int>>()
         for (dx in -chunkRadius..chunkRadius) {
             for (dz in -chunkRadius..chunkRadius) {
                 val cx = centerChunkX + dx
                 val cz = centerChunkZ + dz
-                if (world.isChunkLoaded(cx, cz)) {
-                    chunkPositions.add(cx to cz)
-                }
-            }
-        }
-        chunkPositions.shuffle(ThreadLocalRandom.current())
-
-        var scheduled = 0
-        for ((cx, cz) in chunkPositions) {
-            // 每个区块调度到它自己的区域执行，避免 Folia 跨区域访问异常
-            runInRegion(world, cx, cz) {
-                try {
-                    val chunk = world.getChunkAt(cx, cz)
-                    val cleaned = cleanupChunk(chunk, minY, maxY)
-                    val removed = cleanupEntities(chunk)
-                    if (cleaned > 0 || removed > 0) {
-                        info("[2B2TCore] 地狱顶层清理：方块×$cleaned 实体×$removed（chunk=$cx,$cz，玩家=${player.name}）")
+                if (!world.isChunkLoaded(cx, cz)) continue
+                // 调度到该 chunk 所在区域执行，避免 Folia 跨区域访问异常
+                Bukkit.getRegionScheduler().execute(BukkitPlugin.getInstance(), world, cx, cz) {
+                    try {
+                        val chunk = world.getChunkAt(cx, cz)
+                        val cleaned = cleanupChunk(chunk, minY, maxY)
+                        val removed = cleanupEntities(chunk)
+                        if (cleaned > 0 || removed > 0) {
+                            info("[2B2TCore] 地狱顶层清理：方块×$cleaned 实体×$removed（chunk=$cx,$cz，玩家=$owner）")
+                        }
+                    } catch (ex: Exception) {
+                        info("[2B2TCore] 地狱顶层清理失败 chunk=$cx,$cz: ${ex.message}")
                     }
-                } catch (ex: Exception) {
-                    info("[2B2TCore] 地狱顶层清理失败 chunk=$cx,$cz: ${ex.message}")
                 }
             }
-            scheduled++
-        }
-
-        if (scheduled == 0) {
-            info("[2B2TCore] 地狱顶层清理：玩家 ${player.name} 周围无已加载区块可清理")
-        }
-    }
-
-    /** 调度 runnable 到指定 chunk 所在区域执行（Folia 安全） */
-    private fun runInRegion(world: World, cx: Int, cz: Int, runnable: Runnable) {
-        val location = Location(world, (cx shl 4).toDouble(), 128.0, (cz shl 4).toDouble())
-        try {
-            // Folia / Paper 1.19.4+
-            val server = Bukkit.getServer()
-            val getRegionScheduler = server.javaClass.getMethod("getRegionScheduler")
-            val regionScheduler = getRegionScheduler.invoke(server)
-            regionScheduler.javaClass.getMethod("execute", org.bukkit.plugin.Plugin::class.java, Location::class.java, Runnable::class.java)
-                .invoke(regionScheduler, BukkitPlugin.getInstance(), location, runnable)
-        } catch (_: NoSuchMethodError) {
-            // 旧版 Paper/Spigot：直接运行
-            runnable.run()
-        } catch (ex: Exception) {
-            // 反射失败回退
-            runnable.run()
         }
     }
 
@@ -199,7 +183,7 @@ object NetherRoofListener : Listener {
                             block.setType(Material.AIR, false)
                             count++
                         } catch (_: Exception) {
-                            // 跨区域或区域锁冲突 → 跳过
+                            // 区域锁冲突 → 跳过
                         }
                     }
                 }

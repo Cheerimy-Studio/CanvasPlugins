@@ -10,20 +10,20 @@ config-ver: 13
 duplication:
   # 命令复制：通过 /dupe 复制手持物品（权限：2b2tcore.dupe.command）
   command:
-    enable: true
+    enable: false
     multiply-times: 2  # 复制倍数
-    max-amount: 2333   # 单次复制数量上限
+    max-amount: 16   # 单次复制数量上限
 
   # 物品展示框复制：旋转展示框时有概率掉落其内物品（权限：2b2tcore.dupe.item-frame）
   item-frame:
-    enable: false
-    possibility: 10  # 触发概率（百分比，0-100）
+    enable: true
+    possibility: 1  # 触发概率（百分比，0-100）
 
   # 鸡刷复制
   chicken:
     # Xin 模式：将潜影盒存入鸡中，每隔指定分钟数掉落（权限：2b2tcore.dupe.chicken.xin）
-    xin-mode: false
-    xin-mode-interval: 15        # 每隔多少分钟刷新一次
+    xin-mode: true
+    xin-mode-interval: 60        # 每隔多少分钟刷新一次
     xin-mode-max-per-chunk: 3   # 每个区块最多几只有效鸡（超出的显示浓烟，不刷物）
     # 点击模式：右键鸡时复制手持物品（权限：2b2tcore.dupe.chicken.click）
     click-mode: false
@@ -32,7 +32,7 @@ duplication:
   # 驴复制
   donkey:
     # Xin 模式：击杀驴兽时掉落其库存（权限：2b2tcore.dupe.donkey.xin）
-    xin-mode: false
+    xin-mode: true
     # Org 模式：骑乘驴兽下线时复制其库存（权限：2b2tcore.dupe.donkey.org）
     org-mode: false
     # Org 模式下是否允许处理船链上的驴兽
@@ -40,8 +40,8 @@ duplication:
 
   # 破坏放置复制：累计破坏潜影盒到指定次数时复制（权限：2b2tcore.dupe.mine-and-place）
   mine-and-place:
-    enable: false
-    amount: 10  # 触发复制所需破坏次数
+    enable: true
+    amount: 100  # 触发复制所需破坏次数
 
   # 复制品标记：所有复制产生的物品都会带有「复制品」词条（lore + PDC 标记）
   # 复制品不可被二次复制；拥有权限 2b2tcore.dupe.original 的玩家复制出的物品为原版（不带词条）
@@ -80,11 +80,11 @@ spawn:
 
 # ===================== 地狱顶层（Y > 128）限制器 =====================
 # 无权限 `2b2tcore.runmax` 的玩家在地狱超过 128 层会被强制传回下方安全处，
-# 并清理周围已加载区块 Y > 128 的方块和实体。
+# 并清理周围已加载区块 Y > 128 的方块和实体，且禁止在上层搭建方块。
 # 有权限的玩家上升到 256 层以上时也会被强制传送回下方安全处。
 nether-roof:
-  enable: false               # 总开关
-  cleanup-radius-chunks: 1  # 清理半径（区块数，0 表示仅当前区块，最大 2）
+  enable: true                # 总开关
+  cleanup-radius-chunks: 2    # 清理半径（区块数，0 表示仅当前区块，最大 2）
 
 # ===================== 聊天颜色（需安装 PistonChat）=====================
 # 未安装 PistonChat 时本段无效，不会触发其事件类加载
@@ -95,12 +95,12 @@ chat-color:
   default-color: "&7"
   # 权限组：自上而下匹配，首个命中的权限组生效
   groups:
-    op:
-      permission: "2b2tcore.chatcolor.op"
-      color: "&6"  # OP 金色
     vip:
       permission: "2b2tcore.chatcolor.vip"
       color: "&e"
+    op:
+      permission: "2b2tcore.chatcolor.op"
+      color: "&c"
 
 # ===================== 消息文本 =====================
 # 支持旧版 & 颜色代码
@@ -111,7 +111,7 @@ messages:
   suicide: "&7你已自杀。"
   # /help 命令输出格式（支持 %placeholder% 占位符）
   # 含功能占位符的行在该功能未启用时整行不输出
-  # 可用功能占位符：%suicide% %dupe-cmd% %item-frame% %chicken% %donkey% %mine-place% %chat-color% %stat%
+  # 可用功能占位符：%suicide% %dupe-cmd% %item-frame% %chicken% %donkey% %mine-place% %chat-color% %stat% %nether-roof%
   help:
     lines:
       - "&e===== &62B2T &e====="
@@ -122,10 +122,5 @@ messages:
       - "%chicken%"
       - "%donkey%"
       - "%mine-place%"
-      - "&7出生点随机传送 + 10秒无敌"
+      - "%nether-roof%"
       - "%stat%"
-      - " "
-      - "&e管理命令："
-      - "&e/core info &7— 查看插件信息"
-      - "&e/core reload &7— 重载配置文件"
-      - "&e/core clearcache &7— 清空复制缓存"
