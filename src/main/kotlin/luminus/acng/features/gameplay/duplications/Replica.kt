@@ -3,6 +3,7 @@ package luminus.acng.features.gameplay.duplications
 import luminus.acng.Main.config
 import luminus.acng.msg
 import org.bukkit.ChatColor
+import org.bukkit.Material
 import org.bukkit.NamespacedKey
 import org.bukkit.block.BlockState
 import org.bukkit.block.ShulkerBox
@@ -53,6 +54,23 @@ object Replica {
         "grindable",         // 不可在磨石上分解
         "enchantable",       // 不可在附魔台上二次附魔
         "vanishcurse",       // 死亡时消失（不掉落）
+    )
+
+    /**
+     * 稀有方块（传送石合成材料等珍贵方块），复制品禁止放置。
+     * 普通方块复制品仍允许放置（放置后标记丢失可接受）。
+     * 通过 itemtag:placeable flag 由 ItemTag 拦截放置。
+     */
+    private val rarePlaceBlockMaterials = setOf(
+        Material.DRAGON_EGG,       // 龙蛋
+        Material.COAL_BLOCK,       // 煤炭块
+        Material.IRON_BLOCK,       // 铁块
+        Material.GOLD_BLOCK,       // 金块
+        Material.LAPIS_BLOCK,      // 青金石块
+        Material.DIAMOND_BLOCK,    // 钻石块
+        Material.NETHERITE_BLOCK,  // 下界合金块
+        Material.EMERALD_BLOCK,    // 绿宝石块
+        Material.REDSTONE_BLOCK,   // 红石块
     )
 
     /** 复制品词条（lore），支持 & 颜色代码 */
@@ -136,6 +154,11 @@ object Replica {
     private fun mark(item: ItemStack, depth: Int): ItemStack {
         val meta = item.itemMeta ?: return item
         applyReplicaMeta(meta)
+
+        // 稀有方块：额外打 placeable flag，禁止放置（依赖 ItemTag 拦截）
+        if (itemTagFlagsEnabled() && item.type in rarePlaceBlockMaterials) {
+            meta.persistentDataContainer.set(NamespacedKey("itemtag", "placeable"), PersistentDataType.INTEGER, 0)
+        }
 
         // 潜影盒内部物品递归打标
         if (depth < MAX_NESTING && meta is BlockStateMeta) {
