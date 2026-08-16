@@ -108,14 +108,60 @@ object Command {
         return processedMessages.trimEnd()
     }
 
-    /** 构造权限状态行，供 /stat 消息使用（一行显示） */
+    /** 构造权限状态行，供 /stat 消息使用（分组汇总：全部=勾，部分=黄色问号，没有=X） */
     private fun buildPermissionStatus(player: Player): String {
         val tick = "&a✔"
+        val question = "&e?"
         val cross = "&c✘"
-        val runMax = if (player.hasPermission("2b2tcore.runmax")) tick else cross
-        val dupe = if (player.hasPermission("2b2tcore.dupe.command")) tick else cross
-        val greenName = if (player.hasPermission("2b2tcore.chatcolor.vip")) tick else cross
-        return "&7权限：&7🏃 $runMax &7📦 $dupe &7🟢 $greenName"
+
+        // 复制权限组
+        val dupePermissions = listOf(
+            "2b2tcore.dupe.command",
+            "2b2tcore.dupe.original",
+            "2b2tcore.dupe.chicken.xin",
+            "2b2tcore.dupe.chicken.click",
+            "2b2tcore.dupe.donkey.xin",
+            "2b2tcore.dupe.donkey.org",
+            "2b2tcore.dupe.item-frame",
+            "2b2tcore.dupe.mine-and-place"
+        )
+        val dupeStatus = evaluatePermissionGroup(player, dupePermissions, tick, question, cross)
+
+        // 地狱上层权限组（单一权限）
+        val runmaxStatus = evaluatePermissionGroup(player, listOf("2b2tcore.runmax"), tick, question, cross)
+
+        // 聊天颜色权限组
+        val chatColorStatus = evaluatePermissionGroup(
+            player,
+            listOf("2b2tcore.chatcolor.vip", "2b2tcore.chatcolor.op"),
+            tick, question, cross
+        )
+
+        // 自杀权限组（单一权限，默认 true 所以通常所有人都有）
+        val suicideStatus = evaluatePermissionGroup(player, listOf("2b2tcore.suicide"), tick, question, cross)
+
+        return "&7权限：&7[复制 $dupeStatus] [跑顶 $runmaxStatus] [聊天 $chatColorStatus] [自杀 $suicideStatus]"
+    }
+
+    /**
+     * 评估一组权限的汇总状态：
+     * - 全部有 → tick
+     * - 部分有 → question（黄色）
+     * - 全无 → cross
+     */
+    private fun evaluatePermissionGroup(
+        player: Player,
+        permissions: List<String>,
+        tick: String,
+        question: String,
+        cross: String
+    ): String {
+        val hasCount = permissions.count { player.hasPermission(it) }
+        return when {
+            hasCount == permissions.size -> tick
+            hasCount > 0 -> question
+            else -> cross
+        }
     }
 
     data class PlayerData(val kills: Int, val deaths: Int, val kd: Double, val joins: Int, val quits: Int, val onlineTime: DateTime)

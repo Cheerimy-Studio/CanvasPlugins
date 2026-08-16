@@ -1,6 +1,10 @@
 package luminus.acng.features.gameplay.spawn
 
 import luminus.acng.Main.config
+import org.bukkit.Bukkit
+import org.bukkit.Location
+import org.bukkit.Material
+import org.bukkit.World
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
@@ -76,17 +80,50 @@ object SpawnListener : Listener {
         val world = player.world
         val worldSpawn = world.spawnLocation
         val rnd = ThreadLocalRandom.current()
-        val x = worldSpawn.blockX + rnd.nextInt(-radius, radius + 1)
-        val z = worldSpawn.blockZ + rnd.nextInt(-radius, radius + 1)
-        val loc = world.getHighestBlockAt(x, z).location.add(0.5, 1.0, 0.5)
-        player.teleportAsync(loc)
+        val maxAttempts = config.getInt("spawn.max-attempts", 50)
+
+        for (attempt in 1..maxAttempts) {
+            val x = worldSpawn.blockX + rnd.nextInt(-radius, radius + 1)
+            val z = worldSpawn.blockZ + rnd.nextInt(-radius, radius + 1)
+            val loc = findSafeLocation(world, x, z)
+            if (loc != null) {
+                player.teleportAsync(loc)
+                return
+            }
+        }
+        // 找不到安全位置，fallback 到世界出生点
+        player.teleportAsync(world.spawnLocation)
     }
 
-    /** 授予无敌时间 */
+    /** 寻找安全落脚点：实心方块上方两格空气，且不是危险方块 */
+    private fun findSafeLocation(world: World, x: Int, z: Int): Location? {
+        val highest = world.getHighestBlockAt(x, z)
+        if (highest.type == Material.AIR || highest.isLiquid) return null
+        val type = highest.type
+        if (type == Material.LAVA || type == Material.FIRE || type == Material.SWEET_BERRY_BUSH ||
+            type == Material.CACTUS || type == Material.WATER || type == Material.POWDER_SNOW) return null
+        if (highest.getRelative(0, 1, 0).type != Material.AIR) return null
+        if (highest.getRelative(0, 2, 0).type != Material.AIR) return null
+        return Location(world, x + 0.5, highest.y + 1.0, z + 0.5)
+    }
+
+    /** 授予无敌时间（使用 setInvulnerable + 无敌帧双保险） */
     private fun grantInvulnerability(player: Player) {
         val invulnerableSeconds = config.getInt("spawn.invulnerability-seconds", 10)
         if (invulnerableSeconds > 0) {
             player.noDamageTicks = invulnerableSeconds * 20
+            try {
+                player.isInvulnerable = true
+                // 在玩家实体调度器上延迟取消无敌，避免跨线程访问
+                player.scheduler.runDelayed(
+                    BukkitPlugin.getInstance(),
+                    { player.isInvulnerable = false },
+                    null,
+                    invulnerableSeconds * 20L
+                )
+            } catch (_: Throwable) {
+                // 旧版本不支持 isInvulnerable，仅依赖 noDamageTicks
+            }
         }
     }
 }
