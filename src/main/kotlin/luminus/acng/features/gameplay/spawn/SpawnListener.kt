@@ -85,24 +85,11 @@ object SpawnListener : Listener {
         // 只设置随机坐标，不读取任何方块（避免 Folia 跨区域异常）
         event.respawnLocation = Location(world, x + 0.5, safeHighY, z + 0.5)
 
-        // 重生后：延迟 1 秒调度到目标区块区域线程做安全落点修正 + 无敌
-        val cx = x shr 4
-        val cz = z shr 4
-        Bukkit.getGlobalRegionScheduler().runDelayed(BukkitPlugin.getInstance(), { _ ->
-            Bukkit.getRegionScheduler().execute(BukkitPlugin.getInstance(), world, cx, cz) {
-                try {
-                    val loc = findSafeLocation(world, x, z)
-                    if (loc != null) {
-                        player.teleportAsync(loc)
-                    }
-                    // 安全落点找不到时不做额外处理，玩家已在随机范围高空（可自行降落）
-                } catch (_: Exception) {
-                    // 区域锁冲突等异常，忽略
-                }
-                // 无敌在区域线程设置也安全（isInvulnerable 是实体属性）
-                grantInvulnerability(player)
-            }
-        }, 20L) // 延迟 1 秒等区块加载
+        // 重生后：复用 onJoin 同款 doRandomTeleport（RegionScheduler + 递归找安全点，已证明有效）
+        player.scheduler.run(BukkitPlugin.getInstance(), { _ ->
+            doRandomTeleport(player)
+            grantInvulnerability(player)
+        }, null)
     }
 
     /** 随机传送到世界出生点周围（调度到玩家实体线程） */
