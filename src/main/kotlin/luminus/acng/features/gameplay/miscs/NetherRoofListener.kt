@@ -84,12 +84,12 @@ object NetherRoofListener : Listener {
         }
     }
 
-    /** 任何玩家（含 OP）均禁止在地狱上层（Y > 128）搭建方块 */
+    /** 任何玩家（含 OP）均禁止在地狱上层（Y >= 128）搭建方块 */
     @EventHandler
     fun onBlockPlace(event: BlockPlaceEvent) {
         if (!config.getBoolean("nether-roof.enable", false)) return
         if (!isNether(event.block.world)) return
-        if (event.block.y > CLEANUP_HEIGHT) {
+        if (event.block.y >= CLEANUP_HEIGHT) {
             event.isCancelled = true
             sendDenyMessage(event.player)
         }
