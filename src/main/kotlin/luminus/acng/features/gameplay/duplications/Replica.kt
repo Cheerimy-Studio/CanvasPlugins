@@ -13,6 +13,12 @@ import org.bukkit.inventory.meta.BlockStateMeta
 import org.bukkit.inventory.meta.BundleMeta
 import org.bukkit.inventory.meta.ItemMeta
 import org.bukkit.persistence.PersistentDataType
+import io.papermc.paper.threadedregions.scheduler.ScheduledTask
+import org.bukkit.Bukkit
+import taboolib.common.LifeCycle
+import taboolib.common.platform.Awake
+import taboolib.platform.BukkitPlugin
+import java.io.File
 import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
 
@@ -28,7 +34,8 @@ import java.util.concurrent.ConcurrentHashMap
  * - 产物继承：熔炉/营火/烟熏器/高炉烧炼产物自动继承复制品标记（见 ReplicaBlockListener）
  * - 方块持久化：
  *   - TileState 方块（潜影盒/熔炉等）放置时写入 PDC，挖掘掉落物恢复标记（重启不丢）
- *   - 普通方块（钻石块/海绵等）放置时坐标写入内存 Map，挖掘掉落物恢复标记（重启后清空）
+ *   - 普通方块（钻石块/海绵等）放置时坐标写入内存 Set + 硬盘缓存
+ *     replica-blocks.txt，挖掘掉落物恢复标记（重启后也从硬盘恢复）
  *
  * ItemTag flag 由 ItemTag 插件的监听器拦截，2B2TCore 不重复实现拦截逻辑。
  */
@@ -38,21 +45,70 @@ object Replica {
     const val ORIGINAL_PERMISSION = "2b2tcore.dupe.original"
     private const val MAX_NESTING = 5
 
-    // ==================== 普通方块位置记录（内存 Map，无存储文件） ====================
+    // ==================== 普通方块位置记录（内存 Set + 硬盘缓存） ====================
 
-    /** 普通方块（无 TileState）复制品位置记录：挖掘时 remove，重启后清空 */
-    private val replicaBlockLocations = ConcurrentHashMap<String, Unit>()
+    /** 普通方块（无 TileState）复制品位置记录：内存权威 + 硬盘缓存（重启不丢） */
+    private val replicaBlockLocations = ConcurrentHashMap.newKeySet<String>()
+
+    /** 硬盘缓存文件：plugins/2B2TCore/replica-blocks.txt（每行一个坐标，轻量） */
+    private val locationsFile: File by lazy {
+        File(BukkitPlugin.getInstance().dataFolder, "replica-blocks.txt")
+    }
+
+    /** 是否有未落盘的变更 */
+    @Volatile
+    private var locationsDirty = false
+
+    /** debounce flush 任务（延迟 1 秒合并多次变更后写盘） */
+    private var flushTask: ScheduledTask? = null
 
     private fun blockKey(world: String, x: Int, y: Int, z: Int) = "$world:$x:$y:$z"
 
-    /** 放置普通方块复制品时记录坐标 */
-    fun recordBlockLocation(world: String, x: Int, y: Int, z: Int) {
-        replicaBlockLocations[blockKey(world, x, y, z)] = Unit
+    /** 启动时加载硬盘缓存到内存 */
+    @Awake(LifeCycle.ENABLE)
+    fun loadLocations() {
+        if (!locationsFile.exists()) return
+        runCatching {
+            locationsFile.readLines().forEach { if (it.isNotBlank()) replicaBlockLocations.add(it) }
+        }
     }
 
-    /** 检查并移除坐标记录（挖掘时调用，命中=该掉落物应恢复标记） */
+    /** 卸载时强制落盘 */
+    @Awake(LifeCycle.DISABLE)
+    fun flushOnDisable() {
+        flushTask?.cancel()
+        saveLocations()
+    }
+
+    /** 立即写盘（数据量小，全量重写） */
+    private fun saveLocations() {
+        if (!locationsDirty) return
+        locationsDirty = false
+        runCatching {
+            locationsFile.parentFile?.mkdirs()
+            locationsFile.writeText(replicaBlockLocations.joinToString("\n"))
+        }
+    }
+
+    /** 变更后延迟 1 秒写盘（合并高频变更，避免频繁 I/O） */
+    private fun scheduleFlush() {
+        locationsDirty = true
+        flushTask?.cancel()
+        flushTask = Bukkit.getGlobalRegionScheduler().runDelayed(
+            BukkitPlugin.getInstance(), { _ -> saveLocations() }, 20L
+        )
+    }
+
+    /** 放置普通方块复制品时记录坐标 */
+    fun recordBlockLocation(world: String, x: Int, y: Int, z: Int) {
+        if (replicaBlockLocations.add(blockKey(world, x, y, z))) scheduleFlush()
+    }
+
+    /** 检查并移除坐标记录（挖掘时调用，命中=该掉落物应恢复标记，同时及时卸载） */
     fun isRecordedBlock(world: String, x: Int, y: Int, z: Int): Boolean {
-        return replicaBlockLocations.remove(blockKey(world, x, y, z)) != null
+        val removed = replicaBlockLocations.remove(blockKey(world, x, y, z))
+        if (removed) scheduleFlush()
+        return removed
     }
 
     /**

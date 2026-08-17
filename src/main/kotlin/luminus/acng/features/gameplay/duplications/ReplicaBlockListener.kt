@@ -71,8 +71,9 @@ object ReplicaBlockListener : Listener {
     @SubscribeEvent
     fun onSmelt(event: FurnaceSmeltEvent) {
         if (!enabled()) return
+        val result = event.result ?: return
         if (Replica.isReplica(event.source)) {
-            event.result = Replica.mark(event.result)
+            event.result = Replica.mark(result)
         }
     }
 
@@ -80,8 +81,9 @@ object ReplicaBlockListener : Listener {
     @SubscribeEvent
     fun onCook(event: BlockCookEvent) {
         if (!enabled()) return
+        val result = event.result ?: return
         if (Replica.isReplica(event.source)) {
-            event.result = Replica.mark(event.result)
+            event.result = Replica.mark(result)
         }
     }
 
@@ -101,17 +103,31 @@ object ReplicaBlockListener : Listener {
         if (!Replica.isReplica(tool)) return
 
         val clicked = event.clickedBlock ?: return
-        // 只有真正「改变方块类型」的工具使用才记录；右键箱子/门等交互不记录
-        if (!isTerrainTool(tool.type)) return
+        // 只有「工具 × 目标方块」组合真正改变地形时才记录，避免误标普通方块
+        if (!isModifiableBy(tool.type, clicked.type)) return
 
         Replica.recordBlockLocation(clicked.world.name, clicked.x, clicked.y, clicked.z)
     }
 
-    /** 判断是否为「会改变地形/方块类型」的工具 */
-    private fun isTerrainTool(material: Material): Boolean {
-        val name = material.name
-        return name.endsWith("_HOE") ||   // 锄头（木/石/铁/金/钻/下界合金）
-            name.endsWith("_SHOVEL") ||  // 铲子
-            name.endsWith("_AXE")        // 斧头（去皮/去氧化）
+    /** 判断「工具 × 目标方块」组合是否会真正改变地形/方块类型 */
+    private fun isModifiableBy(tool: Material, block: Material): Boolean {
+        val t = tool.name
+        val b = block.name
+        return when {
+            t.endsWith("_HOE") -> b in HOE_TARGETS
+            t.endsWith("_SHOVEL") -> b in SHOVEL_TARGETS
+            t.endsWith("_AXE") -> (b.contains("LOG") || b.contains("WOOD")) && !b.startsWith("STRIPPED_")
+            else -> false
+        }
     }
+
+    /** 锄头可改变的目标方块（草/土/草径 → 耕地、砂土/缠根泥土 → 泥土） */
+    private val HOE_TARGETS = setOf(
+        "GRASS_BLOCK", "DIRT", "DIRT_PATH", "COARSE_DIRT", "ROOTED_DIRT"
+    )
+
+    /** 铲子可改变的目标方块（草/土/灰化土/菌丝 → 草径） */
+    private val SHOVEL_TARGETS = setOf(
+        "GRASS_BLOCK", "DIRT", "PODZOL", "MYCELIUM"
+    )
 }
