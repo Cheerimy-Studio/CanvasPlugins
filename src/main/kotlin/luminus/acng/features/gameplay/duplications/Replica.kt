@@ -25,8 +25,10 @@ import java.util.concurrent.ConcurrentHashMap
  *   由 ItemTag flag 拦截），不可二次复制（checkCanDupe 拦截）
  * - 潜影盒 / 收纳袋内部物品递归打标（最多 5 层）
  * - 拥有 2b2tcore.dupe.original 权限的玩家复制出的物品为原版（不带词条与 flag）
- * - 产物继承：熔炉烧炼产物自动继承复制品标记（见 ReplicaBlockListener）
- * - 方块持久化：放置时写入 TileState PDC，挖掘掉落物自动恢复标记（见 ReplicaBlockListener）
+ * - 产物继承：熔炉/营火/烟熏器/高炉烧炼产物自动继承复制品标记（见 ReplicaBlockListener）
+ * - 方块持久化：
+ *   - TileState 方块（潜影盒/熔炉等）放置时写入 PDC，挖掘掉落物恢复标记（重启不丢）
+ *   - 普通方块（钻石块/海绵等）放置时坐标写入内存 Map，挖掘掉落物恢复标记（重启后清空）
  *
  * ItemTag flag 由 ItemTag 插件的监听器拦截，2B2TCore 不重复实现拦截逻辑。
  */
@@ -35,6 +37,23 @@ object Replica {
     val replicaKey = NamespacedKey("2b2tcore", "replica")
     const val ORIGINAL_PERMISSION = "2b2tcore.dupe.original"
     private const val MAX_NESTING = 5
+
+    // ==================== 普通方块位置记录（内存 Map，无存储文件） ====================
+
+    /** 普通方块（无 TileState）复制品位置记录：挖掘时 remove，重启后清空 */
+    private val replicaBlockLocations = ConcurrentHashMap<String, Unit>()
+
+    private fun blockKey(world: String, x: Int, y: Int, z: Int) = "$world:$x:$y:$z"
+
+    /** 放置普通方块复制品时记录坐标 */
+    fun recordBlockLocation(world: String, x: Int, y: Int, z: Int) {
+        replicaBlockLocations[blockKey(world, x, y, z)] = Unit
+    }
+
+    /** 检查并移除坐标记录（挖掘时调用，命中=该掉落物应恢复标记） */
+    fun isRecordedBlock(world: String, x: Int, y: Int, z: Int): Boolean {
+        return replicaBlockLocations.remove(blockKey(world, x, y, z)) != null
+    }
 
     /**
      * ItemTag 禁止「二次更改」flag（仅打 ItemTag 实际支持的 flag）。
@@ -107,6 +126,7 @@ object Replica {
     fun mark(item: ItemStack): ItemStack = mark(item, 0)
 
     private fun mark(item: ItemStack, depth: Int): ItemStack {
+        if (item.type.isAir) return item
         val meta = item.itemMeta ?: return item
         applyReplicaMeta(meta)
 
