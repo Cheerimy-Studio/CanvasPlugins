@@ -1,10 +1,13 @@
 package luminus.acng.features.gameplay.duplications
 
 import luminus.acng.Main.config
+import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.block.Block
 import org.bukkit.block.BlockFace
 import org.bukkit.block.TileState
+import org.bukkit.entity.Item
+import org.bukkit.entity.ItemFrame
 import org.bukkit.event.block.Action
 import org.bukkit.event.block.BlockBurnEvent
 import org.bukkit.event.block.BlockCookEvent
@@ -16,10 +19,13 @@ import org.bukkit.event.block.BlockPistonRetractEvent
 import org.bukkit.event.block.BlockPlaceEvent
 import org.bukkit.event.block.LeavesDecayEvent
 import org.bukkit.event.entity.EntityExplodeEvent
+import org.bukkit.event.hanging.HangingBreakEvent
 import org.bukkit.event.inventory.FurnaceSmeltEvent
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.persistence.PersistentDataType
 import taboolib.common.platform.event.SubscribeEvent
+import taboolib.platform.BukkitPlugin
+import java.util.function.Consumer
 
 /**
  * 复制品方块持久化 + 产物继承 + 坐标同步监听器。
@@ -87,6 +93,36 @@ object ReplicaBlockListener {
         event.items.forEach { entity ->
             entity.itemStack = Replica.mark(entity.itemStack)
         }
+    }
+
+    /**
+     * 展示框/画等悬挂实体被破坏时，掉落物可能丢失 PDC（Paper 重建 ItemStack）。
+     * 如果展示框内物品是复制品，延迟 1 tick 给掉落物重新打标。
+     */
+    @SubscribeEvent
+    fun onHangingBreak(event: HangingBreakEvent) {
+        if (!enabled()) return
+        val entity = event.entity
+        if (entity !is ItemFrame) return
+        val item = entity.item
+        if (item.type.isAir || !Replica.isReplica(item)) return
+
+        // 记录位置和物品类型，延迟 1 tick 查找掉落物重新打标
+        val loc = entity.location.clone()
+        val itemType = item.type
+        Bukkit.getRegionScheduler().runDelayed(
+            BukkitPlugin.getInstance(),
+            loc,
+            Consumer<io.papermc.paper.threadedregions.scheduler.ScheduledTask> { _ ->
+                loc.getNearbyEntitiesByType(Item::class.java, 2.0).forEach { drop ->
+                    val stack = drop.itemStack
+                    if (stack.type == itemType && !Replica.isReplica(stack)) {
+                        drop.itemStack = Replica.mark(stack)
+                    }
+                }
+            },
+            1L
+        )
     }
 
     // ==================== 产物继承 ====================

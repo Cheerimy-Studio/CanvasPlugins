@@ -107,6 +107,12 @@ object ChickenDupe {
             val chicken = event.entity as Chicken
             if (!timers.containsKey(chicken.uniqueId) && chicken.loadItem() == null) return
 
+            // 掉落存储的物品（否则鸡死亡时潜影盒丢失）
+            val storedItem = chicken.loadItem()
+            if (storedItem != null) {
+                chicken.world.dropItemNaturally(chicken.location, storedItem)
+            }
+
             val chunk = chicken.chunk
             timers.remove(chicken.uniqueId)?.cancel()
             visualTimers.remove(chicken.uniqueId)?.cancel()
