@@ -82,7 +82,13 @@ object ReplicaBlockListener {
         }
     }
 
-    /** 方块掉落时恢复复制品标记（TileState PDC 命中 或 内存跟踪命中） */
+    /**
+     * 方块掉落时恢复复制品标记（TileState PDC 命中 或 内存跟踪命中）。
+     *
+     * 关键：只标记与方块同类型的掉落物（容器本体/方块物品本身），
+     * 跳过内容物（如箱子里的物品单独掉落时不应被标记）。
+     * 使用 markItemOnly 避免递归标记潜影盒/收纳袋内部物品。
+     */
     @SubscribeEvent
     fun onDrop(event: BlockDropItemEvent) {
         if (!enabled()) return
@@ -90,8 +96,12 @@ object ReplicaBlockListener {
         val replicated = Replica.isReplicaBlock(event.blockState) ||
             Replica.isRecordedBlock(block.world.name, block.x, block.y, block.z)
         if (!replicated) return
+        val blockType = block.type
         event.items.forEach { entity ->
-            entity.itemStack = Replica.mark(entity.itemStack)
+            // 只标记与方块同类型的掉落物（容器本体），不标记内容物
+            if (entity.itemStack.type == blockType) {
+                entity.itemStack = Replica.markItemOnly(entity.itemStack)
+            }
         }
     }
 
@@ -117,7 +127,7 @@ object ReplicaBlockListener {
                 loc.getNearbyEntitiesByType(Item::class.java, 2.0).forEach { drop ->
                     val stack = drop.itemStack
                     if (stack.type == itemType && !Replica.isReplica(stack)) {
-                        drop.itemStack = Replica.mark(stack)
+                        drop.itemStack = Replica.markItemOnly(stack)
                     }
                 }
             },

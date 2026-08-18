@@ -245,6 +245,19 @@ object Replica {
 
     // ==================== 打标 ====================
 
+    /**
+     * 标记物品本身为复制品，但**不递归**标记潜影盒/收纳袋内部物品。
+     * 用于方块掉落时「恢复标记」场景（onDrop / onHangingBreak），
+     * 避免把容器内原件误标为复制品。
+     */
+    fun markItemOnly(item: ItemStack): ItemStack {
+        if (item.type.isAir) return item
+        val meta = item.itemMeta ?: return item
+        applyReplicaMeta(meta)
+        item.itemMeta = meta
+        return item
+    }
+
     fun mark(item: ItemStack): ItemStack = mark(item, 0)
 
     private fun mark(item: ItemStack, depth: Int): ItemStack {
