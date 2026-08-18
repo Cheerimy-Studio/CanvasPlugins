@@ -40,7 +40,11 @@ import taboolib.common.platform.event.SubscribeEvent
  * 3. 坐标同步（活塞推动/方块销毁）：
  *    - 活塞推动/拉回（BlockPistonExtendEvent/RetractEvent）：迁移坐标跟踪
  *    - 爆炸（EntityExplodeEvent/BlockExplodeEvent）：清除被毁方块的跟踪
- *    - 燃烧/褪色/落叶（BlockBurnEvent/BlockFadeEvent/LeavesDecayEvent）：清除跟踪
+ *    - 燃烧（BlockBurnEvent）：清除跟踪
+ *    - 褪色（BlockFadeEvent）：消失（空气/水）清除跟踪；原地变形保持跟踪
+ *    - 落叶（LeavesDecayEvent）：清除跟踪
+ *    - 形成/生长/扩散（BlockFormEvent/BlockGrowEvent/BlockSpreadEvent）：
+ *      原地变形坐标不变，跟踪自动保持；新位置不继承，无需处理
  *
  * 独立于 mine-and-place 功能，只要 replica.enable=true 即生效。
  */
@@ -181,12 +185,27 @@ object ReplicaBlockListener {
         Replica.forgetBlockLocation(event.block.world.name, event.block.x, event.block.y, event.block.z)
     }
 
-    /** 褪色（草→泥土等）：清除跟踪（新方块非复制品） */
+    /**
+     * 褪色（草→泥土、菌丝→灰化土、冰→水、雪融化等）。
+     *
+     * 如果新方块消失（空气、水、岩浆），清除跟踪。
+     * 如果原地变形（farmland→dirt 等），坐标不变，跟踪保持，挖起掉落物仍带标记。
+     */
     @SubscribeEvent
     fun onFade(event: BlockFadeEvent) {
         if (!enabled() || event.isCancelled) return
-        Replica.forgetBlockLocation(event.block.world.name, event.block.x, event.block.y, event.block.z)
+        val newType = event.newState.type
+        if (newType.isAir || newType == Material.WATER || newType == Material.LAVA) {
+            Replica.forgetBlockLocation(event.block.world.name, event.block.x, event.block.y, event.block.z)
+        }
     }
+
+    /**
+     * 方块形成/生长/扩散：原地变形（混凝土硬化、作物生长）坐标不变，跟踪自动保持；
+     * 新位置形成（水结冰、草扩散）不继承标记，无需处理。
+     *
+     * 不注册为事件监听器（无 @SubscribeEvent），仅保留方法签名供文档引用。
+     */
 
     /** 落叶：清除跟踪 */
     @SubscribeEvent
