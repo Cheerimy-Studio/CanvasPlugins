@@ -34,8 +34,8 @@ import java.util.concurrent.ConcurrentHashMap
  * - 产物继承：熔炉/营火/烟熏器/高炉烧炼产物自动继承复制品标记（见 ReplicaBlockListener）
  * - 方块持久化：
  *   - TileState 方块（潜影盒/熔炉等）放置时写入 PDC，挖掘掉落物恢复标记（重启不丢）
- *   - 普通方块（钻石块/海绵等）放置时坐标写入内存 Set + 硬盘缓存
- *     replica-blocks.txt，挖掘掉落物恢复标记（重启后也从硬盘恢复）
+ *   - 普通方块（钻石块/海绵等）放置时坐标写入内存 + 分世界分区块硬盘缓存
+ *     （data/replica-blocks/<world>/<cx>.<cz>.txt），挖掘恢复标记（重启不丢）
  *
  * ItemTag flag 由 ItemTag 插件的监听器拦截，2B2TCore 不重复实现拦截逻辑。
  */
@@ -45,31 +45,50 @@ object Replica {
     const val ORIGINAL_PERMISSION = "2b2tcore.dupe.original"
     private const val MAX_NESTING = 5
 
-    // ==================== 普通方块位置记录（内存 Set + 硬盘缓存） ====================
+    // ==================== 普通方块位置记录（内存 Set + 分世界分区块硬盘缓存） ====================
 
-    /** 普通方块（无 TileState）复制品位置记录：内存权威 + 硬盘缓存（重启不丢） */
-    private val replicaBlockLocations = ConcurrentHashMap.newKeySet<String>()
+    /** 区块键：world + 区块坐标（区分区块，便于按区块落盘） */
+    private data class ChunkKey(val world: String, val cx: Int, val cz: Int)
 
-    /** 硬盘缓存文件：plugins/2B2TCore/replica-blocks.txt（每行一个坐标，轻量） */
-    private val locationsFile: File by lazy {
-        File(BukkitPlugin.getInstance().dataFolder, "replica-blocks.txt")
+    /** 内存权威：区块 -> 该区块内复制品普通方块坐标集（"x:y:z"） */
+    private val replicaBlockLocations = ConcurrentHashMap<ChunkKey, MutableSet<String>>()
+
+    /** 脏区块：有未落盘变更的区块（debounce 后按区块增量写盘） */
+    private val dirtyChunks = ConcurrentHashMap.newKeySet<ChunkKey>()
+
+    /** 数据目录：plugins/2B2TCore/data/replica-blocks/<world>/<cx>.<cz>.txt */
+    private val dataDir: File by lazy {
+        File(BukkitPlugin.getInstance().dataFolder, "data/replica-blocks")
     }
-
-    /** 是否有未落盘的变更 */
-    @Volatile
-    private var locationsDirty = false
 
     /** debounce flush 任务（延迟 1 秒合并多次变更后写盘） */
     private var flushTask: ScheduledTask? = null
 
-    private fun blockKey(world: String, x: Int, y: Int, z: Int) = "$world:$x:$y:$z"
+    private fun chunkKeyOf(world: String, x: Int, z: Int) = ChunkKey(world, x shr 4, z shr 4)
 
-    /** 启动时加载硬盘缓存到内存 */
+    private fun coordKey(x: Int, y: Int, z: Int) = "$x:$y:$z"
+
+    private fun chunkFile(key: ChunkKey) = File(dataDir, "${key.world}/${key.cx}.${key.cz}.txt")
+
+    /** 启动时加载硬盘缓存到内存（遍历分世界分区块文件） */
     @Awake(LifeCycle.ENABLE)
     fun loadLocations() {
-        if (!locationsFile.exists()) return
+        if (!dataDir.exists()) return
         runCatching {
-            locationsFile.readLines().forEach { if (it.isNotBlank()) replicaBlockLocations.add(it) }
+            dataDir.listFiles()?.forEach { worldDir ->
+                if (!worldDir.isDirectory) return@forEach
+                val world = worldDir.name
+                worldDir.listFiles()?.forEach { file ->
+                    if (!file.isFile || !file.name.endsWith(".txt")) return@forEach
+                    val parts = file.nameWithoutExtension.split(".")
+                    if (parts.size != 2) return@forEach
+                    val cx = parts[0].toIntOrNull() ?: return@forEach
+                    val cz = parts[1].toIntOrNull() ?: return@forEach
+                    val key = ChunkKey(world, cx, cz)
+                    val set = replicaBlockLocations.getOrPut(key) { ConcurrentHashMap.newKeySet() }
+                    file.readLines().forEach { line -> if (line.isNotBlank()) set.add(line) }
+                }
+            }
         }
     }
 
@@ -77,38 +96,85 @@ object Replica {
     @Awake(LifeCycle.DISABLE)
     fun flushOnDisable() {
         flushTask?.cancel()
-        saveLocations()
+        saveDirtyChunks()
     }
 
-    /** 立即写盘（数据量小，全量重写） */
-    private fun saveLocations() {
-        if (!locationsDirty) return
-        locationsDirty = false
-        runCatching {
-            locationsFile.parentFile?.mkdirs()
-            locationsFile.writeText(replicaBlockLocations.joinToString("\n"))
+    /** 立即写盘（仅写脏区块，空区块删除文件） */
+    private fun saveDirtyChunks() {
+        if (dirtyChunks.isEmpty()) return
+        val dirty = dirtyChunks.toList()
+        dirtyChunks.clear()
+        dirty.forEach { key ->
+            val set = replicaBlockLocations[key]
+            val file = chunkFile(key)
+            runCatching {
+                if (set == null || set.isEmpty()) {
+                    file.delete()
+                } else {
+                    file.parentFile?.mkdirs()
+                    file.writeText(set.joinToString("\n"))
+                }
+            }
         }
     }
 
     /** 变更后延迟 1 秒写盘（合并高频变更，避免频繁 I/O） */
     private fun scheduleFlush() {
-        locationsDirty = true
         flushTask?.cancel()
         flushTask = Bukkit.getGlobalRegionScheduler().runDelayed(
-            BukkitPlugin.getInstance(), { _ -> saveLocations() }, 20L
+            BukkitPlugin.getInstance(), { _ -> saveDirtyChunks() }, 20L
         )
     }
 
     /** 放置普通方块复制品时记录坐标 */
     fun recordBlockLocation(world: String, x: Int, y: Int, z: Int) {
-        if (replicaBlockLocations.add(blockKey(world, x, y, z))) scheduleFlush()
+        val key = chunkKeyOf(world, x, z)
+        val set = replicaBlockLocations.getOrPut(key) { ConcurrentHashMap.newKeySet() }
+        if (set.add(coordKey(x, y, z))) {
+            dirtyChunks.add(key)
+            scheduleFlush()
+        }
     }
 
     /** 检查并移除坐标记录（挖掘时调用，命中=该掉落物应恢复标记，同时及时卸载） */
     fun isRecordedBlock(world: String, x: Int, y: Int, z: Int): Boolean {
-        val removed = replicaBlockLocations.remove(blockKey(world, x, y, z))
-        if (removed) scheduleFlush()
-        return removed
+        val key = chunkKeyOf(world, x, z)
+        val set = replicaBlockLocations[key] ?: return false
+        if (set.remove(coordKey(x, y, z))) {
+            if (set.isEmpty()) replicaBlockLocations.remove(key)
+            dirtyChunks.add(key)
+            scheduleFlush()
+            return true
+        }
+        return false
+    }
+
+    /** 清除坐标记录（非复制品放置/爆炸/燃烧/褪色时清理陈旧记录，防止误标） */
+    fun forgetBlockLocation(world: String, x: Int, y: Int, z: Int) {
+        val key = chunkKeyOf(world, x, z)
+        val set = replicaBlockLocations[key] ?: return
+        if (set.remove(coordKey(x, y, z))) {
+            if (set.isEmpty()) replicaBlockLocations.remove(key)
+            dirtyChunks.add(key)
+            scheduleFlush()
+        }
+    }
+
+    /**
+     * 原子迁移坐标（活塞推动/重力方块落地时调用）：移除旧坐标 + 记录新坐标，
+     * 只触发一次 debounce flush。旧坐标无记录时静默忽略。
+     */
+    fun moveBlockLocation(world: String, fx: Int, fy: Int, fz: Int, tx: Int, ty: Int, tz: Int) {
+        val fromKey = chunkKeyOf(world, fx, fz)
+        val fromSet = replicaBlockLocations[fromKey] ?: return
+        if (fromSet.remove(coordKey(fx, fy, fz))) {
+            dirtyChunks.add(fromKey)
+            if (fromSet.isEmpty()) replicaBlockLocations.remove(fromKey)
+            val toKey = chunkKeyOf(world, tx, tz)
+            val toSet = replicaBlockLocations.getOrPut(toKey) { ConcurrentHashMap.newKeySet() }
+            if (toSet.add(coordKey(tx, ty, tz))) dirtyChunks.add(toKey)
+            scheduleFlush()
+        }
     }
 
     /**

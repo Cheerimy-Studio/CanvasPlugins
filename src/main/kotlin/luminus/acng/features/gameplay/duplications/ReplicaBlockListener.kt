@@ -2,59 +2,77 @@ package luminus.acng.features.gameplay.duplications
 
 import luminus.acng.Main.config
 import org.bukkit.Material
+import org.bukkit.block.Block
+import org.bukkit.block.BlockFace
 import org.bukkit.block.TileState
-import org.bukkit.event.EventHandler
-import org.bukkit.event.Listener
 import org.bukkit.event.block.Action
+import org.bukkit.event.block.BlockBurnEvent
 import org.bukkit.event.block.BlockCookEvent
 import org.bukkit.event.block.BlockDropItemEvent
+import org.bukkit.event.block.BlockExplodeEvent
+import org.bukkit.event.block.BlockFadeEvent
+import org.bukkit.event.block.BlockPistonExtendEvent
+import org.bukkit.event.block.BlockPistonRetractEvent
 import org.bukkit.event.block.BlockPlaceEvent
+import org.bukkit.event.block.LeavesDecayEvent
+import org.bukkit.event.entity.EntityExplodeEvent
 import org.bukkit.event.inventory.FurnaceSmeltEvent
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.persistence.PersistentDataType
 import taboolib.common.platform.event.SubscribeEvent
 
 /**
- * 复制品方块持久化 + 产物继承监听器。
+ * 复制品方块持久化 + 产物继承 + 坐标同步监听器。
  *
  * 1. 方块持久化（BlockPlaceEvent + BlockDropItemEvent）：
  *    - TileState 方块（潜影盒/熔炉/木桶等）：放置时 PDC 写入方块（随区块持久化，重启不丢），
  *      掉落时恢复标记
- *    - 普通方块（钻石块/海绵/书架等无 TileState）：放置时坐标写入内存 Map，
- *      掉落时查 Map 命中则恢复标记。⚠️ 重启后 Map 清空，重启前放置的普通方块挖起变原版
+ *    - 普通方块（钻石块/海绵/书架等无 TileState）：放置时坐标写入内存 + 硬盘缓存
+ *      （分世界分区块，重启不丢），掉落时恢复标记
+ *    - 非复制品放置时自动清理同位置的陈旧记录（防止爆炸/燃烧等残留导致误标）
  *
  * 2. 产物继承：
  *    - 熔炉/烟熏器/高炉烧炼（FurnaceSmeltEvent）：源材料是复制品 → 产物继承标记
  *    - 营火烹饪（BlockCookEvent）：同上
  *    - 工具改变方块（PlayerInteractEvent：锄头/铲子/斧头等）：工具是复制品 →
- *      改变后的方块坐标写入内存 Map，挖起掉落物继承标记
+ *      改变后的方块坐标写入跟踪，挖起掉落物继承标记
+ *
+ * 3. 坐标同步（活塞推动/方块销毁）：
+ *    - 活塞推动/拉回（BlockPistonExtendEvent/RetractEvent）：迁移坐标跟踪
+ *    - 爆炸（EntityExplodeEvent/BlockExplodeEvent）：清除被毁方块的跟踪
+ *    - 燃烧/褪色/落叶（BlockBurnEvent/BlockFadeEvent/LeavesDecayEvent）：清除跟踪
  *
  * 独立于 mine-and-place 功能，只要 replica.enable=true 即生效。
  */
-object ReplicaBlockListener : Listener {
+object ReplicaBlockListener {
 
     private fun enabled(): Boolean = config.getBoolean("duplication.replica.enable", true)
 
-    /** 放置复制品时写入方块 PDC（TileState）或内存 Map（普通方块） */
+    // ==================== 方块持久化 ====================
+
+    /** 放置复制品时写入方块 PDC（TileState）或内存+硬盘缓存（普通方块）；
+     *  放置非复制品时清理同位置陈旧记录 */
     @SubscribeEvent
     fun onPlace(event: BlockPlaceEvent) {
         if (!enabled()) return
         val item = event.itemInHand
-        if (!Replica.isReplica(item)) return
-
         val block = event.blockPlaced
-        val state = block.state
-        if (state is TileState) {
-            // TileState 方块：PDC 写入方块，随区块数据持久化
-            state.persistentDataContainer.set(Replica.replicaKey, PersistentDataType.BYTE, 1.toByte())
-            state.update()
+
+        if (Replica.isReplica(item)) {
+            val state = block.state
+            if (state is TileState) {
+                state.persistentDataContainer.set(Replica.replicaKey, PersistentDataType.BYTE, 1.toByte())
+                state.update()
+            } else {
+                Replica.recordBlockLocation(block.world.name, block.x, block.y, block.z)
+            }
         } else {
-            // 普通方块：坐标写入内存 Map（无存储文件）
-            Replica.recordBlockLocation(block.world.name, block.x, block.y, block.z)
+            // 非复制品放置：清理同位置陈旧跟踪（爆炸/燃烧残留等）
+            Replica.forgetBlockLocation(block.world.name, block.x, block.y, block.z)
         }
     }
 
-    /** 方块掉落时恢复复制品标记（TileState PDC 命中 或 内存 Map 命中） */
+    /** 方块掉落时恢复复制品标记（TileState PDC 命中 或 内存跟踪命中） */
     @SubscribeEvent
     fun onDrop(event: BlockDropItemEvent) {
         if (!enabled()) return
@@ -67,7 +85,9 @@ object ReplicaBlockListener : Listener {
         }
     }
 
-    /** 熔炉/烟熏器/高炉烧炼产物继承：源材料是复制品 → 产物继承标记 */
+    // ==================== 产物继承 ====================
+
+    /** 熔炉/烟熏器/高炉烧炼产物继承 */
     @SubscribeEvent
     fun onSmelt(event: FurnaceSmeltEvent) {
         if (!enabled()) return
@@ -77,7 +97,7 @@ object ReplicaBlockListener : Listener {
         }
     }
 
-    /** 营火烹饪产物继承：源食物是复制品 → 产物继承标记 */
+    /** 营火烹饪产物继承 */
     @SubscribeEvent
     fun onCook(event: BlockCookEvent) {
         if (!enabled()) return
@@ -89,12 +109,12 @@ object ReplicaBlockListener : Listener {
 
     /**
      * 工具改变方块继承：锄头/铲子/斧头等复制品工具右键改变方块时，
-     * 把目标方块坐标写入内存 Map，挖起掉落物继承标记。
+     * 把目标方块坐标写入跟踪，挖起掉落物继承标记。
      *
-     * 覆盖：锄头（草/土→耕地、砂土→泥土）、铲子（草→草径、泥土→草径）、
-     * 斧头（去皮原木/去皮木头、铜块去氧化）等。
+     * 覆盖：锄头（草/土→耕地、砂土→泥土）、铲子（草→草径）、
+     * 斧头（原木/木头→去皮）等。
      */
-    @EventHandler
+    @SubscribeEvent
     fun onToolUse(event: PlayerInteractEvent) {
         if (!enabled()) return
         if (event.action != Action.RIGHT_CLICK_BLOCK) return
@@ -103,11 +123,79 @@ object ReplicaBlockListener : Listener {
         if (!Replica.isReplica(tool)) return
 
         val clicked = event.clickedBlock ?: return
-        // 只有「工具 × 目标方块」组合真正改变地形时才记录，避免误标普通方块
         if (!isModifiableBy(tool.type, clicked.type)) return
 
         Replica.recordBlockLocation(clicked.world.name, clicked.x, clicked.y, clicked.z)
     }
+
+    // ==================== 坐标同步 ====================
+
+    /** 活塞推动：迁移所有被推方块的坐标跟踪 */
+    @SubscribeEvent
+    fun onPistonExtend(event: BlockPistonExtendEvent) {
+        if (!enabled() || event.isCancelled) return
+        handlePistonMove(event.blocks, event.direction)
+    }
+
+    /** 活塞拉回：迁移所有被拉方块的坐标跟踪 */
+    @SubscribeEvent
+    fun onPistonRetract(event: BlockPistonRetractEvent) {
+        if (!enabled() || event.isCancelled) return
+        handlePistonMove(event.blocks, event.direction)
+    }
+
+    private fun handlePistonMove(blocks: List<Block>, direction: BlockFace) {
+        blocks.forEach { block ->
+            val target = block.getRelative(direction)
+            Replica.moveBlockLocation(
+                block.world.name, block.x, block.y, block.z,
+                target.x, target.y, target.z
+            )
+        }
+    }
+
+    /** 爆炸（TNT/苦力怕等）：清除被毁方块的跟踪 */
+    @SubscribeEvent
+    fun onEntityExplode(event: EntityExplodeEvent) {
+        if (!enabled() || event.isCancelled) return
+        cleanupBlocks(event.blockList())
+    }
+
+    /** 方块爆炸（床/重生锚）：清除被毁方块的跟踪 */
+    @SubscribeEvent
+    fun onBlockExplode(event: BlockExplodeEvent) {
+        if (!enabled() || event.isCancelled) return
+        cleanupBlocks(event.blockList())
+    }
+
+    private fun cleanupBlocks(blocks: List<Block>) {
+        blocks.forEach { block ->
+            Replica.forgetBlockLocation(block.world.name, block.x, block.y, block.z)
+        }
+    }
+
+    /** 燃烧：清除被毁方块的跟踪 */
+    @SubscribeEvent
+    fun onBurn(event: BlockBurnEvent) {
+        if (!enabled() || event.isCancelled) return
+        Replica.forgetBlockLocation(event.block.world.name, event.block.x, event.block.y, event.block.z)
+    }
+
+    /** 褪色（草→泥土等）：清除跟踪（新方块非复制品） */
+    @SubscribeEvent
+    fun onFade(event: BlockFadeEvent) {
+        if (!enabled() || event.isCancelled) return
+        Replica.forgetBlockLocation(event.block.world.name, event.block.x, event.block.y, event.block.z)
+    }
+
+    /** 落叶：清除跟踪 */
+    @SubscribeEvent
+    fun onDecay(event: LeavesDecayEvent) {
+        if (!enabled() || event.isCancelled) return
+        Replica.forgetBlockLocation(event.block.world.name, event.block.x, event.block.y, event.block.z)
+    }
+
+    // ==================== 工具判定 ====================
 
     /** 判断「工具 × 目标方块」组合是否会真正改变地形/方块类型 */
     private fun isModifiableBy(tool: Material, block: Material): Boolean {
