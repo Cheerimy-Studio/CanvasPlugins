@@ -65,6 +65,16 @@ teleport:
   enable: true      # 总开关
   durability: 10    # 传送石本体耐久（每次复制复制品 -1）
 
+# ===================== 起源石道具 =====================
+# 合成：草方块 + 灰化土 + 菌丝体 + 泥土 + 砂土 + 缠根泥土 + 诡异菌岩 + 绯红菌岩 + 传送核心
+# 土方块不可为复制品，传送核心允许复制品；以紫菘花为原型
+# 本体：随机唯一 ID + 耐久（默认 100），无复制品称号
+# 使用本体（右键）：降低耐久 1；展示框复制：本体耐久 -1，掉落复制品
+# 复制品继承 ID、带复制品称号，不可二次复制，单次使用，右键传送到持有本体玩家处
+origin-stone:
+  enable: true      # 总开关
+  durability: 100   # 起源石本体耐久（每次使用/复制 -1）
+
 # ===================== 自杀命令 =====================
 # 启用后玩家可使用 /suicide（别名 /514）自杀（权限：2b2tcore.suicide）
 suicide-enable: true
@@ -111,6 +121,15 @@ messages:
   no-item: "&c你必须手持一个物品才能复制！"
   deny-redupe: "&c复制品无法再次复制！"
   suicide: "&7你已自杀。"
+  # 起源石
+  origin-stone.used: "&d起源石耐久: &e%1%/100"
+  origin-stone.depleted: "&c起源石耐久已耗尽！"
+  origin-stone.teleported: "&a已传送到起源石持有者身边！"
+  origin-stone.no-holder: "&c未找到持有本体的在线玩家！"
+  # 传送石
+  teleport.no-holder: "&c未找到持有传送石本体的在线玩家！"
+  teleport.used: "&a已传送到传送石持有者身边！"
+  teleport.depleted: "&c传送石耐久已耗尽！"
   # /help 命令输出格式（支持 %placeholder% 占位符）
   # 含功能占位符的行在该功能未启用时整行不输出
   # 可用功能占位符：%suicide% %dupe-cmd% %item-frame% %chicken% %donkey% %mine-place% %chat-color% %stat% %nether-roof%

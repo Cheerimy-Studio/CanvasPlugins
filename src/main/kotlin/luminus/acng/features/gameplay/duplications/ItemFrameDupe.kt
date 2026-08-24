@@ -1,6 +1,7 @@
 package luminus.acng.features.gameplay.duplications
 
 import luminus.acng.Main.config
+import luminus.acng.features.gameplay.teleport.OriginStone
 import luminus.acng.features.gameplay.teleport.TeleportStone
 import luminus.acng.msg
 import org.bukkit.entity.ItemFrame
@@ -12,6 +13,10 @@ import java.util.concurrent.ThreadLocalRandom
  * 物品展示框复制：旋转展示框时有概率掉落其内物品（权限：2b2tcore.dupe.item-frame）
  *
  * 传送石特殊规则（唯一允许复制传送石的方式）：
+ * - 本体：掉落继承 ID 的复制品，本体耐久 -1；耐久耗尽无法复制
+ * - 复制品：不可二次复制
+ *
+ * 起源石特殊规则（与传送石相同）：
  * - 本体：掉落继承 ID 的复制品，本体耐久 -1；耐久耗尽无法复制
  * - 复制品：不可二次复制
  */
@@ -45,6 +50,25 @@ object ItemFrameDupe {
                 entity.world.dropItem(entity.location, TeleportStone.makeReplica(item))
                 // 本体耐久 -1，写回展示框
                 if (TeleportStone.decreaseDurability(item)) {
+                    entity.setItem(item)
+                }
+            }
+            return
+        }
+
+        // 起源石特殊处理（与传送石相同逻辑）
+        if (OriginStone.isStone(item)) {
+            if (OriginStone.isReplicaItem(item)) {
+                Replica.deny(event.player)
+                return
+            }
+            if (OriginStone.getDurability(item) <= 0) {
+                event.player.msg("&c起源石耐久已耗尽，无法复制！")
+                return
+            }
+            if (ThreadLocalRandom.current().nextInt(100) < config.getInt("duplication.item-frame.possibility", 1)) {
+                entity.world.dropItem(entity.location, OriginStone.makeReplica(item))
+                if (OriginStone.decreaseDurability(item)) {
                     entity.setItem(item)
                 }
             }
