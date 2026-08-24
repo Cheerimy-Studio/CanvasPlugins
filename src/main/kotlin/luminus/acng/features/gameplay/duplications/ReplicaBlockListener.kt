@@ -6,8 +6,11 @@ import org.bukkit.Material
 import org.bukkit.block.Block
 import org.bukkit.block.BlockFace
 import org.bukkit.block.TileState
+import org.bukkit.entity.EntityType
+import org.bukkit.entity.FallingBlock
 import org.bukkit.entity.Item
 import org.bukkit.entity.ItemFrame
+import org.bukkit.entity.Player
 import org.bukkit.event.block.Action
 import org.bukkit.event.block.BlockBurnEvent
 import org.bukkit.event.block.BlockCookEvent
@@ -18,13 +21,16 @@ import org.bukkit.event.block.BlockPistonExtendEvent
 import org.bukkit.event.block.BlockPistonRetractEvent
 import org.bukkit.event.block.BlockPlaceEvent
 import org.bukkit.event.block.LeavesDecayEvent
+import org.bukkit.event.entity.EntityChangeBlockEvent
 import org.bukkit.event.entity.EntityExplodeEvent
 import org.bukkit.event.hanging.HangingBreakEvent
+import org.bukkit.event.inventory.CraftItemEvent
 import org.bukkit.event.inventory.FurnaceSmeltEvent
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.persistence.PersistentDataType
 import taboolib.common.platform.event.SubscribeEvent
 import taboolib.platform.BukkitPlugin
+import java.util.UUID
 import java.util.function.Consumer
 
 /**
@@ -96,9 +102,9 @@ object ReplicaBlockListener {
         val replicated = Replica.isReplicaBlock(event.blockState) ||
             Replica.isRecordedBlock(block.world.name, block.x, block.y, block.z)
         if (!replicated) return
-        val blockType = block.type
+        // 方块被挖后 block.type 变为 AIR，必须用 blockState.type
+        val blockType = event.blockState.type
         event.items.forEach { entity ->
-            // 只标记与方块同类型的掉落物（容器本体），不标记内容物
             if (entity.itemStack.type == blockType) {
                 entity.itemStack = Replica.markItemOnly(entity.itemStack)
             }
@@ -258,6 +264,76 @@ object ReplicaBlockListener {
     fun onDecay(event: LeavesDecayEvent) {
         if (!enabled() || event.isCancelled) return
         Replica.forgetBlockLocation(event.block.world.name, event.block.x, event.block.y, event.block.z)
+    }
+
+    // ==================== 重力方块跟踪（龙蛋/沙子/沙砾等） ====================
+
+    /** 正在下落的复制品方块：entity UUID → 原始坐标世界名 */
+    private val fallingBlocks = java.util.concurrent.ConcurrentHashMap<UUID, String>()
+
+    /**
+     * 重力方块开始下落时：从内存跟踪中取出坐标，暂存到 fallingBlocks。
+     * 落地时记录新坐标；摔碎时延迟 1 tick 给掉落物打标。
+     */
+    @SubscribeEvent
+    fun onFallingBlockChange(event: EntityChangeBlockEvent) {
+        if (!enabled()) return
+        val entity = event.entity
+        if (entity !is FallingBlock) return
+
+        val tracked = fallingBlocks.remove(entity.uniqueId)
+        if (tracked != null) {
+            // 第二次触发：落地或摔碎
+            val block = event.block
+            if (event.to.isAir) {
+                // 摔碎 → 延迟 1 tick 给掉落物打标
+                val loc = block.location.clone()
+                Bukkit.getRegionScheduler().runDelayed(
+                    BukkitPlugin.getInstance(),
+                    loc,
+                    Consumer<io.papermc.paper.threadedregions.scheduler.ScheduledTask> { _ ->
+                        loc.getNearbyEntitiesByType(Item::class.java, 2.0).forEach { drop ->
+                            if (!Replica.isReplica(drop.itemStack)) {
+                                drop.itemStack = Replica.markItemOnly(drop.itemStack)
+                            }
+                        }
+                    },
+                    1L
+                )
+            } else {
+                // 落地变成方块 → 记录新坐标
+                Replica.recordBlockLocation(block.world.name, block.x, block.y, block.z)
+            }
+        } else {
+            // 第一次触发：方块开始下落
+            val block = event.block
+            if (Replica.isRecordedBlock(block.world.name, block.x, block.y, block.z)) {
+                fallingBlocks[entity.uniqueId] = block.world.name
+            }
+        }
+    }
+
+    // ==================== 合成继承 ====================
+
+    /**
+     * 合成产物继承：合成台/工作台中只要有任一原料是复制品，产物自动继承复制品标记。
+     * 配置项 duplication.replica.craft-inherit（默认 true）。
+     */
+    @SubscribeEvent
+    fun onCraft(event: CraftItemEvent) {
+        if (!enabled()) return
+        if (!config.getBoolean("duplication.replica.craft-inherit", true)) return
+        val player = event.whoClicked as? Player ?: return
+        if (player.hasPermission(Replica.ORIGINAL_PERMISSION)) return
+
+        val matrix = event.inventory.matrix ?: return
+        val hasReplica = matrix.any { it != null && !it.type.isAir && Replica.isReplica(it) }
+        if (!hasReplica) return
+
+        val result = event.inventory.result ?: return
+        if (!Replica.isReplica(result)) {
+            event.inventory.result = Replica.markItemOnly(result.clone())
+        }
     }
 
     // ==================== 工具判定 ====================

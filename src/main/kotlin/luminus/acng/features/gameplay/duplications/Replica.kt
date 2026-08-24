@@ -187,7 +187,7 @@ object Replica {
         "tradeable",        // 不可与村民交易
         "smithing_table",   // 不可在锻造台使用
         "renamable",        // 不可在铁砧上重命名
-        "craft_ingredient", // 不可用于合成
+        // "craft_ingredient" 已移除：合成走 ReplicaBlockListener.onCraft 继承
         "grindable",        // 不可在磨石上分解
         "enchantable",      // 不可在附魔台上附魔
     )
