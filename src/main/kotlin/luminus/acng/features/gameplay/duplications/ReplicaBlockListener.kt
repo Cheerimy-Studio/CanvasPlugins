@@ -6,7 +6,6 @@ import org.bukkit.Material
 import org.bukkit.block.Block
 import org.bukkit.block.BlockFace
 import org.bukkit.block.TileState
-import org.bukkit.entity.EntityType
 import org.bukkit.entity.FallingBlock
 import org.bukkit.entity.Item
 import org.bukkit.entity.ItemFrame
@@ -268,8 +267,8 @@ object ReplicaBlockListener {
 
     // ==================== 重力方块跟踪（龙蛋/沙子/沙砾等） ====================
 
-    /** 正在下落的复制品方块：entity UUID → 原始坐标世界名 */
-    private val fallingBlocks = java.util.concurrent.ConcurrentHashMap<UUID, String>()
+    /** 正在下落的复制品方块 UUID 集合（值无需存储，只跟踪是否为复制品下落） */
+    private val fallingBlocks = java.util.concurrent.ConcurrentHashMap.newKeySet<UUID>()
 
     /**
      * 重力方块开始下落时：从内存跟踪中取出坐标，暂存到 fallingBlocks。
@@ -282,7 +281,7 @@ object ReplicaBlockListener {
         if (entity !is FallingBlock) return
 
         val tracked = fallingBlocks.remove(entity.uniqueId)
-        if (tracked != null) {
+        if (tracked) {
             // 第二次触发：落地或摔碎
             val block = event.block
             if (event.to.isAir) {
@@ -308,7 +307,7 @@ object ReplicaBlockListener {
             // 第一次触发：方块开始下落
             val block = event.block
             if (Replica.isRecordedBlock(block.world.name, block.x, block.y, block.z)) {
-                fallingBlocks[entity.uniqueId] = block.world.name
+                fallingBlocks.add(entity.uniqueId)
             }
         }
     }
