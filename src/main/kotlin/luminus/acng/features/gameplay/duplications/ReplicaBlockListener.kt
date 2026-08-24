@@ -93,19 +93,36 @@ object ReplicaBlockListener {
      * 关键：只标记与方块同类型的掉落物（容器本体/方块物品本身），
      * 跳过内容物（如箱子里的物品单独掉落时不应被标记）。
      * 使用 markItemOnly 避免递归标记潜影盒/收纳袋内部物品。
+     *
+     * 注意：Paper/Folia 的 blockState.type 在事件触发时可能已变为 AIR，
+     * 因此 type 匹配失败时仍对追踪命中（非 TileState）的掉落物全部打标，
+     * 避免坐标白白丢失。
      */
     @SubscribeEvent
     fun onDrop(event: BlockDropItemEvent) {
         if (!enabled()) return
         val block = event.block
-        val replicated = Replica.isReplicaBlock(event.blockState) ||
-            Replica.isRecordedBlock(block.world.name, block.x, block.y, block.z)
-        if (!replicated) return
-        // 方块被挖后 block.type 变为 AIR，必须用 blockState.type
-        val blockType = event.blockState.type
-        event.items.forEach { entity ->
-            if (entity.itemStack.type == blockType) {
-                entity.itemStack = Replica.markItemOnly(entity.itemStack)
+        val blockState = event.blockState
+        val replicaBlock = Replica.isReplicaBlock(blockState)
+        val recordedBlock = Replica.isRecordedBlock(block.world.name, block.x, block.y, block.z)
+        if (!replicaBlock && !recordedBlock) return
+
+        val blockType = blockState.type
+        if (blockType.isAir) {
+            // Paper/Folia 快照异常：blockState 已变 AIR，无法按类型过滤
+            // 对 TileState 命中的不做处理（TileState 类型不可能是 AIR）
+            // 对坐标跟踪命中的，标记全部掉落物（普通方块只有自身掉落物）
+            if (recordedBlock) {
+                event.items.forEach { entity ->
+                    entity.itemStack = Replica.markItemOnly(entity.itemStack)
+                }
+            }
+        } else {
+            // 正常路径：只标记与方块同类型的掉落物
+            event.items.forEach { entity ->
+                if (entity.itemStack.type == blockType) {
+                    entity.itemStack = Replica.markItemOnly(entity.itemStack)
+                }
             }
         }
     }
