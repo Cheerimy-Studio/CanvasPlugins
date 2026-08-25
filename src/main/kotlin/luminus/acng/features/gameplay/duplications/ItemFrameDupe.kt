@@ -3,6 +3,7 @@ package luminus.acng.features.gameplay.duplications
 import luminus.acng.Main.config
 import luminus.acng.features.gameplay.teleport.OriginStone
 import luminus.acng.features.gameplay.teleport.TeleportStone
+import luminus.acng.features.gameplay.teleport.WarpStone
 import luminus.acng.msg
 import org.bukkit.entity.ItemFrame
 import taboolib.common.platform.event.SubscribeEvent
@@ -69,6 +70,25 @@ object ItemFrameDupe {
             if (ThreadLocalRandom.current().nextInt(100) < config.getInt("duplication.item-frame.possibility", 1)) {
                 entity.world.dropItem(entity.location, OriginStone.makeReplica(item))
                 if (OriginStone.decreaseDurability(item)) {
+                    entity.setItem(item)
+                }
+            }
+            return
+        }
+
+        // 瞬移石特殊处理（与传送石相同逻辑）
+        if (WarpStone.isStone(item)) {
+            if (WarpStone.isReplicaItem(item)) {
+                Replica.deny(event.player)
+                return
+            }
+            if (WarpStone.getDurability(item) <= 0) {
+                event.player.msg("&c瞬移石耐久已耗尽，无法复制！")
+                return
+            }
+            if (ThreadLocalRandom.current().nextInt(100) < config.getInt("duplication.item-frame.possibility", 1)) {
+                entity.world.dropItem(entity.location, WarpStone.makeReplica(item))
+                if (WarpStone.decreaseDurability(item)) {
                     entity.setItem(item)
                 }
             }
