@@ -24,9 +24,7 @@ object OriginStoneListener : Listener {
                 item.amount -= 1
                 if (item.amount <= 0 && hand != null) player.inventory.setItem(hand, null)
                 val overworld = org.bukkit.Bukkit.getWorlds().first()
-                player.teleportAsync(overworld.spawnLocation.clone().apply {
-                    x = 0.5; y = 319.0; z = 0.5
-                }).thenAccept { success ->
+                player.teleportAsync(overworld.spawnLocation).thenAccept { success ->
                     if (success) player.msg("&a已传送至起源！")
                 }
                 event.isCancelled = true

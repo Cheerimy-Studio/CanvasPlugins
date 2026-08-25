@@ -130,7 +130,7 @@ chat-color:
       color: "&c"
     vip:
       permission: "2b2tcore.chatcolor.vip"
-      color: "&e"
+      color: "&a"
 
 # ===================== 消息文本 =====================
 # 支持旧版 & 颜色代码
