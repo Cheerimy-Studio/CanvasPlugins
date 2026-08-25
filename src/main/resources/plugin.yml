@@ -1,0 +1,62 @@
+name: SuperVanish
+main: de.myzelyam.supervanish.SuperVanish
+author: MyzelYam
+description: Advanced /vanish plugin which makes other players think that you're not on the server
+version: ${project.version}
+api-version: '26.2'
+folia-supported: true
+website: https://www.spigotmc.org/resources/supervanish-be-invisible.1331/
+softdepend:
+- ProtocolLib
+- LibsDisguises
+- DisguiseCraft
+- dynmap
+- Essentials
+- TrailGUI
+- PlaceholderAPI
+- CustomParticleEffects
+- NametagEdit
+- MVdWPlaceholderAPI
+- Vault
+- OpenInv
+commands:
+  sv:
+    usage: /sv
+    description: SuperVanish's main command
+    aliases: [supervanish, v, vanish]
+permissions:
+  sv.*:
+    children:
+      sv.use: true
+      sv.see: true
+      sv.reload: true
+      sv.logout: true
+      sv.login: true
+      sv.others: true
+      sv.list: true
+      sv.keepfly: true
+      sv.toggleitems: true
+      sv.recreatefiles: true
+      sv.notoggle: true
+      sv.joinvanished: true
+      sv.notify: true
+      sv.breakblocks: true
+      sv.placeblocks: true
+      sv.damage: true
+      sv.stacktrace: true
+      sv.silentchest: true
+    description: Grants you all SuperVanish permissions
+  supervanish.*:
+    children:
+      sv.*: true
+    description: Grants you all SuperVanish permissions
+  sv.see:
+    description: You can see other vanished players
+  sv.notoggle:
+    description: Other players cannot hide/show you if you're online
+  sv.keepfly:
+    description: You can always keep flying when you reappear
+  sv.joinvanished:
+    description: You always join vanished (must be enabled in config)
+  sv.silentchest:
+    description: You can open chests silently
