@@ -90,6 +90,7 @@ object Main : Plugin() {
                 luminus.acng.features.gameplay.miscs.NetherRoofListener.register()
                 // reload 后确保传送石配方/监听器已注册
                 luminus.acng.features.gameplay.teleport.TeleportRecipes.register()
+                luminus.acng.features.gameplay.teleport.WarpStoneRecipes.register()
                 sender.msg("&e已重载配置文件")
             }
         }

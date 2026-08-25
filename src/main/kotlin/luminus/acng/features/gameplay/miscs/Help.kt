@@ -55,10 +55,7 @@ object Help {
             "%mine-place%" to minePlaceText(),
             "%chat-color%" to chatColorText(),
             "%stat%" to statText(),
-            "%nether-roof%" to netherRoofText(),
-            "%teleport%" to teleportText(),
-            "%origin-stone%" to originStoneText(),
-            "%warp-stone%" to warpStoneText()
+            "%nether-roof%" to netherRoofText()
         )
 
         // 如果行中包含任何未启用的功能占位符，整行不显示
@@ -148,24 +145,6 @@ object Help {
     private fun netherRoofText(): String {
         return if (config.getBoolean("nether-roof.enable", false)) {
             "&e地狱顶层限制 &7— 超过 128 层自动传送（权限：2b2tcore.runmax）"
-        } else ""
-    }
-
-    private fun teleportText(): String {
-        return if (config.getBoolean("teleport.enable", true)) {
-            "&e传送石 &7— 展示框复制，右键传送到持有者身边（/core give teleportstone）"
-        } else ""
-    }
-
-    private fun originStoneText(): String {
-        return if (config.getBoolean("origin-stone.enable", true)) {
-            "&e起源石 &7— 展示框复制，右键传送到 (0,319,0)（/core give originstone）"
-        } else ""
-    }
-
-    private fun warpStoneText(): String {
-        return if (config.getBoolean("warp-stone.enable", true)) {
-            "&e瞬移石 &7— 右键向视线方向传送 8888 格（/core give warpstone）"
         } else ""
     }
 
