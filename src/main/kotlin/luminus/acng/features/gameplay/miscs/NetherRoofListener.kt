@@ -41,7 +41,7 @@ object NetherRoofListener : Listener {
     private const val PERMISSION = "2b2tcore.runmax"
     private const val NETHER_WORLD_NAME = "world_nether"
     private const val CLEANUP_HEIGHT = 128.0
-    private const val FORCE_TELEPORT_HEIGHT = 256.0
+    private const val FORCE_TELEPORT_HEIGHT = 512.0
 
     private var registered = false
     private val messageCooldown = ConcurrentHashMap<UUID, Long>()
@@ -111,16 +111,37 @@ object NetherRoofListener : Listener {
         return world.environment == World.Environment.NETHER || world.name == NETHER_WORLD_NAME
     }
 
-    /** 传送到 Y <= 128 的最近安全坐标（低于基岩层） */
+    /** 传送到 Y <= 128 的最近安全坐标（低于基岩层），TP 后给予无敌 */
     private fun teleportToSafeBelow(player: Player, from: Location) {
         val world = from.world ?: return
         val safe = findSafeLocationBelow(world, from.blockX, from.blockZ)
+        val seconds = config.getInt("nether-roof.invulnerability-seconds", 10).coerceAtLeast(0)
         // Folia 安全：优先 teleportAsync
         try {
-            player.teleportAsync(safe)
+            player.teleportAsync(safe).thenAccept { success ->
+                if (success && seconds > 0) giveInvulnerability(player, seconds)
+            }
         } catch (_: NoSuchMethodError) {
             player.teleport(safe)
+            if (seconds > 0) giveInvulnerability(player, seconds)
         }
+    }
+
+    /** 给予无敌效果，到期后通过 RegionScheduler 取消（Folia 安全） */
+    private fun giveInvulnerability(player: Player, seconds: Int) {
+        player.isInvulnerable = true
+        player.msg("&a你已被传送到安全位置，无敌 ${seconds} 秒！")
+        Bukkit.getRegionScheduler().runDelayed(
+            BukkitPlugin.getInstance(),
+            player.location,
+            { _ ->
+                try {
+                    player.isInvulnerable = false
+                    player.msg("&7无敌效果已结束。")
+                } catch (_: Exception) { /* 玩家已离线 */ }
+            },
+            seconds * 20L
+        )
     }
 
     /** 在 (x,z) 处查找 Y <= 128 的最近安全落脚位置 */
