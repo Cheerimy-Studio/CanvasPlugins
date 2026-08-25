@@ -2,7 +2,11 @@ package luminus.acng
 
 import luminus.acng.features.gameplay.duplications.ChickenDupe
 import luminus.acng.features.gameplay.duplications.MineAndPlaceDupe
+import luminus.acng.features.gameplay.teleport.OriginStone
+import luminus.acng.features.gameplay.teleport.TeleportItems
 import luminus.acng.features.gameplay.teleport.TeleportStone
+import luminus.acng.features.gameplay.teleport.WarpStone
+import luminus.acng.features.gameplay.teleport.WarpStoneItems
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.command.CommandSender
@@ -100,14 +104,111 @@ object Main : Plugin() {
         }
 
         @CommandBody
-        val createtpstone = subCommand {
-            execute<Player> { sender, _, _ ->
-                val stone = TeleportStone.createBody()
-                val id = TeleportStone.getId(stone) ?: "未知"
-                sender.inventory.addItem(stone).forEach { (_, item) ->
-                    sender.world.dropItemNaturally(sender.location, item)
+        val give = subCommand {
+            // /core give teleportstone [数量]
+            literal("teleportstone") {
+                dynamic("amount") {
+                    suggestion<Player> { _, _ -> listOf("1", "2", "4", "8", "16", "32", "64") }
+                    execute<Player> { sender, ctx, _ ->
+                        val amount = (ctx.argument(-1).toIntOrNull() ?: 1).coerceIn(1, 64)
+                        val item = TeleportStone.createBody(); item.amount = amount
+                        sender.inventory.addItem(item).forEach { (_, v) -> sender.world.dropItemNaturally(sender.location, v) }
+                        sender.msg("&a已给予 ${amount} 个传送石")
+                    }
                 }
-                sender.msg("&a已生成传送石（ID: ${id.take(8)}）")
+                execute<Player> { sender, _, _ ->
+                    sender.inventory.addItem(TeleportStone.createBody())
+                    sender.msg("&a已给予 1 个传送石")
+                }
+            }
+            // /core give originstone [数量]
+            literal("originstone") {
+                dynamic("amount") {
+                    suggestion<Player> { _, _ -> listOf("1", "2", "4", "8", "16", "32", "64") }
+                    execute<Player> { sender, ctx, _ ->
+                        val amount = (ctx.argument(-1).toIntOrNull() ?: 1).coerceIn(1, 64)
+                        val item = OriginStone.createBody(); item.amount = amount
+                        sender.inventory.addItem(item).forEach { (_, v) -> sender.world.dropItemNaturally(sender.location, v) }
+                        sender.msg("&a已给予 ${amount} 个起源石")
+                    }
+                }
+                execute<Player> { sender, _, _ ->
+                    sender.inventory.addItem(OriginStone.createBody())
+                    sender.msg("&a已给予 1 个起源石")
+                }
+            }
+            // /core give warpstone [数量]
+            literal("warpstone") {
+                dynamic("amount") {
+                    suggestion<Player> { _, _ -> listOf("1", "2", "4", "8", "16", "32", "64") }
+                    execute<Player> { sender, ctx, _ ->
+                        val amount = (ctx.argument(-1).toIntOrNull() ?: 1).coerceIn(1, 64)
+                        val item = WarpStone.createBody(); item.amount = amount
+                        sender.inventory.addItem(item).forEach { (_, v) -> sender.world.dropItemNaturally(sender.location, v) }
+                        sender.msg("&a已给予 ${amount} 个瞬移石")
+                    }
+                }
+                execute<Player> { sender, _, _ ->
+                    sender.inventory.addItem(WarpStone.createBody())
+                    sender.msg("&a已给予 1 个瞬移石")
+                }
+            }
+            // /core give pearl [等级] [数量]（默认满级 1 个）
+            literal("pearl") {
+                dynamic("level") {
+                    suggestion<Player> { _, _ -> (1..WarpStoneItems.MAX_LEVEL).map { it.toString() } }
+                    dynamic("amount") {
+                        suggestion<Player> { _, _ -> listOf("1", "4", "8", "16", "64") }
+                        execute<Player> { sender, ctx, _ ->
+                            val level = (ctx.argument(-2).toIntOrNull() ?: WarpStoneItems.MAX_LEVEL).coerceIn(1, WarpStoneItems.MAX_LEVEL)
+                            val amount = (ctx.argument(-1).toIntOrNull() ?: 1).coerceIn(1, 64)
+                            val item = WarpStoneItems.createPearl(level); item.amount = amount
+                            sender.inventory.addItem(item).forEach { (_, v) -> sender.world.dropItemNaturally(sender.location, v) }
+                            sender.msg("&a已给予 ${amount} 个 ${WarpStoneItems.levelName(level).replace("§", "&")} 压缩珍珠")
+                        }
+                    }
+                    execute<Player> { sender, ctx, _ ->
+                        val level = (ctx.argument(-1).toIntOrNull() ?: WarpStoneItems.MAX_LEVEL).coerceIn(1, WarpStoneItems.MAX_LEVEL)
+                        sender.inventory.addItem(WarpStoneItems.createPearl(level))
+                        sender.msg("&a已给予 1 个 ${WarpStoneItems.levelName(level).replace("§", "&")} 压缩珍珠")
+                    }
+                }
+                execute<Player> { sender, _, _ ->
+                    sender.inventory.addItem(WarpStoneItems.createPearl(WarpStoneItems.MAX_LEVEL))
+                    sender.msg("&a已给予 1 个 &6满级 压缩珍珠")
+                }
+            }
+            // /core give shard [数量]
+            literal("shard") {
+                dynamic("amount") {
+                    suggestion<Player> { _, _ -> listOf("1", "4", "8", "16", "64") }
+                    execute<Player> { sender, ctx, _ ->
+                        val amount = (ctx.argument(-1).toIntOrNull() ?: 1).coerceIn(1, 64)
+                        val item = TeleportItems.createShard(); item.amount = amount
+                        sender.inventory.addItem(item).forEach { (_, v) -> sender.world.dropItemNaturally(sender.location, v) }
+                        sender.msg("&a已给予 ${amount} 个传送碎片")
+                    }
+                }
+                execute<Player> { sender, _, _ ->
+                    sender.inventory.addItem(TeleportItems.createShard())
+                    sender.msg("&a已给予 1 个传送碎片")
+                }
+            }
+            // /core give core [数量]
+            literal("core") {
+                dynamic("amount") {
+                    suggestion<Player> { _, _ -> listOf("1", "4", "8", "16", "64") }
+                    execute<Player> { sender, ctx, _ ->
+                        val amount = (ctx.argument(-1).toIntOrNull() ?: 1).coerceIn(1, 64)
+                        val item = TeleportItems.createCore(); item.amount = amount
+                        sender.inventory.addItem(item).forEach { (_, v) -> sender.world.dropItemNaturally(sender.location, v) }
+                        sender.msg("&a已给予 ${amount} 个传送核心")
+                    }
+                }
+                execute<Player> { sender, _, _ ->
+                    sender.inventory.addItem(TeleportItems.createCore())
+                    sender.msg("&a已给予 1 个传送核心")
+                }
             }
         }
     }

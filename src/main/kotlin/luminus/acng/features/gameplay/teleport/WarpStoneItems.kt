@@ -46,12 +46,14 @@ object WarpStoneItems {
         meta.setEnchantmentGlintOverride(true)
         meta.persistentDataContainer.set(PEARL_KEY, PersistentDataType.BYTE, 1)
         meta.persistentDataContainer.set(LEVEL_KEY, PersistentDataType.INTEGER, level)
+        // ItemTag flags: 禁止放置/使用（防止被当作末影珍珠扔出）
+        meta.persistentDataContainer.set(NamespacedKey("itemtag", "placeable"), PersistentDataType.INTEGER, 0)
+        meta.persistentDataContainer.set(NamespacedKey("itemtag", "usable"), PersistentDataType.INTEGER, 0)
         meta.lore = listOf(
             "${ChatColor.GRAY}等级: ${levelName(level)}",
             "${ChatColor.GRAY}用于合成瞬移石",
         )
         item.itemMeta = meta
-        // 打复制品标记（允许合成，不可二次复制）
         return Replica.mark(item)
     }
 
