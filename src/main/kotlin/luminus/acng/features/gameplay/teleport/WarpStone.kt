@@ -8,7 +8,6 @@ import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.NamespacedKey
-import org.bukkit.World
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import org.bukkit.persistence.PersistentDataType
@@ -113,35 +112,14 @@ object WarpStone {
 
     // ==================== 瞬移 ====================
 
-    /** 执行瞬移 + 附魔金苹果效果。Folia 安全。 */
+    /** 执行瞬移 + 附魔金苹果效果。Folia 安全。XZ 直线传送，Y 保持不变。 */
     fun executeWarp(player: Player) {
-        val dir = player.location.direction.clone().normalize()
-        val target = player.location.clone().add(dir.multiply(teleportDistance))
-
-        val world = player.world
-        val border = world.worldBorder
-        val center = border.center
-        val radius = border.size / 2.0
-        val dx = target.x - center.x
-        val dz = target.z - center.z
-        val dist = Math.sqrt(dx * dx + dz * dz)
-        if (dist > radius) {
-            val scale = radius / dist
-            target.x = center.x + dx * scale
-            target.z = center.z + dz * scale
-        }
-
-        // 下界天花板限制：取 nether-roof 配置值 - 1（避免触发 NetherRoofListener 踢出）
-        val env = world.environment
-        val maxY = if (env == World.Environment.NETHER) {
-            val roofCeiling = config.getInt("nether-roof.ceiling-y", 512).toDouble()
-            (roofCeiling - 1).coerceAtMost((world.maxHeight - 2).toDouble())
-        } else {
-            (world.maxHeight - 2).toDouble()
-        }
-        target.y = (world.getHighestBlockYAt(target).toDouble() + 1).coerceIn(
-            world.minHeight.toDouble(), maxY
-        )
+        val loc = player.location
+        val dir = loc.direction.clone().normalize()
+        dir.y = 0.0
+        dir.normalize()
+        val target = loc.clone().add(dir.multiply(teleportDistance))
+        target.y = loc.y
 
         setCooldown(player)
 
