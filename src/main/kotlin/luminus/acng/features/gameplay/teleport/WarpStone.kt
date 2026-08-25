@@ -131,10 +131,11 @@ object WarpStone {
             target.z = center.z + dz * scale
         }
 
-        // 下界天花板限制：Y 上限取 NetherRoofListener 的清理高度 - 1
+        // 下界天花板限制：取 nether-roof 配置值 - 1（避免触发 NetherRoofListener 踢出）
         val env = world.environment
         val maxY = if (env == World.Environment.NETHER) {
-            minOf((world.maxHeight - 2).toDouble(), 127.0)
+            val roofCeiling = config.getInt("nether-roof.ceiling-y", 512).toDouble()
+            (roofCeiling - 1).coerceAtMost((world.maxHeight - 2).toDouble())
         } else {
             (world.maxHeight - 2).toDouble()
         }
