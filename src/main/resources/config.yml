@@ -112,7 +112,6 @@ nether-roof:
   ceiling-y: 512
   # TP 后无敌时间（秒，0 则不给）
   invulnerability-seconds: 10
-  invulnerability-seconds: 10 # TP 后无敌时间（秒，0 则不给）
   # 禁止搭建提示冷却（秒，同一玩家间隔内最多提示一次）
   message-cooldown-seconds: 60
 

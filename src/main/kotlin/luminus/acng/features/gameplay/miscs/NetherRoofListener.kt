@@ -25,9 +25,9 @@ import java.util.concurrent.ConcurrentHashMap
  * 地狱顶层（Y >= 128）限制器。
  *
  * - 无权限 `2b2tcore.runmax` 的玩家在地狱 Y >= 128 时会被传送到 Y <= 128 的最近安全位置，
- *   并清理玩家所在区块 Y >= 128 的方块与非玩家实体（不产生掉落物）。
+ *   并清理玩家所在区块 Y >= 128 的方块与非玩家实体（不产生掉落物），TP 后给予无敌。
  * - 任何玩家（含 OP）在地狱 Y >= 128 放置方块会被直接取消（禁止在上层搭建）。
- * - 有权限的玩家在 Y >= 128 时若继续上升到 Y >= 256，会被自动传送到下方最近安全处（不清理方块）。
+ * - 有权限的玩家在 Y >= 512 时会被自动传送到下方最近安全处（不清理方块），TP 后给予无敌。
  *
  * 性能：cleanupAbove 有每玩家 5 秒冷却，避免 PlayerMoveEvent 频繁触发时重复清理。
  *
@@ -35,6 +35,7 @@ import java.util.concurrent.ConcurrentHashMap
  * - 方块/实体操作通过 RegionScheduler 调度到对应 chunk 所在区域执行；
  * - teleport 优先使用 teleportAsync；
  * - isChunkLoaded 检查在区域回调内进行，避免跨区域预检查。
+ * - 无敌取消通过 RegionScheduler.runDelayed 延迟执行。
  */
 object NetherRoofListener : Listener {
 
@@ -64,7 +65,7 @@ object NetherRoofListener : Listener {
         val y = to.y
 
         if (player.hasPermission(PERMISSION)) {
-            // 有权限：超过 256 强制传送到下方安全处
+            // 有权限：超过 512 强制传送到下方安全处
             if (y >= FORCE_TELEPORT_HEIGHT) {
                 teleportToSafeBelow(player, to)
             }
