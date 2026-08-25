@@ -18,7 +18,9 @@ repositories {
 }
 
 dependencies {
-    compileOnly("io.papermc.paper:paper-api:26.2.build.+")
+    // folia-api is a superset of paper-api; using folia-api gives us access to
+    // the GlobalRegionScheduler while keeping full Paper/Spigot API compatibility.
+    compileOnly("dev.folia:folia-api:26.2.build.1-beta")
 }
 
 def targetJavaVersion = 25

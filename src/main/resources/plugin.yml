@@ -2,6 +2,7 @@ name: StopSpam
 version: '${version}'
 main: com.jellypudding.stopSpam.StopSpam
 api-version: '26.2'
+folia-supported: true
 description: "Prevents chat spam by rate limiting messages with escalating timeouts"
 author: AlphaAlex115
 website: www.minecraftoffline.net

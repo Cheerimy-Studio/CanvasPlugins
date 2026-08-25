@@ -55,14 +55,37 @@ public final class StopSpam extends JavaPlugin {
 
     private void scheduleCleanupTasks() {
         long everyFourHours = 20L * 60 * 60 * 4;
-        getServer().getScheduler().runTaskTimer(this, () -> {
+        long everyMinute = 20L * 60;
+
+        Runnable cleanupExpired = () -> {
             spamDetector.cleanupExpiredData(System.currentTimeMillis());
             getLogger().info("Cleaned up expired timeouts and old violation records.");
-        }, everyFourHours, everyFourHours);
+        };
+        Runnable cleanupOld = () -> spamDetector.cleanupOldMessages(System.currentTimeMillis());
 
-        long everyMinute = 20L * 60;
-        getServer().getScheduler().runTaskTimer(this, () ->
-                spamDetector.cleanupOldMessages(System.currentTimeMillis()),
-                everyMinute, everyMinute);
+        if (isFolia()) {
+            // Folia / Canvas: use GlobalRegionScheduler
+            var globalScheduler = getServer().getGlobalRegionScheduler();
+            globalScheduler.runAtFixedRate(this, task -> cleanupExpired.run(), everyFourHours, everyFourHours);
+            globalScheduler.runAtFixedRate(this, task -> cleanupOld.run(), everyMinute, everyMinute);
+        } else {
+            // Standard Paper / Spigot: use legacy BukkitScheduler
+            getServer().getScheduler().runTaskTimer(this, cleanupExpired, everyFourHours, everyFourHours);
+            getServer().getScheduler().runTaskTimer(this, cleanupOld, everyMinute, everyMinute);
+        }
+    }
+
+    /**
+     * Detect Folia/Canvas at runtime. Canvas 26.2 includes Folia's GlobalRegionScheduler.
+     */
+    private static boolean isFolia() {
+        try {
+            // GlobalRegionScheduler exists only on Folia/Canvas; standard Paper has this method
+            // returning a different type. We check for the actual interface.
+            Class.forName("io.papermc.paper.threadedregions.scheduler.GlobalRegionScheduler");
+            return org.bukkit.Bukkit.getGlobalRegionScheduler() != null;
+        } catch (ClassNotFoundException | NoSuchMethodError e) {
+            return false;
+        }
     }
 }
