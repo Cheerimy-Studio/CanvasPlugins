@@ -17,42 +17,40 @@ object WarpStoneListener : Listener {
         if (!config.getBoolean("warp-stone.enable", true)) return
         if (event.action != Action.RIGHT_CLICK_AIR && event.action != Action.RIGHT_CLICK_BLOCK) return
         val item = event.item ?: return
+
+        // 必须是瞬移石才拦截
+        if (!WarpStone.isStone(item)) return
+
         val player = event.player
+
+        // 无条件取消
+        event.isCancelled = true
+        event.setUseItemInHand(Event.Result.DENY)
+
+        // 冷却检查（本体和复制品共享冷却）
+        if (WarpStone.isOnCooldown(player)) {
+            player.msg("&c冷却中，请等待 ${WarpStone.getRemainingCooldown(player)} 秒！")
+            return
+        }
 
         when {
             WarpStone.isReplicaItem(item) -> {
-                if (WarpStone.isOnCooldown(player)) {
-                    player.msg("&c冷却中，请等待 ${WarpStone.getRemainingCooldown(player)} 秒！")
-                    event.isCancelled = true
-                    event.setUseItemInHand(Event.Result.DENY)
-                    return
-                }
-                WarpStone.executeWarp(player)
+                // 复制品：消耗 + 瞬移
                 val hand = event.hand
                 item.amount -= 1
                 if (item.amount <= 0 && hand != null) player.inventory.setItem(hand, null)
+                WarpStone.executeWarp(player)
                 player.msg("&a瞬移成功！")
-                event.isCancelled = true
-                event.setUseItemInHand(Event.Result.DENY)
             }
             WarpStone.isBody(item) -> {
-                if (WarpStone.isOnCooldown(player)) {
-                    player.msg("&c冷却中，请等待 ${WarpStone.getRemainingCooldown(player)} 秒！")
-                    event.isCancelled = true
-                    event.setUseItemInHand(Event.Result.DENY)
-                    return
-                }
+                // 本体：检查耐久 + 消耗 + 瞬移
                 if (WarpStone.getDurability(item) <= 0) {
                     player.msg("&c瞬移石耐久已耗尽！")
-                    event.isCancelled = true
-                    event.setUseItemInHand(Event.Result.DENY)
                     return
                 }
-                WarpStone.executeWarp(player)
                 WarpStone.decreaseDurability(item)
+                WarpStone.executeWarp(player)
                 player.msg("&a瞬移成功！剩余耐久: ${WarpStone.getDurability(item)}")
-                event.isCancelled = true
-                event.setUseItemInHand(Event.Result.DENY)
             }
         }
     }
