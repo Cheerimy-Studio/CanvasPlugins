@@ -142,15 +142,13 @@ messages:
   # 起源石
   origin-stone.used: "&d起源石耐久: &e%1%/100"
   origin-stone.depleted: "&c起源石耐久已耗尽！"
-  origin-stone.teleported: "&a已传送到起源石持有者身边！"
-  origin-stone.no-holder: "&c未找到持有本体的在线玩家！"
   # 传送石
   teleport.no-holder: "&c未找到持有传送石本体的在线玩家！"
   teleport.used: "&a已传送到传送石持有者身边！"
   teleport.depleted: "&c传送石耐久已耗尽！"
   # /help 命令输出格式（支持 %placeholder% 占位符）
   # 含功能占位符的行在该功能未启用时整行不输出
-  # 可用功能占位符：%suicide% %dupe-cmd% %item-frame% %chicken% %donkey% %mine-place% %chat-color% %stat% %nether-roof%
+  # 可用功能占位符：%suicide% %dupe-cmd% %item-frame% %chicken% %donkey% %mine-place% %chat-color% %stat% %nether-roof% %teleport% %origin-stone% %warp-stone%
   help:
     lines:
       - "&e===== &62B2T &e====="
@@ -161,4 +159,9 @@ messages:
       - "%chicken%"
       - "%donkey%"
       - "%mine-place%"
+      - "%teleport%"
+      - "%origin-stone%"
+      - "%warp-stone%"
       - "%stat%"
+      - "%nether-roof%"
+      - "%chat-color%"

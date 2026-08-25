@@ -8,6 +8,7 @@ import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.NamespacedKey
+import org.bukkit.World
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import org.bukkit.persistence.PersistentDataType
@@ -130,8 +131,15 @@ object WarpStone {
             target.z = center.z + dz * scale
         }
 
+        // 下界天花板限制：Y 上限取 NetherRoofListener 的清理高度 - 1
+        val env = world.environment
+        val maxY = if (env == World.Environment.NETHER) {
+            minOf((world.maxHeight - 2).toDouble(), 127.0)
+        } else {
+            (world.maxHeight - 2).toDouble()
+        }
         target.y = (world.getHighestBlockYAt(target).toDouble() + 1).coerceIn(
-            world.minHeight.toDouble(), (world.maxHeight - 2).toDouble()
+            world.minHeight.toDouble(), maxY
         )
 
         setCooldown(player)

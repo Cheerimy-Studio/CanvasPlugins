@@ -48,6 +48,7 @@ object TeleportStone {
         val id = UUID.randomUUID().toString()
         meta.persistentDataContainer.set(ID_KEY, PersistentDataType.STRING, id)
         meta.persistentDataContainer.set(DURABILITY_KEY, PersistentDataType.INTEGER, maxDurability)
+        meta.isUnbreakable = true
         meta.lore = buildLore(id, maxDurability)
         item.itemMeta = meta
         return item
