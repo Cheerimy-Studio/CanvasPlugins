@@ -115,8 +115,9 @@ object WarpStone {
     /** 执行瞬移 + 附魔金苹果效果。Folia 安全。XZ 直线传送，Y 保持不变。 */
     fun executeWarp(player: Player) {
         val loc = player.location
-        val dir = loc.direction.clone().normalize()
+        val dir = loc.direction.clone()
         dir.y = 0.0
+        if (dir.lengthSquared() < 0.001) dir.x = 1.0 // 垂直看天/脚下时兜底随机方向
         dir.normalize()
         val target = loc.clone().add(dir.multiply(teleportDistance))
         target.y = loc.y
