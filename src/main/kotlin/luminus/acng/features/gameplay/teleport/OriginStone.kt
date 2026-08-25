@@ -10,7 +10,7 @@ import org.bukkit.inventory.ItemStack
 import org.bukkit.persistence.PersistentDataType
 import java.util.UUID
 
-/** 起源石核心逻辑。本体：紫菘花 + 耐久；复制品：单次传送到主世界 (0,319,0)。 */
+/** 起源石核心逻辑。本体：紫颂花 + 耐久；复制品：单次传送到主世界 (0,319,0)。 */
 object OriginStone {
 
     val ID_KEY = NamespacedKey("2b2tcore", "origin_stone_id")
@@ -21,7 +21,7 @@ object OriginStone {
     fun createBody(): ItemStack = createBody(UUID.randomUUID().toString())
 
     fun createBody(id: String): ItemStack {
-        val item = ItemStack(Material.ALLIUM)
+        val item = ItemStack(Material.CHORUS_FLOWER)
         val meta = item.itemMeta ?: return item
         meta.displayName(Component.text("起源石").color(NamedTextColor.DARK_PURPLE))
         meta.persistentDataContainer.set(ID_KEY, PersistentDataType.STRING, id)
@@ -36,7 +36,7 @@ object OriginStone {
 
     fun makeReplica(body: ItemStack): ItemStack {
         val id = getID(body) ?: return body
-        val item = ItemStack(Material.ALLIUM)
+        val item = ItemStack(Material.CHORUS_FLOWER)
         val meta = item.itemMeta ?: return item
         meta.displayName(Component.text("起源石").color(NamedTextColor.DARK_PURPLE))
         meta.persistentDataContainer.set(ID_KEY, PersistentDataType.STRING, id)
@@ -49,7 +49,7 @@ object OriginStone {
     }
 
     fun isStone(item: ItemStack?): Boolean {
-        if (item == null || item.type != Material.ALLIUM) return false
+        if (item == null || item.type != Material.CHORUS_FLOWER) return false
         return item.itemMeta?.persistentDataContainer?.has(ID_KEY, PersistentDataType.STRING) == true
     }
 
@@ -88,9 +88,6 @@ object OriginStone {
         return listOf(
             "&7ID: $shortId",
             "&7耐久: $durColor$durability&7/$maxDurability",
-            "",
-            "&5右键使用",
-            "&5展示框旋转复制",
         ).map { it.replace("&", "\u00A7") }
     }
 
@@ -98,9 +95,6 @@ object OriginStone {
         val shortId = if (id.length > 8) id.substring(0, 8) else id
         return listOf(
             "&7ID: $shortId",
-            "",
-            "&5右键传送至起源 (0, 319, 0)",
-            "&7（单次使用）",
         ).map { it.replace("&", "\u00A7") }
     }
 }

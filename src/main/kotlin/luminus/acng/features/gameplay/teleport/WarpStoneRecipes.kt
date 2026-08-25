@@ -90,19 +90,11 @@ object WarpStoneRecipes : Listener {
         val player = event.whoClicked as? Player ?: return
 
         when {
-            // 压缩珍珠：确保合成结果带复制品标记
-            WarpStoneItems.isPearl(result) -> {
-                if (!Replica.isReplica(result)) {
-                    inventory.result = Replica.markItemOnly(result)
-                }
-            }
-            // 瞬移石：传送核心允许复制品，其余材料（满级珍珠）本身是复制品也允许
-            // 合成成功后替换为带新随机 ID 的本体
+            // 压缩珍珠：确保合成结果带复制品标记（配方 result 模板已通过 Replica.mark 打标）
+            WarpStoneItems.isPearl(result) -> { /* 已由 Replica.mark 处理 */ }
+            // 瞬移石：合成成功后替换为带新随机 ID 的本体
             WarpStone.isStone(result) -> {
-                if (WarpStone.isReplicaItem(result)) {
-                    // 配方 result 是复制品模板，替换为新本体
-                    inventory.result = WarpStone.createBody()
-                }
+                inventory.result = WarpStone.createBody()
             }
         }
     }

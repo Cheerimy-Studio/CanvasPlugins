@@ -1,7 +1,9 @@
 package luminus.acng.features.gameplay.duplications
 
 import luminus.acng.Main.config
+import luminus.acng.features.gameplay.teleport.OriginStone
 import luminus.acng.features.gameplay.teleport.TeleportStone
+import luminus.acng.features.gameplay.teleport.WarpStone
 import luminus.acng.msg
 import io.papermc.paper.threadedregions.scheduler.ScheduledTask
 import org.bukkit.Bukkit
@@ -268,9 +270,9 @@ object ChickenDupe {
             val chicken = event.rightClicked as Chicken
             val item = player.inventory.itemInMainHand.clone()
             if (item.type.isAir) return
-            // 传送石只能通过展示框复制
-            if (TeleportStone.isStone(item)) {
-                player.msg("&c传送石只能通过展示框复制！")
+            // 传送石/起源石/瞬移石只能通过展示框复制
+            if (TeleportStone.isStone(item) || OriginStone.isStone(item) || WarpStone.isStone(item)) {
+                player.msg("&c该物品只能通过展示框复制！")
                 return
             }
             // 复制品不可被二次复制

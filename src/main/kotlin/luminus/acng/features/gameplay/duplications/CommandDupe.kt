@@ -1,7 +1,9 @@
 package luminus.acng.features.gameplay.duplications
 
 import luminus.acng.Main.config
+import luminus.acng.features.gameplay.teleport.OriginStone
 import luminus.acng.features.gameplay.teleport.TeleportStone
+import luminus.acng.features.gameplay.teleport.WarpStone
 import luminus.acng.msg
 import org.bukkit.entity.Player
 import taboolib.common.LifeCycle
@@ -31,9 +33,9 @@ object CommandDupe {
                 config.getString("messages.no-item", "You must hold an item to dupe!")?.let { sender.msg(it) }
                 return@simpleCommand
             }
-            // 传送石只能通过展示框复制
-            if (TeleportStone.isStone(item)) {
-                sender.msg("&c传送石只能通过展示框复制！")
+            // 传送石/起源石/瞬移石只能通过展示框复制
+            if (TeleportStone.isStone(item) || OriginStone.isStone(item) || WarpStone.isStone(item)) {
+                sender.msg("&c该物品只能通过展示框复制！")
                 return@simpleCommand
             }
             // 复制品不可被二次复制

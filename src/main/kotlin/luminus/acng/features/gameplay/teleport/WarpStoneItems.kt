@@ -50,8 +50,7 @@ object WarpStoneItems {
         meta.persistentDataContainer.set(NamespacedKey("itemtag", "placeable"), PersistentDataType.INTEGER, 0)
         meta.persistentDataContainer.set(NamespacedKey("itemtag", "usable"), PersistentDataType.INTEGER, 0)
         meta.lore = listOf(
-            "${ChatColor.GRAY}等级: ${levelName(level)}",
-            "${ChatColor.GRAY}用于合成瞬移石",
+            "${ChatColor.GRAY}等级: ${levelName(level)}"
         )
         item.itemMeta = meta
         return Replica.mark(item)

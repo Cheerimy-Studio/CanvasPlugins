@@ -39,8 +39,8 @@ object WarpStoneListener : Listener {
                 val hand = event.hand
                 item.amount -= 1
                 if (item.amount <= 0 && hand != null) player.inventory.setItem(hand, null)
-                WarpStone.executeWarp(player)
                 player.msg("&a瞬移成功！")
+                WarpStone.executeWarp(player)
             }
             WarpStone.isBody(item) -> {
                 // 本体：检查耐久 + 消耗 + 瞬移
@@ -49,8 +49,8 @@ object WarpStoneListener : Listener {
                     return
                 }
                 WarpStone.decreaseDurability(item)
-                WarpStone.executeWarp(player)
                 player.msg("&a瞬移成功！剩余耐久: ${WarpStone.getDurability(item)}")
+                WarpStone.executeWarp(player)
             }
         }
     }

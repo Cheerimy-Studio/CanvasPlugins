@@ -154,9 +154,7 @@ object WarpStone {
             "&7ID: $shortId",
             "&7耐久: $durColor$durability&7/$maxDurability",
             "",
-            "&b右键瞬移 ${teleportDistance.toInt()} 格",
-            "&b冷却 ${cooldownSeconds} 秒",
-            "&b展示框旋转复制",
+            "&b冷却: ${cooldownSeconds}秒",
         ).map { it.replace("&", "\u00A7") }
     }
 
@@ -164,8 +162,6 @@ object WarpStone {
         val shortId = if (id.length > 8) id.substring(0, 8) else id
         return listOf(
             "&7ID: $shortId",
-            "",
-            "&b右键瞬移（单次）",
         ).map { it.replace("&", "\u00A7") }
     }
 }

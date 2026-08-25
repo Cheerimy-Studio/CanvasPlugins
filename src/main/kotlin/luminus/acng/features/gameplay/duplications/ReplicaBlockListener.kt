@@ -2,6 +2,7 @@ package luminus.acng.features.gameplay.duplications
 
 import luminus.acng.Main.config
 import luminus.acng.features.gameplay.teleport.OriginStone
+import luminus.acng.features.gameplay.teleport.TeleportItems
 import luminus.acng.features.gameplay.teleport.TeleportStone
 import luminus.acng.features.gameplay.teleport.WarpStone
 import luminus.acng.features.gameplay.teleport.WarpStoneItems
@@ -351,8 +352,9 @@ object ReplicaBlockListener {
         if (!hasReplica) return
 
         val result = event.inventory.result ?: return
-        // 跳过特殊道具（传送石/起源石/瞬移石/压缩珍珠，由各自的合成处理器处理）
-        if (TeleportStone.isStone(result) || OriginStone.isStone(result) ||
+        // 跳过特殊道具（传送碎片/核心/传送石/起源石/瞬移石/压缩珍珠，由各自的合成处理器处理）
+        if (TeleportItems.isShard(result) || TeleportItems.isCore(result) ||
+            TeleportStone.isStone(result) || OriginStone.isStone(result) ||
             WarpStone.isStone(result) || WarpStoneItems.isPearl(result)) return
         if (!Replica.isReplica(result)) {
             event.inventory.result = Replica.markItemOnly(result.clone())

@@ -1,7 +1,9 @@
 package luminus.acng.features.gameplay.duplications
 
 import luminus.acng.Main.config
+import luminus.acng.features.gameplay.teleport.OriginStone
 import luminus.acng.features.gameplay.teleport.TeleportStone
+import luminus.acng.features.gameplay.teleport.WarpStone
 import org.bukkit.Bukkit
 import org.bukkit.entity.AbstractHorse
 import org.bukkit.entity.Boat
@@ -30,8 +32,9 @@ object DonkeyDupe {
             val entity = event.entity as AbstractHorse
             entity.inventory.contents.forEach { item ->
                 if (item != null && !item.type.isAir) {
-                    // 复制品（或内含复制品的容器）不可被二次复制；传送石只能展示框复制
-                    if (Replica.containsReplica(item) || TeleportStone.isStone(item)) return@forEach
+                    // 复制品（或内含复制品的容器）不可被二次复制；特殊石只能展示框复制
+                    if (Replica.containsReplica(item) || TeleportStone.isStone(item)
+                        || OriginStone.isStone(item) || WarpStone.isStone(item)) return@forEach
                     // 掉落物默认打上复制品词条；拥有 2b2tcore.dupe.original 权限的击杀者得到原版
                     entity.world.dropItemNaturally(entity.location, Replica.output(killer, item.clone()))
                 }
@@ -117,7 +120,8 @@ object DonkeyDupe {
             val cloned = Bukkit.createInventory(null, source.type, "Duplicated Inventory")
             source.contents
                 .withIndex()
-                .filter { (_, item) -> item != null && !Replica.containsReplica(item) && !TeleportStone.isStone(item) }
+                .filter { (_, item) -> item != null && !Replica.containsReplica(item)
+                    && !TeleportStone.isStone(item) && !OriginStone.isStone(item) && !WarpStone.isStone(item) }
                 .forEach { (slot, item) ->
                     // 复制品（或内含复制品的容器）不复制；传送石只能展示框复制；输出默认带复制品词条，原版权限玩家得原版
                     cloned.setItem(slot, Replica.output(duper, item!!.clone()))
