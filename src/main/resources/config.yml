@@ -83,7 +83,7 @@ origin-stone:
 # 冷却 10 秒，可展示框复制（每次消耗 1 耐久），复制品单次使用
 warp-stone:
   enable: true        # 总开关
-  durability: 100     # 瞬移石本体耐久（每次使用/复制 -1）
+  durability: 10       # 瞬移石本体耐久（每次使用/复制 -1）
   cooldown: 10        # 使用冷却（秒）
   distance: 8888      # 瞬移距离（格）
 

@@ -2,17 +2,13 @@ package luminus.acng.features.gameplay.teleport
 
 import luminus.acng.Main.config
 import luminus.acng.msg
+import org.bukkit.event.Event
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.block.Action
 import org.bukkit.event.player.PlayerInteractEvent
 
-/**
- * 起源石使用监听器。
- *
- * - 本体右键：降低耐久 1，显示剩余耐久；耐久耗尽后提示
- * - 复制品右键：消耗 1 个，传送到主世界 (0, 319, 0)
- */
+/** 起源石右键使用。本体消耗耐久；复制品消耗 + 传送至起源。 */
 object OriginStoneListener : Listener {
 
     @EventHandler
@@ -23,27 +19,30 @@ object OriginStoneListener : Listener {
         val player = event.player
 
         when {
-            // 复制品：消耗，传送到主世界 (0, 319, 0)
             OriginStone.isReplicaItem(item) -> {
-                if (OriginStone.consume(player)) {
-                    val hand = event.hand
-                    item.amount -= 1
-                    if (item.amount <= 0 && hand != null) {
-                        player.inventory.setItem(hand, null)
-                    }
-                    player.msg("&a已传送至起源！")
+                val hand = event.hand
+                item.amount -= 1
+                if (item.amount <= 0 && hand != null) player.inventory.setItem(hand, null)
+                player.teleportAsync(player.world.spawnLocation.clone().apply {
+                    x = 0.5; y = 319.0; z = 0.5
+                    world = org.bukkit.Bukkit.getWorld(world!!.name) ?: world
+                }).thenAccept { success ->
+                    if (success) player.msg("&a已传送至起源！")
                 }
                 event.isCancelled = true
+                event.setUseItemInHand(Event.Result.DENY)
             }
-            // 本体：降低耐久 1
             OriginStone.isBody(item) -> {
                 if (OriginStone.decreaseDurability(item)) {
-                    val dur = OriginStone.getDurability(player.inventory.itemInMainHand)
-                    if (dur <= 0) {
+                    val dur = OriginStone.getDurability(item)
+                    if (dur > 0) {
+                        player.msg("&d起源石耐久: &e$dur/${config.getInt("origin-stone.durability", 100)}")
+                    } else {
                         player.msg("&c起源石耐久已耗尽！")
                     }
                 }
                 event.isCancelled = true
+                event.setUseItemInHand(Event.Result.DENY)
             }
         }
     }
