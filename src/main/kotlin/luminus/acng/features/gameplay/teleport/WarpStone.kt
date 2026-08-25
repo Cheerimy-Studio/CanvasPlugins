@@ -18,13 +18,13 @@ import taboolib.platform.BukkitPlugin
 import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
 
-/** 瞬移石核心逻辑。本体：信标 + 耐久（默认 10）；复制品：单次瞬移 8888 格 + 附魔金苹果效果。 */
+/** 瞬移石核心逻辑。本体：信标 + 耐久（默认 20）；复制品：单次瞬移 8888 格 + 附魔金苹果效果。 */
 object WarpStone {
 
     val ID_KEY = NamespacedKey("2b2tcore", "warp_stone_id")
     val DURABILITY_KEY = NamespacedKey("2b2tcore", "warp_stone_dur")
 
-    private val maxDurability get() = config.getInt("warp-stone.durability", 10)
+    private val maxDurability get() = config.getInt("warp-stone.durability", 20)
     private val cooldownSeconds get() = config.getInt("warp-stone.cooldown", 10)
     private val teleportDistance get() = config.getDouble("warp-stone.distance", 8888.0)
 

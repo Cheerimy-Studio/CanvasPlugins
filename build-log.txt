@@ -19,23 +19,16 @@ Daemon will be stopped at the end of the build
 
 > Task :compileKotlin
 w: -Xjvm-default is deprecated. Use -jvm-default instead.
-w: file:///C:/Users/PC/Downloads/CopyPlugin/AnarchyCore-NextGen/src/main/kotlin/luminus/acng/Main.kt:11:8 'enum class ChatColor : Enum<ChatColor!>' is deprecated. Deprecated in Java.
-w: file:///C:/Users/PC/Downloads/CopyPlugin/AnarchyCore-NextGen/src/main/kotlin/luminus/acng/Main.kt:114:43 'fun argument(offset: Int): String' is deprecated. 设计过于傻逼,令人智熄.
-w: file:///C:/Users/PC/Downloads/CopyPlugin/AnarchyCore-NextGen/src/main/kotlin/luminus/acng/Main.kt:130:43 'fun argument(offset: Int): String' is deprecated. 设计过于傻逼,令人智熄.
-w: file:///C:/Users/PC/Downloads/CopyPlugin/AnarchyCore-NextGen/src/main/kotlin/luminus/acng/Main.kt:146:43 'fun argument(offset: Int): String' is deprecated. 设计过于傻逼,令人智熄.
-w: file:///C:/Users/PC/Downloads/CopyPlugin/AnarchyCore-NextGen/src/main/kotlin/luminus/acng/Main.kt:164:46 'fun argument(offset: Int): String' is deprecated. 设计过于傻逼,令人智熄.
-w: file:///C:/Users/PC/Downloads/CopyPlugin/AnarchyCore-NextGen/src/main/kotlin/luminus/acng/Main.kt:165:47 'fun argument(offset: Int): String' is deprecated. 设计过于傻逼,令人智熄.
-w: file:///C:/Users/PC/Downloads/CopyPlugin/AnarchyCore-NextGen/src/main/kotlin/luminus/acng/Main.kt:172:42 'fun argument(offset: Int): String' is deprecated. 设计过于傻逼,令人智熄.
-w: file:///C:/Users/PC/Downloads/CopyPlugin/AnarchyCore-NextGen/src/main/kotlin/luminus/acng/Main.kt:187:43 'fun argument(offset: Int): String' is deprecated. 设计过于傻逼,令人智熄.
-w: file:///C:/Users/PC/Downloads/CopyPlugin/AnarchyCore-NextGen/src/main/kotlin/luminus/acng/Main.kt:203:43 'fun argument(offset: Int): String' is deprecated. 设计过于傻逼,令人智熄.
-w: file:///C:/Users/PC/Downloads/CopyPlugin/AnarchyCore-NextGen/src/main/kotlin/luminus/acng/Main.kt:230:17 'enum class ChatColor : Enum<ChatColor!>' is deprecated. Deprecated in Java.
+w: file:///C:/Users/PC/Downloads/CopyPlugin/AnarchyCore-NextGen/src/main/kotlin/luminus/acng/features/gameplay/teleport/WarpStone.kt:44:14 'var lore: (Mutable)List<String!>?' is deprecated. Deprecated in Java.
+w: file:///C:/Users/PC/Downloads/CopyPlugin/AnarchyCore-NextGen/src/main/kotlin/luminus/acng/features/gameplay/teleport/WarpStone.kt:58:14 'var lore: (Mutable)List<String!>?' is deprecated. Deprecated in Java.
+w: file:///C:/Users/PC/Downloads/CopyPlugin/AnarchyCore-NextGen/src/main/kotlin/luminus/acng/features/gameplay/teleport/WarpStone.kt:88:14 'var lore: (Mutable)List<String!>?' is deprecated. Deprecated in Java.
 
 > Task :compileJava NO-SOURCE
 > Task :classes
 > Task :jar
 
 > Task :taboolibMainTask
-[taboolibMainTask] 69 classes, 21 resources | ASM: 583ms (20 threads), Write: 92ms, Total: 717ms
+[taboolibMainTask] 69 classes, 21 resources | ASM: 539ms (20 threads), Write: 106ms, Total: 692ms
 
 > Task :assemble
 > Task :compileTestKotlin NO-SOURCE
